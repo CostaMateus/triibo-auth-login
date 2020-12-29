@@ -189,6 +189,8 @@
                     <!-- Error message -->
                     <p id= "error-auth" class="bg-transp text-center text-danger pt-20 mb-0 d-none" ></p>
 
+                    <a id="haveCode" class="bg-transp float-right pointer d-none mt-20 mb-0" onclick="haveCode()" >Tenho código</a>
+
                 </p>
                 <button id="btn-form-auth" type="submit" class="woocommerce-Button button " >Próximo</button>
             </form>
@@ -210,7 +212,7 @@
                     <!-- Error message -->
                     <p id="error-valid" class="bg-transp text-center text-danger pt-20 mb-0 d-none" ></p>
 
-                    <a id="reenviar" class="bg-transp float-right mt-20 mb-0" onclick="myFunction()" >Reenviar código</a>
+                    <a id="resend" class="bg-transp float-right pointer mt-20 mb-0" onclick="resendCode()" >Reenviar código</a>
 
                 </p>
                 <button id="btn-form-validate" type="submit" class="woocommerce-Button button " >Entrar</button>
@@ -220,19 +222,23 @@
 
     <style>
 
-
         /* Helpers error */
-        .bg-transp   { background-color: transparent !important; }
-        .d-none      { display: none !important; }
+        .error-border { border-color: #D45757 !important; }
 
-        .text-center { text-align: center !important; }
-        .text-danger { color: #d45757 !important; font-weight: bold; }
+        .bg-transp    { background-color: transparent !important; }
+        .d-none       { display: none !important; }
+        .d-flex       { display: flex !important; }
 
-        .float-right { float: right !important; }
+        .text-center  { text-align: center !important; }
+        .text-danger  { color: #d45757 !important; font-weight: bold; }
 
-        .pt-20       { padding-top: 20px !important; }
-        .mt-20       { margin-top: 20px !important; }
-        .mb-0        { margin-bottom: 0 !important; }
+        .float-right  { float: right !important; }
+
+        .pt-20        { padding-top: 20px !important; }
+        .mt-20        { margin-top: 20px !important; }
+        .mb-0         { margin-bottom: 0 !important; }
+
+        .pointer      { cursor: pointer; }
 
         /* css comum entre, .bg-modal-load-next-page e .bg-modal-load-checkout */
         .bg-modal-login { top: 0; left: 0; width: 100vw; height: 100vh; display: flex; position: fixed; overflow: auto; z-index: 99999999; text-align: center; justify-content: space-between; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.7); }
@@ -256,10 +262,6 @@
             .bg-modal-login-child { max-width: 430px; }
         }
 
-        .error-border {
-            border-color: #D45757 !important;
-        }
-
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
@@ -279,11 +281,12 @@
             }
         });
 
-        let genericErrorText = "Ocorreu um erro, tente novamente.";
+        let genericError  = "Ocorreu um erro, tente novamente.";
 
         let code          = null;
         let cellphone     = null;
         let transactionId = null;
+        let codeSent      = false;
 
         let modal_auth    = document.getElementById( 'modal-form-auth'     );
         let modal_valid   = document.getElementById( 'modal-form-validate' );
@@ -295,9 +298,18 @@
         let error_auth    = document.getElementById( 'error-auth'  );
         let error_valid   = document.getElementById( 'error-valid' );
 
-        window.myFunction = function () {
-            $( '#btn-form-auth' ).click();
+        window.haveCode = function () {
+            $( modal_auth ).addClass( 'd-none' );
+            $( modal_valid ).removeClass( 'd-none' );
+        }
 
+        window.resendCode = function () {
+            $( btn_auth ).click();
+            $( btn_valid ).prop( 'disabled', 'disabled' );
+
+            setTimeout( function() {
+                $( btn_valid ).prop( 'disabled', null );
+            }, 4000 );
         }
 
         window.addEventListener( 'click', function ( e ) {
@@ -305,25 +317,24 @@
             $( btn_auth ).prop( 'disabled', null );
             $( btn_valid ).prop( 'disabled', null );
 
-            // exibe modal do celular
             if ( e.target.id == 'btn-triibo-login' )
             {
-                $( modal_auth ).removeClass('d-none');
+                $( modal_auth ).removeClass( 'd-none' );
+
+                if (cellphone != null && codeSent)
+                {
+                    $( '#haveCode' ).removeClass( 'd-none' );
+                }
             }
 
-            // Fazer botao para "tenho codigo"
-
-            // oculta modal do celular ou modal do código
-            // ao clicar fora do modal ou no botão de fechar
             if ( e.target.id == 'modal-form-auth'     ||
-                 e.target.id == 'close-form-auth')    ||
+                 e.target.id == 'close-form-auth'     ||
                  e.target.id == 'modal-form-validate' ||
                  e.target.id == 'close-form-validate' )
             {
                 $( modal_auth ).addClass('d-none');
                 $( modal_valid ).addClass('d-none');
             }
-
 
 
             if ( e.target.id == 'btn-form-auth' )
@@ -347,182 +358,33 @@
             }
 
 
-            // if ( e.target.id == 'btn-form-validate' )
-            // {
-            //     e.preventDefault();
+            if ( e.target.id == 'btn-form-validate' )
+            {
+                e.preventDefault();
 
-            //     btn_valid.setAttribute( 'disabled', 'disabled' );
+                $( btn_valid ).prop( 'disabled', 'disabled' );
 
-            //     code      = document.getElementById( 'code' ).value;
+                code = document.getElementById( 'code' ).value;
 
-            //     let teste = false;
-
-            //     $.ajax({
-            //         url : '/wp-admin/admin-ajax.php',
-            //         type: 'POST',
-            //         data: {
-            //             action        : 'validateSMS_v1',
-            //             code          : code,
-            //             cellphone     : cellphone,
-            //             transactionId : transactionId
-            //         },
-            //         success: function( data ) {
-            //             console.log( JSON.parse( data ) );
-
-            //             let result = JSON.parse( data );
-
-            //             if ( result.error != null )
-            //             {
-            //                 btn_auth.removeAttribute( 'disabled' );
-            //                 btn_valid.removeAttribute( 'disabled' );
-
-            //                 switch ( result.error.errorCode )
-            //                 {
-            //                     case 1006:
-            //                         // fecha modal código e abre modal numero
-            //                         // modal_auth.style.display = 'flex';
-            //                         // modal_valid.style.display = 'none';
-
-            //                         // exibe bloco de erro
-            //                         // error_auth.style.display     = 'block';
-            //                         error_valid.style.display      = 'block';
-
-            //                         // insere msg de erro no bloco
-            //                         // error_auth.innerhtml         = 'Código inválido.';
-            //                         error_valid.innerhtml          = 'Código inválido.';
-
-            //                         // adiciona classe de erro ao input
-            //                         // jQuery('#cellphone').addClass('error-border');
-            //                         jQuery('#code').addClass('error-border');
-            //                         break;
-
-            //                     case 1007:
-            //                         // fecha modal código e abre modal numero
-            //                         // modal_auth.style.display = 'flex';
-            //                         // modal_valid.style.display = 'none';
-
-            //                         // exibe bloco de erro
-            //                         // error_auth.style.display     = 'block';
-            //                         error_valid.style.display      = 'block';
-
-            //                         // insere msg de erro no bloco
-            //                         // error_auth.innerhtml         = 'Código expirado.';
-            //                         error_valid.innerhtml          = 'Código expirado.';
-
-            //                         // adiciona classe de erro ao input
-            //                         // jQuery('#cellphone').addClass('error-border');
-            //                         jQuery('#code').addClass('error-border');
-            //                         break;
-
-            //                     case 1009:
-            //                         // fecha modal código e abre modal numero
-            //                         modal_auth.style.display = 'flex';
-            //                         modal_valid.style.display = 'none';
-
-            //                         // exibe bloco de erro
-            //                         error_auth.style.display     = 'block';
-            //                         // error_valid.style.display      = 'block';
-
-            //                         // insere msg de erro no bloco
-            //                         error_auth.innerhtml         = 'Celular inválido.';
-            //                         // error_valid.innerhtml          = 'Celular inválido.';
-
-            //                         // adiciona classe de erro ao input
-            //                         jQuery('#cellphone').addClass('error-border');
-            //                         // jQuery('#code').addClass('error-border');
-            //                         break;
-
-            //                     case 1004:
-            //                     case 1005:
-            //                     case 1008:
-            //                     default:
-            //                         // fecha modal código e abre modal numero
-            //                         modal_auth.style.display = 'flex';
-            //                         modal_valid.style.display = 'none';
-
-            //                         // exibe bloco de erro
-            //                         error_auth.style.display     = 'block';
-            //                         // error_valid.style.display      = 'block';
-
-            //                         // insere msg de erro no bloco
-            //                         error_auth.innerhtml         = 'Algo de erro, tente novamente.';
-            //                         // error_valid.innerhtml          = 'Algo de erro, tente novamente.';
-
-            //                         // adiciona classe de erro ao input
-            //                         jQuery('#cellphone').addClass('error-border');
-            //                         // jQuery('#code').addClass('error-border');
-            //                         break;
-            //                 }
-            //                 // if ( result.error.errorCode == 1004 ||
-            //                 //      result.error.errorCode == 1005 ||
-            //                 //      result.error.errorCode == 1008)
-            //                 // {
-            //                 // }
-            //                 // else if ( result.error.errorCode == 1006 )
-            //                 // {
-            //                 // }
-            //                 // else if ( result.error.errorCode == 1007 )
-            //                 // {
-            //                 // }
-            //                 // else if ( result.error.errorCode == 1009 )
-            //                 // {
-            //                 // }
-            //                 // else
-            //                 // {
-            //                 // }
-            //             }
-            //             else
-            //             {
-            //                 modal_load                = document.getElementById( 'modal-load-next-page' );
-            //                 modal_load.style.display  = 'flex';
-            //                 modal_valid.style.display = 'none';
-
-            //                 $.ajax({
-            //                     url : '/wp-admin/admin-ajax.php',
-            //                     type: 'POST',
-            //                     data: {
-            //                         action    : 'userInfo_v1',
-            //                         cellphone : cellphone,
-            //                     },
-            //                     success: function( data ) {
-            //                         let user = JSON.parse( data );
-
-            //                         if ( user.error != null )
-            //                         {
-            //                             console.log( JSON.parse( data ) );
-
-            //                             modal_load.style.display  = 'none';
-            //                             modal_auth.style.display = 'flex';
-
-            //                             error_auth.style.display     = 'block';
-            //                             // error_auth.innerhtml         = 'Número não cadastrado no Triibo!!!!!!';
-
-            //                             // adicionar mensagem de erro no modal;
-            //                         }
-            //                         else
-            //                         {
-            //                             window.location.reload();
-
-            //                             // window.location.href = user.success.redirect;
-            //                             // console.log( user );
-            //                         }
-            //                     },
-            //                     error: function( data ) {
-            //                         console.log( data );
-            //                     }
-            //                 });
-            //             }
-            //         },
-            //         error: function( data ) {
-            //             console.log( data );
-            //             btn_auth.removeAttribute( 'disabled' );
-            //             btn_valid.removeAttribute( 'disabled' );
-            //         }
-            //     });
-            // }
+                if (code == '') {
+                    $( btn_valid ).prop( 'disabled', null );
+                    $( error_valid ).removeClass( 'd-none' );
+                    $( error_valid ).html( 'Insira código recebido.' );
+                }
+                else if (code.length < 6 || code.length > 6)
+                {
+                    $( btn_valid ).prop( 'disabled', null );
+                    $( error_valid ).removeClass( 'd-none' );
+                    $( error_valid ).html( 'O código tem 6 dígitos.' );
+                }
+                else
+                {
+                    $( error_valid ).addClass( 'd-none' );
+                    callValidateSMS();
+                }
+            }
 
         }, false);
-
 
 
         window.callAuthAjax = function () {
@@ -542,21 +404,144 @@
                     {
                         $( btn_auth ).prop( 'disabled', null );
                         $( error_auth ).removeClass( 'd-none' );
-                        $( error_auth ).html( genericErrorText );
+                        $( error_auth ).html( genericError );
                     }
                     else
                     {
                         transactionId = result.success.transactionId;
+                        codeSent      = true;
 
                         $( modal_auth ).addClass('d-none');
                         $( modal_valid ).removeClass('d-none');
+
+                        $( btn_auth ).prop( 'disabled', null );
                     }
                 },
                 error  : function( data ) {
                     console.log( data );
                     $( btn_auth ).prop( 'disabled', null );
                     $( error_auth ).removeClass( 'd-none' );
-                    $( error_auth ).html( genericErrorText );
+                    $( error_auth ).html( genericError );
+                }
+            });
+        }
+
+
+        window.callValidateSMS = function () {
+            $.ajax({
+                url : '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action        : 'validateSMS_v1',
+                    code          : code,
+                    cellphone     : cellphone,
+                    transactionId : transactionId
+                },
+                success: function( data ) {
+                    console.log( JSON.parse( data ) );
+
+                    let result = JSON.parse( data );
+
+                    if ( result.error != null )
+                    {
+                        $( btn_auth ).prop( 'disabled', null );
+                        $( btn_valid ).prop( 'disabled', null );
+
+                        switch ( result.error.errorCode )
+                        {
+                            case 1006:
+                                $( error_valid ).removeClass( 'd-none' );
+                                $( error_valid ).html( 'Código inválido.' );
+                                $('#code').addClass('error-border');
+                                break;
+
+                            case 1007:
+                                $( error_valid ).removeClass( 'd-none' );
+                                $( error_valid ).html( 'Código expirado.' );
+                                $('#code').addClass('error-border');
+                                break;
+
+                            case 1009:
+                                $( modal_auth ).removeClass('d-none');
+                                $( modal_valid ).addClass('d-none');
+                                $( error_auth ).removeClass( 'd-none' );
+                                $( error_auth ).html( 'Código expirado.' );
+                                $('#cellphone').addClass('error-border');
+                                break;
+
+                            case 1004:
+                            case 1005:
+                            case 1008:
+                            default:
+                                $( modal_auth ).removeClass('d-none');
+                                $( modal_valid ).addClass('d-none');
+                                $( error_auth ).removeClass( 'd-none' );
+                                $( error_auth ).html( 'Algo de erro, tente novamente.' );
+                                $('#cellphone').addClass('error-border');
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        $( '#modal-load-next-page' ).addClass('d-flex');
+                        $( modal_valid ).addClass('d-none');
+                        callUserInfo();
+                    }
+                },
+                error: function( data ) {
+                    console.log( data );
+                    $( btn_auth ).prop( 'disabled', null );
+                    $( btn_valid ).prop( 'disabled', null );
+
+                    $( modal_valid ).addClass('d-none');
+                    $( modal_auth ).removeClass('d-none');
+
+                    $( error_auth ).removeClass( 'd-none' );
+                    $( error_auth ).html( genericError );
+                }
+            });
+        }
+
+
+        window.callUserInfo = function() {
+            $.ajax({
+                url : '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action    : 'userInfo_v1',
+                    cellphone : cellphone,
+                },
+                success: function( data ) {
+                    let user = JSON.parse( data );
+
+                    if ( user.error != null )
+                    {
+                        console.log( JSON.parse( data ) );
+
+                        $( '#modal-load-next-page' ).removeClass('d-flex');
+                        $( modal_auth ).removeClass('d-none');
+
+                        $( error_auth ).removeClass( 'd-none' );
+                        $( error_auth ).html( 'Número não cadastrado no Triibo!' );
+                        $('#cellphone').addClass('error-border');
+                    }
+                    else
+                    {
+                        window.location.reload();
+                    }
+                },
+                error: function( data ) {
+                    console.log( data );
+
+                    $( btn_auth ).prop( 'disabled', null );
+                    $( btn_valid ).prop( 'disabled', null );
+
+                    $( '#modal-load-next-page' ).removeClass('d-flex');
+                    $( modal_valid ).addClass('d-none');
+                    $( modal_auth ).addClass('d-none');
+
+                    $( error_login ).removeClass( 'd-none' );
+                    $( error_login ).html( genericError );
                 }
             });
         }
