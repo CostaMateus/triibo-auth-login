@@ -283,26 +283,32 @@
 
         let genericError  = "Ocorreu um erro, tente novamente.";
 
+        // variaveis de controle entre as chamadas ajax
         let code          = null;
         let cellphone     = null;
         let transactionId = null;
         let codeSent      = false;
 
+        // vars de controle dos modais
         let modal_auth    = document.getElementById( 'modal-form-auth'     );
         let modal_valid   = document.getElementById( 'modal-form-validate' );
 
+        // vars de controle do envio do celular e do cod
         let btn_auth      = document.getElementById( 'btn-form-auth'     );
         let btn_valid     = document.getElementById( 'btn-form-validate' );
 
+        // vars de controle de erros
         let error_login   = document.getElementById( 'error-login' );
         let error_auth    = document.getElementById( 'error-auth'  );
         let error_valid   = document.getElementById( 'error-valid' );
 
+        // fecha modal do numero e abre modal do cod
         window.haveCode = function () {
             $( modal_auth ).addClass( 'd-none' );
             $( modal_valid ).removeClass( 'd-none' );
         }
 
+        // reexecuta envio do cod
         window.resendCode = function () {
             $( btn_auth ).click();
             $( btn_valid ).prop( 'disabled', 'disabled' );
@@ -312,21 +318,29 @@
             }, 4000 );
         }
 
+        // monitora todos os clicks na página
+        // verifica ids especificos
         window.addEventListener( 'click', function ( e ) {
 
+            // habilita botões de envio
             $( btn_auth ).prop( 'disabled', null );
             $( btn_valid ).prop( 'disabled', null );
 
+            // verifica se o click foi no botão triibo
             if ( e.target.id == 'btn-triibo-login' )
             {
+                // exibe modal para informar o celular
                 $( modal_auth ).removeClass( 'd-none' );
 
+                // verifica variaveis de controle
+                // exibe botão para mudar para o modal de informar o cod
                 if (cellphone != null && codeSent)
                 {
                     $( '#haveCode' ).removeClass( 'd-none' );
                 }
             }
 
+            // verifica se click foi fora ou x do modal, e fecha o respectivo
             if ( e.target.id == 'modal-form-auth'     ||
                  e.target.id == 'close-form-auth'     ||
                  e.target.id == 'modal-form-validate' ||
@@ -336,57 +350,69 @@
                 $( modal_valid ).addClass('d-none');
             }
 
-
+            // verifica se o click foi no botão do modal do celular
             if ( e.target.id == 'btn-form-auth' )
             {
                 e.preventDefault();
 
+                // desabilita o botão
                 $( btn_auth ).prop( 'disabled', 'disabled' );
 
+                // recupera o numero informado
                 cellphone = document.getElementById( 'cellphone' ).value;
 
+                // valida se o numero não é vazio.
                 if (cellphone == '') {
                     $( btn_auth ).prop( 'disabled', null );
                     $( error_auth ).removeClass( 'd-none' );
+                    // exibe o erro
                     $( error_auth ).html( 'Insira um número de celular.' );
                 }
                 else
                 {
                     $( error_auth ).addClass( 'd-none' );
+                    // executa o ajax para o envio do sms
                     callAuthAjax();
                 }
             }
 
-
+            // verifica se o click foi no botão do modal do cod
             if ( e.target.id == 'btn-form-validate' )
             {
                 e.preventDefault();
 
+                // desabilita o botão
                 $( btn_valid ).prop( 'disabled', 'disabled' );
 
+                // recupera cod informado
                 code = document.getElementById( 'code' ).value;
 
+                // valida se cod não é vazio
                 if (code == '') {
                     $( btn_valid ).prop( 'disabled', null );
                     $( error_valid ).removeClass( 'd-none' );
+                    // exibe erro
                     $( error_valid ).html( 'Insira código recebido.' );
                 }
-                else if (code.length < 6 || code.length > 6)
+                // valida se o cod é menor ou maior que 6
+                else if (code.length != 6)
                 {
                     $( btn_valid ).prop( 'disabled', null );
                     $( error_valid ).removeClass( 'd-none' );
+                    // exibe erro
                     $( error_valid ).html( 'O código tem 6 dígitos.' );
                 }
                 else
                 {
                     $( error_valid ).addClass( 'd-none' );
+                    // executa o ajax para validar o cod informado
                     callValidateSMS();
                 }
             }
 
         }, false);
 
-
+        // função de envio do cod para o celular
         window.callAuthAjax = function () {
             $.ajax({
                 url : '/wp-admin/admin-ajax.php',
@@ -396,21 +422,26 @@
                     cellphone : cellphone
                 },
                 success: function( data ) {
-                    console.log( JSON.parse(data) );
+                    // console.log( JSON.parse(data) );
 
                     let result = JSON.parse( data );
 
+                    // valida se o retorno da função tem erros
                     if ( result.error != null)
                     {
                         $( btn_auth ).prop( 'disabled', null );
                         $( error_auth ).removeClass( 'd-none' );
+                        // exibe erro generico
                         $( error_auth ).html( genericError );
                     }
                     else
                     {
+                        // recupera o id da transação
                         transactionId = result.success.transactionId;
+                        // var de controle, cod enviado
                         codeSent      = true;
 
+                        // fecha modal atual e abre o modal do cod
                         $( modal_auth ).addClass('d-none');
                         $( modal_valid ).removeClass('d-none');
 
@@ -418,15 +449,17 @@
                     }
                 },
                 error  : function( data ) {
-                    console.log( data );
+                    // console.log( data );
+
                     $( btn_auth ).prop( 'disabled', null );
                     $( error_auth ).removeClass( 'd-none' );
+                    // exibe erro generico, caso problema na chamada
                     $( error_auth ).html( genericError );
                 }
             });
         }
 
-
+        // função de validação do cod
         window.callValidateSMS = function () {
             $.ajax({
                 url : '/wp-admin/admin-ajax.php',
@@ -438,25 +471,30 @@
                     transactionId : transactionId
                 },
                 success: function( data ) {
-                    console.log( JSON.parse( data ) );
+                    // console.log( JSON.parse( data ) );
 
                     let result = JSON.parse( data );
 
+                    // valida se o retorno da função tem erros
                     if ( result.error != null )
                     {
+                        // habilita os botões de envio
                         $( btn_auth ).prop( 'disabled', null );
                         $( btn_valid ).prop( 'disabled', null );
 
+                        // valida qual o cod do erro
                         switch ( result.error.errorCode )
                         {
                             case 1006:
                                 $( error_valid ).removeClass( 'd-none' );
+                                // exibe erro
                                 $( error_valid ).html( 'Código inválido.' );
                                 $('#code').addClass('error-border');
                                 break;
 
                             case 1007:
                                 $( error_valid ).removeClass( 'd-none' );
+                                // exibe erro
                                 $( error_valid ).html( 'Código expirado.' );
                                 $('#code').addClass('error-border');
                                 break;
@@ -465,6 +503,7 @@
                                 $( modal_auth ).removeClass('d-none');
                                 $( modal_valid ).addClass('d-none');
                                 $( error_auth ).removeClass( 'd-none' );
+                                // exibe erro
                                 $( error_auth ).html( 'Código expirado.' );
                                 $('#cellphone').addClass('error-border');
                                 break;
@@ -476,6 +515,7 @@
                                 $( modal_auth ).removeClass('d-none');
                                 $( modal_valid ).addClass('d-none');
                                 $( error_auth ).removeClass( 'd-none' );
+                                // exibe erro
                                 $( error_auth ).html( 'Algo de erro, tente novamente.' );
                                 $('#cellphone').addClass('error-border');
                                 break;
@@ -485,11 +525,12 @@
                     {
                         $( '#modal-load-next-page' ).addClass('d-flex');
                         $( modal_valid ).addClass('d-none');
+                        // executa o ajax para recuperar as informações do usuário
                         callUserInfo();
                     }
                 },
                 error: function( data ) {
-                    console.log( data );
+                    // console.log( data );
                     $( btn_auth ).prop( 'disabled', null );
                     $( btn_valid ).prop( 'disabled', null );
 
@@ -497,12 +538,13 @@
                     $( modal_auth ).removeClass('d-none');
 
                     $( error_auth ).removeClass( 'd-none' );
+                    // exibe erro generico, caso problema na chamada
                     $( error_auth ).html( genericError );
                 }
             });
         }
 
-
+        // função de recuperação de dados dos usuário e redirecionamento
         window.callUserInfo = function() {
             $.ajax({
                 url : '/wp-admin/admin-ajax.php',
@@ -512,26 +554,29 @@
                     cellphone : cellphone,
                 },
                 success: function( data ) {
+                    // console.log( JSON.parse( data ) );
+
                     let user = JSON.parse( data );
 
+                    // valida se o retorno da função tem erros
                     if ( user.error != null )
                     {
-                        console.log( JSON.parse( data ) );
-
                         $( '#modal-load-next-page' ).removeClass('d-flex');
                         $( modal_auth ).removeClass('d-none');
 
                         $( error_auth ).removeClass( 'd-none' );
+                        // exibe erro
                         $( error_auth ).html( 'Número não cadastrado no Triibo!' );
                         $('#cellphone').addClass('error-border');
                     }
                     else
                     {
+                        // recarrega a página com o login efetuado
                         window.location.reload();
                     }
                 },
                 error: function( data ) {
-                    console.log( data );
+                    // console.log( data );
 
                     $( btn_auth ).prop( 'disabled', null );
                     $( btn_valid ).prop( 'disabled', null );
@@ -541,6 +586,7 @@
                     $( modal_auth ).addClass('d-none');
 
                     $( error_login ).removeClass( 'd-none' );
+                    // exibe erro generico, caso problema na chamada
                     $( error_login ).html( genericError );
                 }
             });
