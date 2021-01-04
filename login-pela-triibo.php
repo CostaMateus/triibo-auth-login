@@ -115,7 +115,7 @@
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 30,
+			CURLOPT_TIMEOUT        => 60,
 			CURLOPT_SSL_VERIFYPEER => false ,
 			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST  => "POST",
@@ -161,7 +161,7 @@
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 30,
+			CURLOPT_TIMEOUT        => 60,
 			CURLOPT_SSL_VERIFYPEER => false,
 			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST  => "POST",
@@ -215,7 +215,7 @@
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 30,
+			CURLOPT_TIMEOUT        => 60,
 			CURLOPT_SSL_VERIFYPEER => false ,
 			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST  => "POST",
@@ -263,7 +263,8 @@
                     'email'    => $email,
                     'name'     => $name,
                     'nickname' => $nickname,
-                    'redirect' => $r_signin['url']
+                    'redirect' => $r_signin['url'],
+                    'user'     => $r_curl
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -310,7 +311,7 @@
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 30,
+			CURLOPT_TIMEOUT        => 60,
 			CURLOPT_SSL_VERIFYPEER => false ,
 			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST  => "POST",
@@ -341,12 +342,16 @@
 
             if ( ! $email_ext )
             {
+                $auxN = explode( ' ', $name );
+
                 $user_id = wp_insert_user([
                     'user_login'    => $username,
                     'user_pass'     => md5( $username . 'triibo20' . $email ),
                     'user_nicename' => str_replace( ' ', '-', $nickname ),
                     'user_email'    => ( strpos( $email, 'sms.triibo.com.br' ) === false ) ? $email : '',
                     'display_name'  => $name,
+                    'first_name'    => $auxN[0],
+                    'last_name'     => (count($auxN) > 1) ? end($auxN) : '',
                 ]);
 
                 if ( ! is_wp_error( $user_id ) )
@@ -359,6 +364,22 @@
                     {
                         $user->set_role( 'customer' );
                     }
+
+                    // add_user_meta( 'int $user_id', 'string $meta_key', 'mixed $meta_value', 'bool $unique = false' );
+                    add_user_meta( $user_id, 'billing_first_name',   'TestFirstName');
+                    add_user_meta( $user_id, 'billing_last_name',    'TestLastName');
+                    add_user_meta( $user_id, 'billing_cpf',          '123.456.789-00');
+                    add_user_meta( $user_id, 'billing_address_1',    'Rua Teste');
+                    add_user_meta( $user_id, 'billing_number',       '123');
+                    add_user_meta( $user_id, 'billing_address_2',    '000');
+                    add_user_meta( $user_id, 'billing_neighborhood', 'Bairro Teste');
+                    add_user_meta( $user_id, 'billing_city',         'São Paulo');
+                    add_user_meta( $user_id, 'billing_postcode',     '01234-123');
+                    add_user_meta( $user_id, 'billing_country',      'BR');                          // fixo
+                    add_user_meta( $user_id, 'billing_state',        'SP');
+                    add_user_meta( $user_id, 'billing_phone',        '(11) 1234-5678');
+                    add_user_meta( $user_id, 'billing_cellphone',    '11912345678');
+                    add_user_meta( $user_id, 'billing_email',        'teste@example.com');
                 }
                 else
                 {
@@ -389,6 +410,7 @@
             return [
                 'error' => false,
                 'url'   => home_url( '/my-account' ),
+                'user'  => $user
             ];
         }
         else
