@@ -382,8 +382,11 @@
             $( btn_auth  ).click();
             $( btn_valid ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
 
+            $( error_valid ).addClass( 'd-none' );
+            $( '#code' ).removeClass( 'error-border' );
+
             setTimeout( function() {
-                $( btn_valid ).prop( 'disabled', null );
+                $( btn_valid ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
             }, 4000 );
         }
 
@@ -646,7 +649,7 @@
                     cellphone : cellphone,
                 },
                 success: function( data ) {
-                    console.log( JSON.parse( data ) );
+                    // console.log( JSON.parse( data ) );
 
                     let user = JSON.parse( data );
 
