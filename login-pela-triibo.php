@@ -231,40 +231,43 @@
         $r_curl   = json_decode( $r_curl, true );
         $r_curl   = $r_curl['success']['userInfo'];
 
-        $username = $r_curl['uId'];
-        $name     = $r_curl['name'];
-        $nickname = $r_curl['name'];
+        $auxName  = explode( ' ', $r_curl['name']);
+        $auxPhone = getPhone( $r_curl['triiboId']);
+        $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
 
-        if ( isset( $r_curl['contactList'] ) )
-        {
-            foreach( $r_curl['contactList'] as $temp )
-            {
-                foreach ( $temp as $key => $value )
-                {
-                    if ( $key == 'type' && $value == 'email')
-                    {
-                        $email = $temp['value'];
-                    }
-                }
-            }
-        }
-        else
-        {
-            $email = str_replace( ',', '.', $r_curl['triiboId'] );
-        }
+        $data = [
+            'username'     => $r_curl['uId'],
+            'nicename'     => str_replace( ' ', '-', $r_curl['name']),
+            'nickname'     => str_replace( ' ', '.', $r_curl['name']),
+            'display_name' => $r_curl['name'],
+            'first_name'   => $auxName[0],
+            'last_name'    => (count($auxName) > 1) ? end($auxName) : '',
+            'cpf'          => ( isset( $r_curl['documentList'] ) ? getCpf( $r_curl['documentList'] ) : '' ),
+            'address_1'    => $auxAddr['address_1'],
+            'number'       => $auxAddr['number'],
+            'address_2'    => $auxAddr['address_2'],
+            'neighborhood' => $auxAddr['neighborhood'],
+            'city'         => $auxAddr['city'],
+            'postcode'     => $auxAddr['postcode'],
+            'state'        => $auxAddr['state'],
+            'country'      => 'BR',
+            'phone'        => $auxPhone,
+            'cellphone'    => $auxPhone,
+            'email'        => ( isset( $r_curl['contactList'] ) ? getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
+        ];
 
-        $r_signin = signIn( $username, $email, $name, $nickname );
+        $r_signin = signIn( $data );
 
         if ( ! $r_signin['error'] )
         {
             $result   = [
                 'success' => [
-                    'username' => $username,
-                    'email'    => $email,
-                    'name'     => $name,
-                    'nickname' => $nickname,
+                    'username' => $data['username'],
+                    'email'    => $data['email'],
+                    'name'     => $data['display_name'],
+                    'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
-                    'user'     => $r_curl
+                    'user'     => $r_signin['user']
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -284,7 +287,6 @@
         echo json_encode( $result );
         die();
     }
-
 
     function getChannelToken_v1( $uId )
     {
@@ -334,24 +336,25 @@
         return $challenge2;
     }
 
-    function signIn( $username, $email, $name, $nickname )
+    function signIn( $data )
     {
-        if ( ! username_exists( $username ) )
+        if ( ! username_exists( $data['username'] ) )
         {
-            $email_ext = email_exists( $email );
+            $email_ext = email_exists( $data['email'] );
 
             if ( ! $email_ext )
             {
-                $auxN = explode( ' ', $name );
+                $data['email'] = ( ( strpos( $data['email'], 'sms.triibo.com.br' ) === false ) && ( $data['email'] != null ) ) ? $data['email'] : '';
 
                 $user_id = wp_insert_user([
-                    'user_login'    => $username,
-                    'user_pass'     => md5( $username . 'triibo20' . $email ),
-                    'user_nicename' => str_replace( ' ', '-', $nickname ),
-                    'user_email'    => ( strpos( $email, 'sms.triibo.com.br' ) === false ) ? $email : '',
-                    'display_name'  => $name,
-                    'first_name'    => $auxN[0],
-                    'last_name'     => (count($auxN) > 1) ? end($auxN) : '',
+                    'user_login'    => $data['username'],
+                    'user_pass'     => md5( $data['username'] . 'triibo20' . $data['email'] ),
+                    'user_nicename' => $data['nicename'],
+                    'user_email'    => $data['email'],
+                    'display_name'  => $data['display_name'],
+                    'nickname'      => $data['nickname'],
+                    'first_name'    => $data['first_name'],
+                    'last_name'     => $data['last_name'],
                 ]);
 
                 if ( ! is_wp_error( $user_id ) )
@@ -365,39 +368,29 @@
                         $user->set_role( 'customer' );
                     }
 
-                    // add_user_meta( 'int $user_id', 'string $meta_key', 'mixed $meta_value', 'bool $unique = false' );
-                    add_user_meta( $user_id, 'billing_first_name',   'TestFirstName');
-                    add_user_meta( $user_id, 'billing_last_name',    'TestLastName');
-                    add_user_meta( $user_id, 'billing_cpf',          '123.456.789-00');
-                    add_user_meta( $user_id, 'billing_address_1',    'Rua Teste');
-                    add_user_meta( $user_id, 'billing_number',       '123');
-                    add_user_meta( $user_id, 'billing_address_2',    '000');
-                    add_user_meta( $user_id, 'billing_neighborhood', 'Bairro Teste');
-                    add_user_meta( $user_id, 'billing_city',         'São Paulo');
-                    add_user_meta( $user_id, 'billing_postcode',     '01234-123');
-                    add_user_meta( $user_id, 'billing_country',      'BR');                          // fixo
-                    add_user_meta( $user_id, 'billing_state',        'SP');
-                    add_user_meta( $user_id, 'billing_phone',        '(11) 1234-5678');
-                    add_user_meta( $user_id, 'billing_cellphone',    '11912345678');
-                    add_user_meta( $user_id, 'billing_email',        'teste@example.com');
+                    updateUserMeta($user_id, $data);
                 }
                 else
                 {
                     // throw new Exception('Error');
                     return [
                         'error'   => true,
-                        'message' => 'L367'
+                        'message' => 'L358'
                     ];
                 }
             }
             else
             {
-                $user = get_user_by( 'id', $email_ext );
+                $id   = $email_ext;
+
+                $user = get_user_by( 'id', $id );
+
+                // updateUserMeta($id, $data);
             }
         }
         else
         {
-            $user = get_user_by( 'login', $username );
+            $user = get_user_by( 'login', $data['username'] );
         }
 
         if ( ! is_wp_error( $user ) )
@@ -418,7 +411,120 @@
             // throw new Exception('Error');
             return [
                 'error'   => true,
-                'message' => 'L398'
+                'message' => 'L404'
             ];
         }
+    }
+
+
+
+    function getEmail ( $data )
+    {
+        $email = null;
+
+        foreach( $data as $temp )
+        {
+            foreach ( $temp as $key => $value )
+            {
+                if ( $key == 'type' && $value == 'email')
+                {
+                    $email = $temp['value'];
+                }
+            }
+        }
+
+        return $email;
+    }
+
+    function getPhone ( $data )
+    {
+        $phone = explode( '@', $data )[0];
+
+        return substr($phone, 3);
+    }
+
+    function getCpf ( $data )
+    {
+        $cpf = '';
+
+        foreach( $data as $temp )
+        {
+            foreach ( $temp as $key => $value )
+            {
+                if ( $key == 'type' && $value == 'cpf')
+                {
+                    $cpf = $temp['value'];
+                }
+            }
+        }
+
+        return $cpf;
+    }
+
+    function getAddress ( $data )
+    {
+        $address_1    = '';
+        $number       = '';
+        $address_2    = '';
+        $neighborhood = '';
+        $city         = '';
+        $postcode     = '';
+        $state        = '';
+
+        if ( $data != null )
+        {
+            foreach( $data as $temp )
+            {
+                foreach ( $temp as $key => $value )
+                {
+                    if ( $key == 'type' && $value == 'principal')
+                    {
+                        $compl  = ( isset( $temp['extra'] ) ? $temp['extra'] : '' );
+                        $aux    = explode( ', ', $temp['googleAddr'] );
+                        $aux[1] = ( isset( $aux[1] ) ? explode( ' - ', $aux[1] ) : ['',''] );
+                        $aux[2] = ( isset( $aux[2] ) ? explode( ' - ', $aux[2] ) : ['',''] );
+
+                        $address_1    = $aux[0];
+                        $number       = $aux[1][0];
+                        $address_2    = $compl;
+                        $neighborhood = $aux[1][1];
+                        $city         = $aux[2][0];
+                        $postcode     = $aux[3];
+                        $state        = $aux[2][1];
+                    }
+                }
+            }
+        }
+
+        return [
+            'address_1'    => $address_1,
+            'number'       => $number,
+            'address_2'    => $address_2,
+            'neighborhood' => $neighborhood,
+            'city'         => $city,
+            'postcode'     => $postcode,
+            'state'        => $state
+        ];
+    }
+
+    function updateUserMeta ( $user_id, $data )
+    {
+        update_user_meta( $user_id, 'nickname',             $data['nickname']     );
+        update_user_meta( $user_id, 'first_name',           $data['first_name']   );
+        update_user_meta( $user_id, 'last_name',            $data['last_name']    );
+
+        update_user_meta( $user_id, 'billing_first_name',   $data['first_name']   );
+        update_user_meta( $user_id, 'billing_last_name',    $data['last_name']    );
+        update_user_meta( $user_id, 'billing_cpf',          $data['cpf']          );
+        update_user_meta( $user_id, 'billing_address_1',    $data['address_1']    );
+        update_user_meta( $user_id, 'billing_number',       $data['number']       );
+        update_user_meta( $user_id, 'billing_address_2',    $data['address_2']    );
+        update_user_meta( $user_id, 'billing_neighborhood', $data['neighborhood'] );
+        update_user_meta( $user_id, 'billing_city',         $data['city']         );
+        update_user_meta( $user_id, 'billing_postcode',     $data['postcode']     );
+        update_user_meta( $user_id, 'billing_state',        $data['state']        );
+        update_user_meta( $user_id, 'billing_country',      $data['country']      );
+        update_user_meta( $user_id, 'billing_phone',        $data['phone']        );
+        update_user_meta( $user_id, 'billing_cellphone',    $data['cellphone']    );
+        update_user_meta( $user_id, 'billing_email',        $data['email']        );
     }
