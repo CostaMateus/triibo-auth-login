@@ -267,7 +267,7 @@
                     'name'     => $data['display_name'],
                     'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
-                    'user'     => $r_signin['user']
+                    // 'user'     => $r_signin['user'],
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -368,7 +368,7 @@
                         $user->set_role( 'customer' );
                     }
 
-                    updateUserMeta($user_id, $data);
+                    newUserMeta($user_id, $data);
                 }
                 else
                 {
@@ -381,11 +381,27 @@
             }
             else
             {
-                $id   = $email_ext;
+                $id       = $email_ext;
 
-                $user = get_user_by( 'id', $id );
+                $user     = get_user_by( 'id', $id );
 
-                // updateUserMeta($id, $data);
+                $metaData = getUserMeta( $id );
+                $newData  = [];
+
+                foreach ( $metaData as $key => $value)
+                {
+                    $newKey = substr($key, 8);
+
+                    if (array_key_exists($newKey, $data) && $data[$newKey] != '' )
+                    {
+                        if ( $data[$newKey] != $value || $value === null )
+                        {
+                            $newData[$key] = $data[$newKey];
+                        }
+                    }
+                }
+
+                updateUserMeta($id, $newData);
             }
         }
         else
@@ -403,7 +419,7 @@
             return [
                 'error' => false,
                 'url'   => home_url( '/my-account' ),
-                'user'  => $user
+                // 'user'  => $user,
             ];
         }
         else
@@ -507,7 +523,7 @@
         ];
     }
 
-    function updateUserMeta ( $user_id, $data )
+    function newUserMeta ( $user_id, $data )
     {
         update_user_meta( $user_id, 'nickname',             $data['nickname']     );
         update_user_meta( $user_id, 'first_name',           $data['first_name']   );
@@ -527,4 +543,21 @@
         update_user_meta( $user_id, 'billing_phone',        $data['phone']        );
         update_user_meta( $user_id, 'billing_cellphone',    $data['cellphone']    );
         update_user_meta( $user_id, 'billing_email',        $data['email']        );
+    }
+
+    function getUserMeta ( $user_id )
+    {
+        $data = array_map( function( $a ) {
+            return $a[0];
+        }, get_user_meta( $user_id ) );
+
+        return $data;
+    }
+
+    function updateUserMeta ( $user_id, $data )
+    {
+        foreach ($data as $key => $value)
+        {
+            update_user_meta( $user_id, $key, $value );
+        }
     }
