@@ -90,7 +90,7 @@
                                             value="<?php esc_attr_e( 'Log in', 'martfury' ); ?>"><?php esc_html_e( 'Log in', 'martfury' ); ?></button>
 
                                     <button type="button" class="woocommerce-Button button set-spin" name="triibo-login"
-                                            id="btn-triibo-login" >Logar com Triibo <div class="d-none spin-load"></div></button>
+                                            id="btn-triibo-login" >Entrar com Triibo <div class="d-none spin-load"></div></button>
                                 </p>
 
                                 <?php do_action( 'woocommerce_login_form_end' ); ?>
