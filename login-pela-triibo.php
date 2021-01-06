@@ -69,11 +69,12 @@
     function lptriibo_add_admin_link()
     {
         add_menu_page(
-            'Login pela Triibo', // Title of the page
-            'Login Triibo',      // Text to show on the menu link
-            'manage_options',    // Capability requirement to see the link
-            'login-pela-triibo', // The 'slug' - file to display when clicking the link
-            'lptriibo_admin'     //
+            'Login pela Triibo', // The text to be displayed in the title tags of the page when the menu is selected
+            'Login Triibo',      // The text to be used for the menu
+            'manage_options',    // The capability required for this menu to be displayed to the user
+            'login-pela-triibo', // The slug name to refer to this menu by
+            'lptriibo_admin',    // The function to be called to output the content for this page
+            plugin_dir_url( __FILE__ ) . 'includes/images/triibo20.png'
         );
     }
     // Call the template of admin page
