@@ -8,18 +8,18 @@
     **/
 
     // don't call the file directly
-    if ( ! defined( 'ABSPATH' ) ) {
+    if ( ! defined( 'ABSPATH' ) )
+    {
         exit;
     }
 
-    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/' );
-    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139' );
+    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                );
+    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       );
     define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' );
-    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp' );
-    define( 'LPT_CHANNEL_NAME',  'triibo-webapp' );
-    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131' );
-    define( 'LPT_UID',           's6gQlMxJK8RbBSO641my8JdAK0q2' );
-
+    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                );
+    define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                );
+    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               );
+    define( 'LPT_UID',           's6gQlMxJK8RbBSO641my8JdAK0q2'                                 );
 
     // Override default template
     // themes/martfury/woocommerce/myaccount/form-login.php
@@ -78,10 +78,13 @@
         );
     }
     // Call the template of admin page
-    function lptriibo_admin() {
-        if ( ! current_user_can( 'manage_options' ) )  {
+    function lptriibo_admin()
+    {
+        if ( ! current_user_can( 'manage_options' ) )
+        {
             wp_die( __( 'Você não tem permissões suficientes para acessar esta página.' ) );
         }
+
         include_once( plugin_dir_path( __FILE__ ) . 'includes/lptriibo-admin.php' );
     }
 
@@ -136,7 +139,7 @@
     add_action( 'wp_ajax_nopriv_validateSMS_v1', 'validateSMS_v1' );
     function validateSMS_v1()
     {
-        $cellphone = preg_replace( '/\D/', '', $_POST['cellphone'] );
+        $cellphone      = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
         $channelTokenId = getChannelToken_v1( null );
 
@@ -232,17 +235,17 @@
         $r_curl   = json_decode( $r_curl, true );
         $r_curl   = $r_curl['success']['userInfo'];
 
-        $auxName  = explode( ' ', $r_curl['name']);
-        $auxPhone = getPhone( $r_curl['triiboId']);
+        $auxName  = explode( ' ', $r_curl['name'] );
+        $auxPhone = getPhone( $r_curl['triiboId'] );
         $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
 
         $data = [
             'username'     => $r_curl['uId'],
-            'nicename'     => str_replace( ' ', '-', $r_curl['name']),
-            'nickname'     => str_replace( ' ', '.', $r_curl['name']),
+            'nicename'     => str_replace( ' ', '-', $r_curl['name'] ),
+            'nickname'     => str_replace( ' ', '.', $r_curl['name'] ),
             'display_name' => $r_curl['name'],
             'first_name'   => $auxName[0],
-            'last_name'    => (count($auxName) > 1) ? end($auxName) : '',
+            'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
             'cpf'          => ( isset( $r_curl['documentList'] ) ? getCpf( $r_curl['documentList'] ) : '' ),
             'address_1'    => $auxAddr['address_1'],
             'number'       => $auxAddr['number'],
@@ -332,7 +335,7 @@
 
     function hashTriibo1( $apiToken, $passPhrase, $channelToken )
     {
-        $challenge1 = md5( $passPhrase . $apiToken );
+        $challenge1 = md5( $passPhrase . $apiToken     );
         $challenge2 = md5( $challenge1 . $channelToken );
         return $challenge2;
     }
@@ -389,11 +392,11 @@
                 $metaData = getUserMeta( $id );
                 $newData  = [];
 
-                foreach ( $metaData as $key => $value)
+                foreach ( $metaData as $key => $value )
                 {
-                    $newKey = substr($key, 8);
+                    $newKey = substr( $key, 8 );
 
-                    if (array_key_exists($newKey, $data) && $data[$newKey] != '' )
+                    if ( array_key_exists( $newKey, $data ) && $data[$newKey] != '' )
                     {
                         if ( $data[$newKey] != $value || $value === null )
                         {
@@ -402,7 +405,7 @@
                     }
                 }
 
-                updateUserMeta($id, $newData);
+                updateUserMeta( $id, $newData );
             }
         }
         else
@@ -443,7 +446,7 @@
         {
             foreach ( $temp as $key => $value )
             {
-                if ( $key == 'type' && $value == 'email')
+                if ( $key == 'type' && $value == 'email' )
                 {
                     $email = $temp['value'];
                 }
@@ -457,7 +460,7 @@
     {
         $phone = explode( '@', $data )[0];
 
-        return substr($phone, 3);
+        return substr( $phone, 3 );
     }
 
     function getCpf ( $data )
@@ -468,7 +471,7 @@
         {
             foreach ( $temp as $key => $value )
             {
-                if ( $key == 'type' && $value == 'cpf')
+                if ( $key == 'type' && $value == 'cpf' )
                 {
                     $cpf = $temp['value'];
                 }
@@ -494,7 +497,7 @@
             {
                 foreach ( $temp as $key => $value )
                 {
-                    if ( $key == 'type' && $value == 'principal')
+                    if ( $key == 'type' && $value == 'principal' )
                     {
                         $compl  = ( isset( $temp['extra'] ) ? $temp['extra'] : '' );
                         $aux    = explode( ', ', $temp['googleAddr'] );
@@ -557,7 +560,7 @@
 
     function updateUserMeta ( $user_id, $data )
     {
-        foreach ($data as $key => $value)
+        foreach ( $data as $key => $value )
         {
             update_user_meta( $user_id, $key, $value );
         }

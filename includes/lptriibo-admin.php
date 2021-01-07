@@ -1,6 +1,6 @@
 
 <script>
-    jQuery('.notice, .error, .dokan-license-notice').css("display", "none");
+    jQuery( '.notice, .error' ).css( "display", "none" );
 </script>
 
 
@@ -9,6 +9,5 @@
 
     <p>O plugin tem por finalidade habilitar no marketplace a posibilidade de se realizar o login pela Triibo.</p>
     <p>Quando ativado, o plugin irá inserir o botão "Entrar com Triibo" na página de login, como mostra a imagem.</p>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>"
-         width="325px" >
+    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>" width="325px" >
 </div>

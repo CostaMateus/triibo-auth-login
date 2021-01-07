@@ -402,8 +402,8 @@
             $( error_auth  ).addClass( 'd-none' ).html( '' );
             $( error_valid ).addClass( 'd-none' ).html( '' );
 
-            $( modal_auth  ).addClass('d-none');
-            $( modal_valid ).addClass('d-none');
+            $( modal_auth  ).addClass( 'd-none' );
+            $( modal_valid ).addClass( 'd-none' );
         }
 
 
@@ -417,7 +417,7 @@
 
             // verifica variaveis de controle
             // exibe botão para mudar para o modal de informar o cod
-            if (cellphone != null && codeSent)
+            if ( cellphone != null && codeSent )
             {
                 $( '#haveCode' ).removeClass( 'd-none' );
             }
@@ -436,15 +436,16 @@
             cellphone = document.getElementById( 'cellphone' ).value;
 
             // valida se o numero não é vazio.
-            if (cellphone == '') {
-                $( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                $( error_auth ).removeClass( 'd-none' );
+            if ( cellphone == '' )
+            {
+                $( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                $( error_auth   ).removeClass( 'd-none' );
                 // exibe o erro
-                $( error_auth ).html( 'Insira um número de celular.' );
+                $( error_auth   ).html( 'Insira um número de celular.' );
             }
             else
             {
-                $( error_auth ).addClass( 'd-none' );
+                $( error_auth   ).addClass( 'd-none' );
                 $( '#cellphone' ).removeClass( 'error-border' );
                 // executa o ajax para o envio do sms
                 callAuthAjax();
@@ -464,14 +465,15 @@
             code = document.getElementById( 'code' ).value;
 
             // valida se cod não é vazio
-            if (code == '') {
+            if ( code == '' )
+            {
                 $( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
                 $( error_valid ).removeClass( 'd-none' );
                 // exibe erro
                 $( error_valid ).html( 'Insira código recebido.' );
             }
             // valida se o cod é menor ou maior que 6
-            else if (code.length != 6)
+            else if ( code.length != 6 )
             {
                 $( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
                 $( error_valid ).removeClass( 'd-none' );
@@ -567,44 +569,44 @@
                         switch ( result.error.errorCode )
                         {
                             case 1006:
-                                $( error_valid ).removeClass( 'd-none' );
+                                $( error_valid  ).removeClass( 'd-none' );
                                 // exibe erro
-                                $( error_valid ).html( 'Código inválido.' );
-                                $('#code').addClass('error-border');
+                                $( error_valid  ).html( 'Código inválido.' );
+                                $( '#code'      ).addClass( 'error-border' );
                                 break;
 
                             case 1007:
-                                $( error_valid ).removeClass( 'd-none' );
+                                $( error_valid  ).removeClass( 'd-none' );
                                 // exibe erro
-                                $( error_valid ).html( 'Código expirado.' );
-                                $('#code').addClass('error-border');
+                                $( error_valid  ).html( 'Código expirado.' );
+                                $( '#code'      ).addClass( 'error-border' );
                                 break;
 
                             case 1009:
-                                $( modal_auth ).removeClass('d-none');
-                                $( modal_valid ).addClass('d-none');
-                                $( error_auth ).removeClass( 'd-none' );
+                                $( modal_auth   ).removeClass('d-none');
+                                $( modal_valid  ).addClass('d-none');
+                                $( error_auth   ).removeClass( 'd-none' );
                                 // exibe erro
-                                $( error_auth ).html( 'Código expirado.' );
-                                $('#cellphone').addClass('error-border');
+                                $( error_auth   ).html( 'Código expirado.' );
+                                $( '#cellphone' ).addClass( 'error-border' );
                                 break;
 
                             case 1005:
-                                $( modal_auth ).removeClass('d-none');
-                                $( modal_valid ).addClass('d-none');
-                                $( error_auth ).removeClass( 'd-none' );
+                                $( modal_auth   ).removeClass('d-none');
+                                $( modal_valid  ).addClass('d-none');
+                                $( error_auth   ).removeClass( 'd-none' );
                                 // exibe erro
-                                $( error_auth ).html( 'Quantidade de tentativas excedida, tente novamente em 15min.' );
-                                $('#cellphone').addClass('error-border');
+                                $( error_auth   ).html( 'Quantidade de tentativas excedida, tente novamente em 15min.' );
+                                $( '#cellphone' ).addClass( 'error-border' );
                             case 1004:
                             case 1008:
                             default:
-                                $( modal_auth ).removeClass('d-none');
-                                $( modal_valid ).addClass('d-none');
-                                $( error_auth ).removeClass( 'd-none' );
+                                $( modal_auth   ).removeClass('d-none');
+                                $( modal_valid  ).addClass('d-none');
+                                $( error_auth   ).removeClass( 'd-none' );
                                 // exibe erro
-                                $( error_auth ).html( 'Algo de erro, tente novamente.' );
-                                $('#cellphone').addClass('error-border');
+                                $( error_auth   ).html( 'Algo de erro, tente novamente.' );
+                                $( '#cellphone' ).addClass( 'error-border' );
                                 break;
                         }
                     }
@@ -660,13 +662,13 @@
 
                         $( '#modal-load-next-page' ).removeClass( 'd-flex' );
 
-                        $( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                        $( modal_auth ).removeClass( 'd-none' );
+                        $( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                        $( modal_auth   ).removeClass( 'd-none' );
 
-                        $( error_auth ).removeClass( 'd-none' );
+                        $( error_auth   ).removeClass( 'd-none' );
                         // exibe erro
-                        $( error_auth ).html( 'Número não cadastrado no Triibo!' );
-                        $('#cellphone').addClass('error-border');
+                        $( error_auth   ).html( 'Número não cadastrado no Triibo!' );
+                        $( '#cellphone' ).addClass( 'error-border' );
                     }
                     else
                     {
