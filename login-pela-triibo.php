@@ -13,13 +13,21 @@
         exit;
     }
 
-    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                );
-    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       );
-    define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' );
-    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                );
-    define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                );
-    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               );
-    define( 'LPT_UID',           's6gQlMxJK8RbBSO641my8JdAK0q2'                                 );
+    define( 'LPT_PROD_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
+    define( 'LPT_PROD_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
+    define( 'LPT_PROD_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // PROD
+    define( 'LPT_PROD_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
+    define( 'LPT_PROD_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
+    define( 'LPT_PROD_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
+    define( 'LPT_PROD_UID',           null                                                           ); // PROD
+
+    // define( 'LPT_HML_API_URL',        'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HML - HOMOLOG
+    // define( 'LPT_HML_API_TOKEN',      '7472216240776562417070486d4c6170693139'                       ); // HML - HOMOLOG
+    // define( 'LPT_HML_CHANNEL_ID',     '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HML - HOMOLOG
+    // define( 'LPT_HML_CHANNEL_GROUP',  'triibo-webapp'                                                ); // HML - HOMOLOG
+    // define( 'LPT_HML_CHANNEL_NAME',   'triibo-webapp'                                                ); // HML - HOMOLOG
+    // define( 'LPT_HML_CHANNEL_TOKEN',  '305221624057656241707021403131'                               ); // HML - HOMOLOG
+    // define( 'LPT_HML_UID',            null                                                           ); // HML - HOMOLOG
 
     // Override default template
     // themes/martfury/woocommerce/myaccount/form-login.php
@@ -100,10 +108,10 @@
 
         $auth_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => LPT_PROD_API_TOKEN,
+                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
+                'channelName'    => LPT_PROD_CHANNEL_NAME,
+                'channelId'      => LPT_PROD_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -115,7 +123,7 @@
         $auth_ch = curl_init();
 
 		curl_setopt_array( $auth_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'authSMS_v1',
+			CURLOPT_URL            => LPT_PROD_API_URL . 'authSMS_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -144,11 +152,11 @@
         $channelTokenId = getChannelToken_v1( null );
 
         $validate_triiboHeader = [
-            'triiboHeader' => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+            'triiboHeader'   => [
+                'apiToken'       => LPT_PROD_API_TOKEN,
+                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
+                'channelName'    => LPT_PROD_CHANNEL_NAME,
+                'channelId'      => LPT_PROD_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -161,7 +169,7 @@
         $validate_ch = curl_init();
 
 		curl_setopt_array( $validate_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'validateSMS_v1',
+			CURLOPT_URL            => LPT_PROD_API_URL . 'validateSMS_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -191,10 +199,10 @@
 
         $user_triiboHeader = [
             'triiboHeader'    => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => LPT_PROD_API_TOKEN,
+                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
+                'channelName'    => LPT_PROD_CHANNEL_NAME,
+                'channelId'      => LPT_PROD_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -215,7 +223,7 @@
         $user_ch  = curl_init();
 
 		curl_setopt_array( $user_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'getUserInfo_v1',
+			CURLOPT_URL            => LPT_PROD_API_URL . 'getUserInfo_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -239,7 +247,7 @@
         $auxPhone = getPhone( $r_curl['triiboId'] );
         $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
 
-        $data = [
+        $data     = [
             'username'     => $r_curl['uId'],
             'nicename'     => str_replace( ' ', '-', $r_curl['name'] ),
             'nickname'     => str_replace( ' ', '.', $r_curl['name'] ),
@@ -247,13 +255,13 @@
             'first_name'   => $auxName[0],
             'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
             'cpf'          => ( isset( $r_curl['documentList'] ) ? getCpf( $r_curl['documentList'] ) : '' ),
-            'address_1'    => $auxAddr['address_1'],
-            'number'       => $auxAddr['number'],
-            'address_2'    => $auxAddr['address_2'],
-            'neighborhood' => $auxAddr['neighborhood'],
-            'city'         => $auxAddr['city'],
+            // 'address_1'    => $auxAddr['address_1'],
+            // 'number'       => $auxAddr['number'],
+            // 'address_2'    => $auxAddr['address_2'],
+            // 'neighborhood' => $auxAddr['neighborhood'],
+            // 'city'         => $auxAddr['city'],
             'postcode'     => $auxAddr['postcode'],
-            'state'        => $auxAddr['state'],
+            // 'state'        => $auxAddr['state'],
             'country'      => 'BR',
             'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
@@ -264,7 +272,7 @@
 
         if ( ! $r_signin['error'] )
         {
-            $result   = [
+            $result = [
                 'success' => [
                     'username' => $data['username'],
                     'email'    => $data['email'],
@@ -279,7 +287,7 @@
         }
         else
         {
-            $result   = [
+            $result = [
                 'success' => null,
                 'error'   => [
                     'message' => $r_signin['message']
@@ -295,13 +303,13 @@
     function getChannelToken_v1( $uId )
     {
         $passPhrase         = floor( rand( 1000000000, 9999999999 ) ) . $uId . floor( rand( 1000000000, 9999999999 ) );
-        $challenge          = hashTriibo1( LPT_API_TOKEN, $passPhrase, LPT_CHANNEL_TOKEN );
+        $challenge          = hashTriibo1( LPT_PROD_API_TOKEN, $passPhrase, LPT_PROD_CHANNEL_TOKEN );
         $token_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'      => LPT_API_TOKEN,
-                'channelGroup'  => LPT_CHANNEL_GROUP,
-                'channelName'   => LPT_CHANNEL_NAME,
-                'channelId'     => LPT_CHANNEL_ID,
+                'apiToken'      => LPT_PROD_API_TOKEN,
+                'channelGroup'  => LPT_PROD_CHANNEL_GROUP,
+                'channelName'   => LPT_PROD_CHANNEL_NAME,
+                'channelId'     => LPT_PROD_CHANNEL_ID,
                 'sessionId'     => '001',
                 'transactionId' => '002',
                 'uId'           => $uId,
@@ -313,7 +321,7 @@
         $token_ch = curl_init();
 
 		curl_setopt_array( $token_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'getChannelToken_v1',
+			CURLOPT_URL            => LPT_PROD_API_URL . 'getChannelToken_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -499,31 +507,46 @@
                 {
                     if ( $key == 'type' && $value == 'principal' )
                     {
-                        $compl  = ( isset( $temp['extra'] ) ? $temp['extra'] : '' );
-                        $aux    = explode( ', ', $temp['googleAddr'] );
-                        $aux[1] = ( isset( $aux[1] ) ? explode( ' - ', $aux[1] ) : ['',''] );
-                        $aux[2] = ( isset( $aux[2] ) ? explode( ' - ', $aux[2] ) : ['',''] );
+                        // $compl  = ( isset( $temp['extra'] ) ? $temp['extra'] : '' );
+                        // $aux    = explode( ', ', $temp['googleAddr'] );
+                        // $aux[1] = ( isset( $aux[1] ) ? explode( ' - ', $aux[1] ) : ['',''] );
+                        // $aux[2] = ( isset( $aux[2] ) ? explode( ' - ', $aux[2] ) : ['',''] );
 
-                        $address_1    = $aux[0];
-                        $number       = $aux[1][0];
-                        $address_2    = $compl;
-                        $neighborhood = $aux[1][1];
-                        $city         = $aux[2][0];
-                        $postcode     = $aux[3];
-                        $state        = $aux[2][1];
+                        // $address_1    = $aux[0];
+                        // $number       = $aux[1][0];
+                        // $address_2    = $compl;
+                        // $neighborhood = $aux[1][1];
+                        // $city         = $aux[2][0];
+                        // $postcode     = $aux[3];
+                        // $state        = $aux[2][1];
+
+
+                        // // $pattern = "/\d{5,5}[-]\d{2,2}/";
+                        // // $str1  = "Alameda Eduardo Prado, 170 - Campos Elíseos, São Paulo - SP, 01218-11";
+                        // // if (preg_match_all($pattern, $str1, $r1))
+                        // // {
+                        // //     print_r($r1[0][0]);
+                        // // }
+
+                        $pattern = "/\d{5,5}[-]\d{2,2}/";
+
+                        if ( preg_match_all( $pattern, $temp['googleAddr'], $r1 ) )
+                        {
+                            $postcode = $r1[0][0];
+                        }
                     }
                 }
             }
         }
 
         return [
-            'address_1'    => $address_1,
-            'number'       => $number,
-            'address_2'    => $address_2,
-            'neighborhood' => $neighborhood,
-            'city'         => $city,
+            // 'address_1'    => $address_1,
+            // 'number'       => $number,
+            // 'address_2'    => $address_2,
+            // 'neighborhood' => $neighborhood,
+            // 'city'         => $city,
             'postcode'     => $postcode,
-            'state'        => $state
+            // 'state'        => $state
         ];
     }
 
