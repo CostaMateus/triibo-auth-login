@@ -528,7 +528,7 @@
                         // //     print_r($r1[0][0]);
                         // // }
 
-                        $pattern = "/\d{5,5}[-]\d{2,2}/";
+                        $pattern = "/\d{5,5}[-]\d{3,3}/";
 
                         if ( preg_match_all( $pattern, $temp['googleAddr'], $r1 ) )
                         {
