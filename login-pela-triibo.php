@@ -245,7 +245,7 @@
 
         $auxName  = explode( ' ', $r_curl['name'] );
         $auxPhone = getPhone( $r_curl['triiboId'] );
-        $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
+        // $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
 
         $data     = [
             'username'     => $r_curl['uId'],
@@ -260,7 +260,7 @@
             // 'address_2'    => $auxAddr['address_2'],
             // 'neighborhood' => $auxAddr['neighborhood'],
             // 'city'         => $auxAddr['city'],
-            'postcode'     => $auxAddr['postcode'],
+            // 'postcode'     => $auxAddr['postcode'],
             // 'state'        => $auxAddr['state'],
             'country'      => 'BR',
             'phone'        => $auxPhone,
@@ -481,6 +481,7 @@
             {
                 if ( $key == 'type' && $value == 'cpf' )
                 {
+                    // averiguar, não esta vindo completo
                     $cpf = $temp['value'];
                 }
             }
@@ -491,13 +492,13 @@
 
     function getAddress ( $data )
     {
-        $address_1    = '';
-        $number       = '';
-        $address_2    = '';
-        $neighborhood = '';
-        $city         = '';
+        // $address_1    = '';
+        // $number       = '';
+        // $address_2    = '';
+        // $neighborhood = '';
+        // $city         = '';
         $postcode     = '';
-        $state        = '';
+        // $state        = '';
 
         if ( $data != null )
         {
