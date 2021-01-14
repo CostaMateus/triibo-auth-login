@@ -13,21 +13,21 @@
         exit;
     }
 
-    define( 'LPT_PROD_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
-    define( 'LPT_PROD_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
-    define( 'LPT_PROD_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // PROD
-    define( 'LPT_PROD_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
-    define( 'LPT_PROD_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
-    define( 'LPT_PROD_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
-    define( 'LPT_PROD_UID',           null                                                           ); // PROD
+    // define( 'LPT_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
+    // define( 'LPT_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
+    // define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // PROD
+    // define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
+    // define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
+    // define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
+    // define( 'LPT_UID',           null                                                           ); // PROD
 
-    // define( 'LPT_HML_API_URL',        'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HML - HOMOLOG
-    // define( 'LPT_HML_API_TOKEN',      '7472216240776562417070486d4c6170693139'                       ); // HML - HOMOLOG
-    // define( 'LPT_HML_CHANNEL_ID',     '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HML - HOMOLOG
-    // define( 'LPT_HML_CHANNEL_GROUP',  'triibo-webapp'                                                ); // HML - HOMOLOG
-    // define( 'LPT_HML_CHANNEL_NAME',   'triibo-webapp'                                                ); // HML - HOMOLOG
-    // define( 'LPT_HML_CHANNEL_TOKEN',  '305221624057656241707021403131'                               ); // HML - HOMOLOG
-    // define( 'LPT_HML_UID',            null                                                           ); // HML - HOMOLOG
+    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
+    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
+    define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
+    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
+    define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
+    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
+    define( 'LPT_UID',           null                                                           ); // HOMOLOG
 
     // Override default template
     // themes/martfury/woocommerce/myaccount/form-login.php
@@ -108,10 +108,10 @@
 
         $auth_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'       => LPT_PROD_API_TOKEN,
-                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
-                'channelName'    => LPT_PROD_CHANNEL_NAME,
-                'channelId'      => LPT_PROD_CHANNEL_ID,
+                'apiToken'       => LPT_API_TOKEN,
+                'channelGroup'   => LPT_CHANNEL_GROUP,
+                'channelName'    => LPT_CHANNEL_NAME,
+                'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -123,7 +123,7 @@
         $auth_ch = curl_init();
 
 		curl_setopt_array( $auth_ch, array(
-			CURLOPT_URL            => LPT_PROD_API_URL . 'authSMS_v1',
+			CURLOPT_URL            => LPT_API_URL . 'authSMS_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -153,10 +153,10 @@
 
         $validate_triiboHeader = [
             'triiboHeader'   => [
-                'apiToken'       => LPT_PROD_API_TOKEN,
-                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
-                'channelName'    => LPT_PROD_CHANNEL_NAME,
-                'channelId'      => LPT_PROD_CHANNEL_ID,
+                'apiToken'       => LPT_API_TOKEN,
+                'channelGroup'   => LPT_CHANNEL_GROUP,
+                'channelName'    => LPT_CHANNEL_NAME,
+                'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -169,7 +169,7 @@
         $validate_ch = curl_init();
 
 		curl_setopt_array( $validate_ch, array(
-			CURLOPT_URL            => LPT_PROD_API_URL . 'validateSMS_v1',
+			CURLOPT_URL            => LPT_API_URL . 'validateSMS_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -199,10 +199,10 @@
 
         $user_triiboHeader = [
             'triiboHeader'    => [
-                'apiToken'       => LPT_PROD_API_TOKEN,
-                'channelGroup'   => LPT_PROD_CHANNEL_GROUP,
-                'channelName'    => LPT_PROD_CHANNEL_NAME,
-                'channelId'      => LPT_PROD_CHANNEL_ID,
+                'apiToken'       => LPT_API_TOKEN,
+                'channelGroup'   => LPT_CHANNEL_GROUP,
+                'channelName'    => LPT_CHANNEL_NAME,
+                'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
@@ -223,7 +223,7 @@
         $user_ch  = curl_init();
 
 		curl_setopt_array( $user_ch, array(
-			CURLOPT_URL            => LPT_PROD_API_URL . 'getUserInfo_v1',
+			CURLOPT_URL            => LPT_API_URL . 'getUserInfo_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -303,13 +303,13 @@
     function getChannelToken_v1( $uId )
     {
         $passPhrase         = floor( rand( 1000000000, 9999999999 ) ) . $uId . floor( rand( 1000000000, 9999999999 ) );
-        $challenge          = hashTriibo1( LPT_PROD_API_TOKEN, $passPhrase, LPT_PROD_CHANNEL_TOKEN );
+        $challenge          = hashTriibo1( LPT_API_TOKEN, $passPhrase, LPT_CHANNEL_TOKEN );
         $token_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'      => LPT_PROD_API_TOKEN,
-                'channelGroup'  => LPT_PROD_CHANNEL_GROUP,
-                'channelName'   => LPT_PROD_CHANNEL_NAME,
-                'channelId'     => LPT_PROD_CHANNEL_ID,
+                'apiToken'      => LPT_API_TOKEN,
+                'channelGroup'  => LPT_CHANNEL_GROUP,
+                'channelName'   => LPT_CHANNEL_NAME,
+                'channelId'     => LPT_CHANNEL_ID,
                 'sessionId'     => '001',
                 'transactionId' => '002',
                 'uId'           => $uId,
@@ -321,7 +321,7 @@
         $token_ch = curl_init();
 
 		curl_setopt_array( $token_ch, array(
-			CURLOPT_URL            => LPT_PROD_API_URL . 'getChannelToken_v1',
+			CURLOPT_URL            => LPT_API_URL . 'getChannelToken_v1',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
