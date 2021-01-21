@@ -718,14 +718,3 @@
 
         return $meta;
     }
-
-
-    $data = [
-        'billing_number'     => "170",
-        'billing_phone'      => "(11) 94928-9507",
-        'billing_postcode'   => "01218-011",
-        'billing_state'      => "SP",
-        'shipping_address_1' => "Alameda Eduardo Prado",
-        'shipping_address_2' => "125A",
-        'shipping_city'      => "São Paulo",
-    ];
