@@ -502,17 +502,28 @@
                     cellphone : cellphone
                 },
                 success: function( data ) {
-                    // console.log( JSON.parse(data) );
+                    // console.log( JSON.parse( data ) );
 
                     let result = JSON.parse( data );
 
                     // valida se o retorno da função tem erros
                     if ( result.error != null)
                     {
-                        $( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                        $( error_auth ).removeClass( 'd-none' );
-                        // exibe erro generico
-                        $( error_auth ).html( genericError );
+                        if ( result.error.errorCode == 1005 )
+                        {
+                            $( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                            $( error_auth   ).removeClass( 'd-none' );
+                            // exibe erro
+                            $( error_auth   ).html( 'Quantidade de tentativas excedida, tente novamente em 15min.' );
+                            $( '#cellphone' ).addClass( 'error-border' );
+                        }
+                        else
+                        {
+                            $( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                            $( error_auth ).removeClass( 'd-none' );
+                            // exibe erro generico
+                            $( error_auth ).html( genericError );
+                        }
                     }
                     else
                     {

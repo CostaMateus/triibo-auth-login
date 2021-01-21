@@ -270,6 +270,11 @@
 
         $r_signin = signIn( $data );
 
+        if ( count( $r_signin['metaData'] ) > 0 )
+        {
+            $set = setUserInfo($r_curl, $r_signin['metaData']);
+        }
+
         if ( ! $r_signin['error'] )
         {
             $result = [
@@ -279,7 +284,8 @@
                     'name'     => $data['display_name'],
                     'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
-                    // 'user'     => $r_signin['user'],
+                    // 'metaData' => $r_signin['metaData'],
+                    // 'setRet'   => $set
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -380,7 +386,7 @@
                         $user->set_role( 'customer' );
                     }
 
-                    newUserMeta($user_id, $data);
+                    // newUserMeta($user_id, $data);
                 }
                 else
                 {
@@ -397,23 +403,23 @@
 
                 $user     = get_user_by( 'id', $id );
 
-                $metaData = getUserMeta( $id );
-                $newData  = [];
+                // $metaData = getUserMeta( $id );
+                // $newData  = [];
 
-                foreach ( $metaData as $key => $value )
-                {
-                    $newKey = substr( $key, 8 );
+                // foreach ( $metaData as $key => $value )
+                // {
+                //     $newKey = substr( $key, 8 );
 
-                    if ( array_key_exists( $newKey, $data ) && $data[$newKey] != '' )
-                    {
-                        if ( $data[$newKey] != $value || $value === null )
-                        {
-                            $newData[$key] = $data[$newKey];
-                        }
-                    }
-                }
+                //     if ( array_key_exists( $newKey, $data ) && $data[$newKey] != '' )
+                //     {
+                //         if ( $data[$newKey] != $value || $value === null )
+                //         {
+                //             $newData[$key] = $data[$newKey];
+                //         }
+                //     }
+                // }
 
-                updateUserMeta( $id, $newData );
+                // updateUserMeta( $id, $newData );
             }
         }
         else
@@ -427,11 +433,13 @@
             wp_set_current_user( $user->ID );
             wp_set_auth_cookie( $user->ID );
 
+            $metaData = getBillingShipping( $user->ID );
+
             // return home_url('/my-account');
             return [
-                'error' => false,
-                'url'   => home_url( '/my-account' ),
-                // 'user'  => $user,
+                'error'    => false,
+                'url'      => home_url( '/my-account' ),
+                'metaData' => $metaData,
             ];
         }
         else
@@ -444,7 +452,102 @@
         }
     }
 
+    function setUserInfo ( $info, $addrs )
+    {
+        $channelTokenId    = getChannelToken_v1( $info['uId'] );
 
+        $set_triiboHeader = [
+            'triiboHeader'    => [
+                'apiToken'       => LPT_API_TOKEN,
+                'channelGroup'   => LPT_CHANNEL_GROUP,
+                'channelName'    => LPT_CHANNEL_NAME,
+                'channelId'      => LPT_CHANNEL_ID,
+                'sessionId'      => '001',
+                'transactionId'  => '002',
+                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId,
+                'uId'            => $info['uId']
+            ],
+            'queryPartnerAPI' => [
+                'setUserInfo'
+            ],
+            'userInfo'        => [
+                // 'addressList' => [],
+                'triiboId'   => $info['triiboId'],
+                'gender'     => $info['gender'],
+                'syncType'   => 'merge',
+                'updateDate' => 1610387795564
+            ],
+        ];
+
+        foreach ($addrs as $key => $value)
+        {
+            if ( $key == 'billing' )
+            {
+                $set_triiboHeader['userInfo']['addressList'][0] = [
+                    'zipCode'      => $value['postcode'],     // '01218-011',
+                    'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
+                    'number'       => $value['number'],       //  170,
+                    'extra'        => $value['address_2'],    // 'Apto 125A',
+                    'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
+                    'city'         => $value['city'],         // 'São Paulo',
+                    'state'        => $value['state'],        // 'SP',
+                    'country'      => $value['country'],      // 'Brasil',
+                    'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
+                                   // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
+                    'type'         => $key,                   // comercial, residencial, billing, shipping
+                    'origin'       => 'marketplace',          // marketplace,
+                ];
+            }
+
+            if ( $key == 'shipping' )
+            {
+                $set_triiboHeader['userInfo']['addressList'][1] = [
+                    'zipCode'      => $value['postcode'],     // '01218-011',
+                    'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
+                    'number'       => $value['number'],       //  170,
+                    'extra'        => $value['address_2'],    // 'Apto 125A',
+                    'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
+                    'city'         => $value['city'],         // 'São Paulo',
+                    'state'        => $value['state'],        // 'SP',
+                    'country'      => $value['country'],      // 'Brasil',
+                    'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
+                                   // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
+                    'type'         => $key,                   // comercial, residencial, billing, shipping
+                    'origin'       => 'marketplace',          // marketplace,
+                ];
+            }
+        }
+
+        $set_ch = curl_init();
+		curl_setopt_array( $set_ch, array(
+			CURLOPT_URL            => LPT_API_URL . 'setUserInfo_v1',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING       => "",
+			CURLOPT_MAXREDIRS      => 10,
+			CURLOPT_TIMEOUT        => 60,
+			CURLOPT_SSL_VERIFYPEER => false ,
+			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST  => "POST",
+			CURLOPT_HTTPHEADER     => array(
+                "Content-type: application/json"
+            ),
+            CURLOPT_POSTFIELDS     => json_encode( $set_triiboHeader )
+        ));
+
+        $set_curl = curl_exec( $set_ch );
+        curl_close( $set_ch );
+
+        $set_curl = json_decode( $set_curl, true );
+
+        return $set_curl;
+    }
+
+
+
+
+    /**
+     * Funções internas
+     */
 
     function getEmail ( $data )
     {
@@ -589,3 +692,40 @@
             update_user_meta( $user_id, $key, $value );
         }
     }
+
+    function getBillingShipping ( $user_id )
+    {
+        $data = getUserMeta( $user_id );
+        $meta = [];
+
+        $bill = 'billing_';
+        $ship = 'shipping_';
+
+        foreach ( $data as $key => $value )
+        {
+            if ( ( substr( $key, 0, strlen( $bill ) ) === $bill ) )
+            {
+                $temp = explode( $bill, $key )[1];
+                $meta['billing'][$temp] = $value;
+            }
+
+            if ( ( substr( $key, 0, strlen( $ship ) ) === $ship ) )
+            {
+                $temp = explode( $ship, $key )[1];
+                $meta['shipping'][$temp] = $value;
+            }
+        }
+
+        return $meta;
+    }
+
+
+    $data = [
+        'billing_number'     => "170",
+        'billing_phone'      => "(11) 94928-9507",
+        'billing_postcode'   => "01218-011",
+        'billing_state'      => "SP",
+        'shipping_address_1' => "Alameda Eduardo Prado",
+        'shipping_address_2' => "125A",
+        'shipping_city'      => "São Paulo",
+    ];
