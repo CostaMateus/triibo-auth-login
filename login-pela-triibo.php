@@ -264,7 +264,8 @@
 
         if ( count( $r_signin['metaData'] ) > 0 )
         {
-            $set = setUserInfo($r_curl, $r_signin['metaData']);
+            $set = setUserInfo( $r_curl, $r_signin['metaData'] );
+            $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
         }
 
         if ( ! $r_signin['error'] )
@@ -424,7 +425,7 @@
 
     function setUserInfo ( $info, $addrs )
     {
-        $channelTokenId    = getChannelToken_v1( $info['uId'] );
+        $channelTokenId   = getChannelToken_v1( $info['uId'] );
 
         $set_triiboHeader = [
             'triiboHeader'    => [
@@ -449,43 +450,23 @@
             ],
         ];
 
+        $i = 0;
         foreach ($addrs as $key => $value)
         {
-            if ( $key == 'billing' )
-            {
-                $set_triiboHeader['userInfo']['addressList'][0] = [
-                    'zipCode'      => $value['postcode'],     // '01218-011',
-                    'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
-                    'number'       => $value['number'],       //  170,
-                    'extra'        => $value['address_2'],    // 'Apto 125A',
-                    'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
-                    'city'         => $value['city'],         // 'São Paulo',
-                    'state'        => $value['state'],        // 'SP',
-                    'country'      => $value['country'],      // 'Brasil',
-                    'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
-                                   // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
-                    'type'         => $key,                   // comercial, residencial, billing, shipping
-                    'origin'       => 'marketplace',          // marketplace,
-                ];
-            }
-
-            if ( $key == 'shipping' )
-            {
-                $set_triiboHeader['userInfo']['addressList'][1] = [
-                    'zipCode'      => $value['postcode'],     // '01218-011',
-                    'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
-                    'number'       => $value['number'],       //  170,
-                    'extra'        => $value['address_2'],    // 'Apto 125A',
-                    'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
-                    'city'         => $value['city'],         // 'São Paulo',
-                    'state'        => $value['state'],        // 'SP',
-                    'country'      => $value['country'],      // 'Brasil',
-                    'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
-                                   // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
-                    'type'         => $key,                   // comercial, residencial, billing, shipping
-                    'origin'       => 'marketplace',          // marketplace,
-                ];
-            }
+            $set_triiboHeader['userInfo']['addressList'][$i++] = [
+                'zipCode'      => $value['postcode'],     // '01218-011',
+                'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
+                'number'       => $value['number'],       //  170,
+                'extra'        => $value['address_2'],    // 'Apto 125A',
+                'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
+                'city'         => $value['city'],         // 'São Paulo',
+                'state'        => $value['state'],        // 'SP',
+                'country'      => $value['country'],      // 'Brasil',
+                'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
+                               // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
+                'type'         => $key,                   // comercial, residencial, billing, shipping
+                'origin'       => 'marketplace',          // marketplace,
+            ];
         }
 
         $set_ch = curl_init();
@@ -510,6 +491,59 @@
         $set_curl = json_decode( $set_curl, true );
 
         return $set_curl;
+    }
+
+    function setPreferAddress ( $uId, $addrs )
+    {
+        $channelTokenId    = getChannelToken_v1( $uId );
+
+        $pref_triiboHeader = [
+            'triiboHeader'    => [
+                'apiToken'       => LPT_API_TOKEN,
+                'channelGroup'   => LPT_CHANNEL_GROUP,
+                'channelName'    => LPT_CHANNEL_NAME,
+                'channelId'      => LPT_CHANNEL_ID,
+                'sessionId'      => '001',
+                'transactionId'  => '002',
+                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId,
+                'uId'            => $uId
+            ],
+            'uId'          => $uId,
+            'origin'       => 'marketplace',
+            // 'zipCode'      => '06053-050',
+            // 'type'         => 'shipping',
+        ];
+
+        $result = [];
+
+        foreach ($addrs as $key => $value)
+        {
+            $pref_triiboHeader['zipCode'] = $value['postcode'];
+            $pref_triiboHeader['type']    = $key;
+
+            $pref_ch = curl_init();
+            curl_setopt_array( $pref_ch, array(
+                CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING       => "",
+                CURLOPT_MAXREDIRS      => 10,
+                CURLOPT_TIMEOUT        => 60,
+                CURLOPT_SSL_VERIFYPEER => false ,
+                CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST  => "POST",
+                CURLOPT_HTTPHEADER     => array(
+                    "Content-type: application/json"
+                ),
+                CURLOPT_POSTFIELDS     => json_encode( $pref_triiboHeader )
+            ));
+
+            $pref_curl = curl_exec( $pref_ch );
+            curl_close( $pref_ch );
+
+            $result[] = json_decode( $pref_curl, true );
+        }
+
+        return $result;
     }
 
 
