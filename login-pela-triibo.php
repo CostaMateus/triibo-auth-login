@@ -245,7 +245,6 @@
 
         $auxName  = explode( ' ', $r_curl['name'] );
         $auxPhone = getPhone( $r_curl['triiboId'] );
-        // $auxAddr  = ( isset( $r_curl['addressList'] ) ? getAddress( $r_curl['addressList'] ) : getAddress( null ) );
 
         $data     = [
             'username'     => $r_curl['uId'],
@@ -255,13 +254,6 @@
             'first_name'   => $auxName[0],
             'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
             'cpf'          => ( isset( $r_curl['documentList'] ) ? getCpf( $r_curl['documentList'] ) : '' ),
-            // 'address_1'    => $auxAddr['address_1'],
-            // 'number'       => $auxAddr['number'],
-            // 'address_2'    => $auxAddr['address_2'],
-            // 'neighborhood' => $auxAddr['neighborhood'],
-            // 'city'         => $auxAddr['city'],
-            // 'postcode'     => $auxAddr['postcode'],
-            // 'state'        => $auxAddr['state'],
             'country'      => 'BR',
             'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
@@ -284,8 +276,6 @@
                     'name'     => $data['display_name'],
                     'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
-                    // 'metaData' => $r_signin['metaData'],
-                    // 'setRet'   => $set
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -385,8 +375,6 @@
                     {
                         $user->set_role( 'customer' );
                     }
-
-                    // newUserMeta($user_id, $data);
                 }
                 else
                 {
@@ -399,27 +387,9 @@
             }
             else
             {
-                $id       = $email_ext;
+                $id   = $email_ext;
 
-                $user     = get_user_by( 'id', $id );
-
-                // $metaData = getUserMeta( $id );
-                // $newData  = [];
-
-                // foreach ( $metaData as $key => $value )
-                // {
-                //     $newKey = substr( $key, 8 );
-
-                //     if ( array_key_exists( $newKey, $data ) && $data[$newKey] != '' )
-                //     {
-                //         if ( $data[$newKey] != $value || $value === null )
-                //         {
-                //             $newData[$key] = $data[$newKey];
-                //         }
-                //     }
-                // }
-
-                // updateUserMeta( $id, $newData );
+                $user = get_user_by( 'id', $id );
             }
         }
         else
@@ -548,7 +518,6 @@
     /**
      * Funções internas
      */
-
     function getEmail ( $data )
     {
         $email = null;
@@ -593,89 +562,6 @@
         return $cpf;
     }
 
-    function getAddress ( $data )
-    {
-        // $address_1    = '';
-        // $number       = '';
-        // $address_2    = '';
-        // $neighborhood = '';
-        // $city         = '';
-        $postcode     = '';
-        // $state        = '';
-
-        if ( $data != null )
-        {
-            foreach( $data as $temp )
-            {
-                foreach ( $temp as $key => $value )
-                {
-                    if ( $key == 'type' && $value == 'principal' )
-                    {
-                        // $compl  = ( isset( $temp['extra'] ) ? $temp['extra'] : '' );
-                        // $aux    = explode( ', ', $temp['googleAddr'] );
-                        // $aux[1] = ( isset( $aux[1] ) ? explode( ' - ', $aux[1] ) : ['',''] );
-                        // $aux[2] = ( isset( $aux[2] ) ? explode( ' - ', $aux[2] ) : ['',''] );
-
-                        // $address_1    = $aux[0];
-                        // $number       = $aux[1][0];
-                        // $address_2    = $compl;
-                        // $neighborhood = $aux[1][1];
-                        // $city         = $aux[2][0];
-                        // $postcode     = $aux[3];
-                        // $state        = $aux[2][1];
-
-
-                        // // $pattern = "/\d{5,5}[-]\d{2,2}/";
-                        // // $str1  = "Alameda Eduardo Prado, 170 - Campos Elíseos, São Paulo - SP, 01218-11";
-                        // // if (preg_match_all($pattern, $str1, $r1))
-                        // // {
-                        // //     print_r($r1[0][0]);
-                        // // }
-
-                        $pattern = "/\d{5,5}[-]\d{3,3}/";
-
-                        if ( preg_match_all( $pattern, $temp['googleAddr'], $r1 ) )
-                        {
-                            $postcode = $r1[0][0];
-                        }
-                    }
-                }
-            }
-        }
-
-        return [
-            // 'address_1'    => $address_1,
-            // 'number'       => $number,
-            // 'address_2'    => $address_2,
-            // 'neighborhood' => $neighborhood,
-            // 'city'         => $city,
-            'postcode'     => $postcode,
-            // 'state'        => $state
-        ];
-    }
-
-    function newUserMeta ( $user_id, $data )
-    {
-        update_user_meta( $user_id, 'nickname',             $data['nickname']     );
-        update_user_meta( $user_id, 'first_name',           $data['first_name']   );
-        update_user_meta( $user_id, 'last_name',            $data['last_name']    );
-
-        update_user_meta( $user_id, 'billing_first_name',   $data['first_name']   );
-        update_user_meta( $user_id, 'billing_last_name',    $data['last_name']    );
-        update_user_meta( $user_id, 'billing_cpf',          $data['cpf']          );
-        update_user_meta( $user_id, 'billing_address_1',    $data['address_1']    );
-        update_user_meta( $user_id, 'billing_number',       $data['number']       );
-        update_user_meta( $user_id, 'billing_address_2',    $data['address_2']    );
-        update_user_meta( $user_id, 'billing_neighborhood', $data['neighborhood'] );
-        update_user_meta( $user_id, 'billing_city',         $data['city']         );
-        update_user_meta( $user_id, 'billing_postcode',     $data['postcode']     );
-        update_user_meta( $user_id, 'billing_state',        $data['state']        );
-        update_user_meta( $user_id, 'billing_country',      $data['country']      );
-        update_user_meta( $user_id, 'billing_phone',        $data['phone']        );
-        update_user_meta( $user_id, 'billing_cellphone',    $data['cellphone']    );
-        update_user_meta( $user_id, 'billing_email',        $data['email']        );
-    }
-
     function getUserMeta ( $user_id )
     {
         $data = array_map( function( $a ) {
@@ -683,14 +569,6 @@
         }, get_user_meta( $user_id ) );
 
         return $data;
-    }
-
-    function updateUserMeta ( $user_id, $data )
-    {
-        foreach ( $data as $key => $value )
-        {
-            update_user_meta( $user_id, $key, $value );
-        }
     }
 
     function getBillingShipping ( $user_id )
