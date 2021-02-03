@@ -19,7 +19,7 @@
     // define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
     // define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
     // define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
-    // define( 'LPT_UID',           null                                                           ); // PROD
+    // define( 'LPT_UID',            null                                                          ); // PROD
 
     define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
     define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
@@ -27,7 +27,7 @@
     define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
     define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
     define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
-    define( 'LPT_UID',           null                                                           ); // HOMOLOG
+    define( 'LPT_UID',            null                                                          ); // HOMOLOG
 
     // Override default template
     // themes/martfury/woocommerce/myaccount/form-login.php
@@ -245,6 +245,7 @@
 
         $auxName  = explode( ' ', $r_curl['name'] );
         $auxPhone = getPhone( $r_curl['triiboId'] );
+        $auxAddr  = ( isset( $r_curl['addressList'] ) ? $r_curl['addressList'] : null );
 
         $data     = [
             'username'     => $r_curl['uId'],
@@ -264,8 +265,23 @@
 
         if ( count( $r_signin['metaData'] ) > 0 )
         {
-            $set = setUserInfo( $r_curl, $r_signin['metaData'] );
-            $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
+            if ( $auxAddr != null )
+            {
+                if ( compareAddresses( $auxAddr, $r_signin['metaData'] ) )
+                {
+                    $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
+                }
+                else
+                {
+                    $set = setUserAddress(   $r_curl,        $r_signin['metaData'] );
+                    $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
+                }
+            }
+            else
+            {
+                $set = setUserAddress(   $r_curl,        $r_signin['metaData'] );
+                $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
+            }
         }
 
         if ( ! $r_signin['error'] )
@@ -277,6 +293,8 @@
                     'name'     => $data['display_name'],
                     'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
+                    // 'addr'     => $auxAddr,
+                    // 'api'      => $adr
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -423,7 +441,7 @@
         }
     }
 
-    function setUserInfo ( $info, $addrs )
+    function setUserAddress ( $info, $addrs )
     {
         $channelTokenId   = getChannelToken_v1( $info['uId'] );
 
@@ -509,39 +527,59 @@
                 'uId'            => $uId
             ],
             'uId'          => $uId,
-            'origin'       => 'marketplace',
+            // 'origin'       => 'marketplace',
             // 'zipCode'      => '06053-050',
             // 'type'         => 'shipping',
+
+            'addresses'    => [
+                // [
+                //     'origin'  => 'marketplace',
+                //     'zipCode' => '06053-050',
+                //     'type'    => 'shipping',
+                // ],
+                // [
+                //     'origin'  => 'marketplace',
+                //     'zipCode' => '04024-020',
+                //     'type'    => 'billing',
+                // ]
+            ]
         ];
 
         $result = [];
 
         foreach ($addrs as $key => $value)
         {
-            $pref_triiboHeader['zipCode'] = $value['postcode'];
-            $pref_triiboHeader['type']    = $key;
+            // $pref_triiboHeader['zipCode'] = $value['postcode'];
+            // $pref_triiboHeader['type']    = $key;
 
-            $pref_ch = curl_init();
-            curl_setopt_array( $pref_ch, array(
-                CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING       => "",
-                CURLOPT_MAXREDIRS      => 10,
-                CURLOPT_TIMEOUT        => 60,
-                CURLOPT_SSL_VERIFYPEER => false ,
-                CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST  => "POST",
-                CURLOPT_HTTPHEADER     => array(
-                    "Content-type: application/json"
-                ),
-                CURLOPT_POSTFIELDS     => json_encode( $pref_triiboHeader )
-            ));
-
-            $pref_curl = curl_exec( $pref_ch );
-            curl_close( $pref_ch );
-
-            $result[] = json_decode( $pref_curl, true );
+            $pref_triiboHeader['addresses'] = [
+                'origin'  => 'marketplace',
+                'zipCode' => $value['postcode'],
+                'type'    => $key
+            ];
         }
+
+        $pref_ch = curl_init();
+        curl_setopt_array( $pref_ch, array(
+            CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => "",
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 60,
+            CURLOPT_SSL_VERIFYPEER => false ,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => "POST",
+            CURLOPT_HTTPHEADER     => array(
+                "Content-type: application/json"
+            ),
+            CURLOPT_POSTFIELDS     => json_encode( $pref_triiboHeader )
+        ));
+
+        $pref_curl = curl_exec( $pref_ch );
+        curl_close( $pref_ch );
+
+        $result[] = json_decode( $pref_curl, true );
+        // }
 
         return $result;
     }
@@ -629,4 +667,53 @@
         }
 
         return $meta;
+    }
+
+
+    function compareAddresses ( $fire, $mkt )
+    {
+        $equal        = [ true ];
+
+        $metaBilling  = isset( $mkt['billing'] )  ? $mkt['billing']  : null;
+        $metaShipping = isset( $mkt['shipping'] ) ? $mkt['shipping'] : null;
+
+        foreach ( $fire as $addr )
+        {
+            switch ( $addr['type'] )
+            {
+                case 'billing':
+                    $b = [];
+                    $b[] = ($addr['zipCode']      == $metaBilling['postcode'])     ? true : false; // '01218-011',
+                    $b[] = ($addr['streetAve']    == $metaBilling['address_1'])    ? true : false; // 'Alameda Eduardo Prado',
+                    $b[] = ($addr['number']       == $metaBilling['number'])       ? true : false; //  170,
+                    $b[] = ($addr['extra']        == $metaBilling['address_2'])    ? true : false; // 'Apto 125A',
+                    $b[] = ($addr['neighborhood'] == $metaBilling['neighborhood']) ? true : false; // 'Campos Eliseos',
+                    $b[] = ($addr['city']         == $metaBilling['city'])         ? true : false; // 'São Paulo',
+                    $b[] = ($addr['state']        == $metaBilling['state'])        ? true : false; // 'SP',
+
+                    if ( in_array( false, $b))
+                    {
+                        $equal[] = false;
+                    }
+                    break;
+
+                case 'shipping':
+                    $s = [];
+                    $s[] = ($addr['zipCode']      == $metaShipping['postcode'])     ? true : false; // '01218-011',
+                    $s[] = ($addr['streetAve']    == $metaShipping['address_1'])    ? true : false; // 'Alameda Eduardo Prado',
+                    $s[] = ($addr['number']       == $metaShipping['number'])       ? true : false; //  170,
+                    $s[] = ($addr['extra']        == $metaShipping['address_2'])    ? true : false; // 'Apto 125A',
+                    $s[] = ($addr['neighborhood'] == $metaShipping['neighborhood']) ? true : false; // 'Campos Eliseos',
+                    $s[] = ($addr['city']         == $metaShipping['city'])         ? true : false; // 'São Paulo',
+                    $s[] = ($addr['state']        == $metaShipping['state'])        ? true : false; // 'SP',
+
+                    if ( in_array( false, $s))
+                    {
+                        $equal[] = false;
+                    }
+                    break;
+            }
+        }
+
+        return ( in_array( false, $equal ) ) ? false : true;
     }
