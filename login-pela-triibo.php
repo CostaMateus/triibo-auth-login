@@ -29,43 +29,88 @@
     define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
     define( 'LPT_UID',            null                                                          ); // HOMOLOG
 
+    // UID = "s6gQlMxJK8RbBSO641my8JdAK0q2"; // Mateus
+
+    add_action('init', 'lpt_init_status_global');
+    function lpt_init_status_global()
+    {
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
+
+        if ( false === $_STATUS_PLUGIN ) {
+            set_transient( '_STATUS_PLUGIN', 'active' ); // inactive
+        }
+    }
+    lpt_init_status_global();
+
+
+    add_action( 'wp_ajax_lpt_set_status_global', 'lpt_set_status_global' );
+    function lpt_set_status_global()
+    {
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
+
+        if ( $_STATUS_PLUGIN == 'active' )
+        {
+            set_transient( '_STATUS_PLUGIN', 'inactive' );
+            $_STATUS_PLUGIN = 'inactive';
+        }
+        else
+        {
+            set_transient( '_STATUS_PLUGIN', 'active' );
+            $_STATUS_PLUGIN = 'active';
+        }
+
+        echo $_STATUS_PLUGIN;
+        die();
+    }
+
+
+
     // Override default template
     // themes/martfury/woocommerce/myaccount/form-login.php
     // plugins/woocommerce/templates/myaccount/form-login.php
     add_filter( 'woocommerce_locate_template', 'lptriibo_woocommerce_locate_template', 999, 3 );
     function lptriibo_woocommerce_locate_template( $template, $template_name, $template_path )
     {
-        global $woocommerce;
-        $_template    = $template;
-        if ( ! $template_path ) $template_path = $woocommerce->template_url;
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
-        $plugin_path  = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/woocommerce/';
-
-        if ( $template_name == 'myaccount/form-login.php' )
+        if ( $_STATUS_PLUGIN == 'active' )
         {
-            $template = $plugin_path . $template_name;
-        }
-        else
-        {
-            // Look within passed path within the theme - this is priority
-            $template = locate_template( array( $template_path . $template_name, $template_name ) );
+            global $woocommerce;
+            $_template = $template;
 
-            // Modification: Get the template from this plugin, if it exists
-            if ( ! $template && file_exists( $plugin_path . $template_name ) )
+            if ( ! $template_path ) $template_path = $woocommerce->template_url;
+
+            $plugin_path  = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/woocommerce/';
+
+            if ( $template_name == 'myaccount/form-login.php' )
             {
                 $template = $plugin_path . $template_name;
             }
-            // Use default template
-            if ( ! $template )
+            else
             {
-                $template = $_template;
+                // Look within passed path within the theme - this is priority
+                $template = locate_template( array( $template_path . $template_name, $template_name ) );
+
+                // Modification: Get the template from this plugin, if it exists
+                if ( ! $template && file_exists( $plugin_path . $template_name ) )
+                {
+                    $template = $plugin_path . $template_name;
+                }
+                // Use default template
+                if ( ! $template )
+                {
+                    $template = $_template;
+                }
             }
+
+            // Return what we found
+            return $template;
         }
-
-        // Return what we found
-        return $template;
+        else
+        {
+            return $template;
+        }
     }
-
 
 
     /*
@@ -95,7 +140,6 @@
 
         include_once( plugin_dir_path( __FILE__ ) . 'includes/lptriibo-admin.php' );
     }
-
 
 
     add_action( 'wp_ajax_authSMS_v1',        'authSMS_v1' );
@@ -263,25 +307,10 @@
 
         $r_signin = signIn( $data );
 
-        if ( count( $r_signin['metaData'] ) > 0 )
+        if ( count( $r_signin['metaDataAddrs'] ) > 0 )
         {
-            if ( $auxAddr != null )
-            {
-                if ( compareAddresses( $auxAddr, $r_signin['metaData'] ) )
-                {
-                    $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
-                }
-                else
-                {
-                    $set = setUserAddress(   $r_curl,        $r_signin['metaData'] );
-                    $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
-                }
-            }
-            else
-            {
-                $set = setUserAddress(   $r_curl,        $r_signin['metaData'] );
-                $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaData'] );
-            }
+            $set = setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
+            $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
         }
 
         if ( ! $r_signin['error'] )
@@ -293,8 +322,6 @@
                     'name'     => $data['display_name'],
                     'nickname' => $data['nickname'],
                     'redirect' => $r_signin['url'],
-                    // 'addr'     => $auxAddr,
-                    // 'api'      => $adr
                 ],
                 'error'   => null,
                 'alert'   => null,
@@ -422,18 +449,16 @@
             wp_set_current_user( $user->ID );
             wp_set_auth_cookie( $user->ID );
 
-            $metaData = getBillingShipping( $user->ID );
+            $metaDataAddrs = getBillingShipping( $user->ID );
 
-            // return home_url('/my-account');
             return [
-                'error'    => false,
-                'url'      => home_url( '/my-account' ),
-                'metaData' => $metaData,
+                'error'         => false,
+                'url'           => home_url( '/my-account' ),
+                'metaDataAddrs' => $metaDataAddrs,
             ];
         }
         else
         {
-            // throw new Exception('Error');
             return [
                 'error'   => true,
                 'message' => 'L404'
@@ -472,18 +497,17 @@
         foreach ($addrs as $key => $value)
         {
             $set_triiboHeader['userInfo']['addressList'][$i++] = [
-                'zipCode'      => $value['postcode'],     // '01218-011',
-                'streetAve'    => $value['address_1'],    // 'Alameda Eduardo Prado',
-                'number'       => $value['number'],       //  170,
-                'extra'        => $value['address_2'],    // 'Apto 125A',
-                'neighborhood' => $value['neighborhood'], // 'Campos Eliseos',
-                'city'         => $value['city'],         // 'São Paulo',
-                'state'        => $value['state'],        // 'SP',
-                'country'      => $value['country'],      // 'Brasil',
+                'zipCode'      => $value['postcode'],
+                'streetAve'    => $value['address_1'],
+                'number'       => $value['number'],
+                'extra'        => $value['address_2'],
+                'neighborhood' => $value['neighborhood'],
+                'city'         => $value['city'],
+                'state'        => $value['state'],
+                'country'      => $value['country'],
                 'googleAddr'   => $value['address_1'] . ', ' . $value['number'] . ' - ' . $value['neighborhood'] . ', ' . $value['city'] . ' - ' . $value['state'] . ', ' . $value['postcode'],
-                               // 'Alameda Eduardo Prado ,     170                  -     Campos Elíseos            ,     São Paulo          -     SP                 ,     01218-011',
-                'type'         => $key,                   // comercial, residencial, billing, shipping
-                'origin'       => 'marketplace',          // marketplace,
+                'type'         => $key,          // comercial, residencial, billing, shipping
+                'origin'       => 'marketplace', // marketplace,
             ];
         }
 
@@ -527,16 +551,8 @@
                 'uId'            => $uId
             ],
             'uId'          => $uId,
-            // 'origin'       => 'marketplace',
-            // 'zipCode'      => '06053-050',
-            // 'type'         => 'shipping',
 
             'addresses'    => [
-                // [
-                //     'origin'  => 'marketplace',
-                //     'zipCode' => '06053-050',
-                //     'type'    => 'shipping',
-                // ],
                 // [
                 //     'origin'  => 'marketplace',
                 //     'zipCode' => '04024-020',
@@ -549,10 +565,7 @@
 
         foreach ($addrs as $key => $value)
         {
-            // $pref_triiboHeader['zipCode'] = $value['postcode'];
-            // $pref_triiboHeader['type']    = $key;
-
-            $pref_triiboHeader['addresses'] = [
+            $pref_triiboHeader['addresses'][] = [
                 'origin'  => 'marketplace',
                 'zipCode' => $value['postcode'],
                 'type'    => $key
@@ -579,7 +592,6 @@
         curl_close( $pref_ch );
 
         $result[] = json_decode( $pref_curl, true );
-        // }
 
         return $result;
     }
@@ -625,7 +637,6 @@
             {
                 if ( $key == 'type' && $value == 'cpf' )
                 {
-                    // averiguar, não esta vindo completo
                     $cpf = $temp['value'];
                 }
             }
@@ -682,32 +693,40 @@
             switch ( $addr['type'] )
             {
                 case 'billing':
-                    $b = [];
-                    $b[] = ($addr['zipCode']      == $metaBilling['postcode'])     ? true : false; // '01218-011',
-                    $b[] = ($addr['streetAve']    == $metaBilling['address_1'])    ? true : false; // 'Alameda Eduardo Prado',
-                    $b[] = ($addr['number']       == $metaBilling['number'])       ? true : false; //  170,
-                    $b[] = ($addr['extra']        == $metaBilling['address_2'])    ? true : false; // 'Apto 125A',
-                    $b[] = ($addr['neighborhood'] == $metaBilling['neighborhood']) ? true : false; // 'Campos Eliseos',
-                    $b[] = ($addr['city']         == $metaBilling['city'])         ? true : false; // 'São Paulo',
-                    $b[] = ($addr['state']        == $metaBilling['state'])        ? true : false; // 'SP',
+                    if ( $metaBilling )
+                    {
+                        $b = [];
+                        $b[] = ( $addr['zipCode']      == $metaBilling['postcode'] )     ? true : false;
+                        $b[] = ( $addr['streetAve']    == $metaBilling['address_1'] )    ? true : false;
+                        $b[] = ( $addr['number']       == $metaBilling['number'] )       ? true : false;
+                        $b[] = ( $addr['extra']        == $metaBilling['address_2'] )    ? true : false;
+                        $b[] = ( $addr['neighborhood'] == $metaBilling['neighborhood'] ) ? true : false;
+                        $b[] = ( $addr['city']         == $metaBilling['city'] )         ? true : false;
+                        $b[] = ( $addr['state']        == $metaBilling['state'] )        ? true : false;
 
-                    if ( in_array( false, $b))
+                        $equal[] = verify_array( $b );
+                    }
+                    else
                     {
                         $equal[] = false;
                     }
                     break;
 
                 case 'shipping':
-                    $s = [];
-                    $s[] = ($addr['zipCode']      == $metaShipping['postcode'])     ? true : false; // '01218-011',
-                    $s[] = ($addr['streetAve']    == $metaShipping['address_1'])    ? true : false; // 'Alameda Eduardo Prado',
-                    $s[] = ($addr['number']       == $metaShipping['number'])       ? true : false; //  170,
-                    $s[] = ($addr['extra']        == $metaShipping['address_2'])    ? true : false; // 'Apto 125A',
-                    $s[] = ($addr['neighborhood'] == $metaShipping['neighborhood']) ? true : false; // 'Campos Eliseos',
-                    $s[] = ($addr['city']         == $metaShipping['city'])         ? true : false; // 'São Paulo',
-                    $s[] = ($addr['state']        == $metaShipping['state'])        ? true : false; // 'SP',
+                    if ( $metaShipping )
+                    {
+                        $s = [];
+                        $s[] = ( $addr['zipCode']      == $metaShipping['postcode'] )     ? true : false;
+                        $s[] = ( $addr['streetAve']    == $metaShipping['address_1'] )    ? true : false;
+                        $s[] = ( $addr['number']       == $metaShipping['number'] )       ? true : false;
+                        $s[] = ( $addr['extra']        == $metaShipping['address_2'] )    ? true : false;
+                        $s[] = ( $addr['neighborhood'] == $metaShipping['neighborhood'] ) ? true : false;
+                        $s[] = ( $addr['city']         == $metaShipping['city'] )         ? true : false;
+                        $s[] = ( $addr['state']        == $metaShipping['state'] )        ? true : false;
 
-                    if ( in_array( false, $s))
+                        $equal[] = verify_array( $s );
+                    }
+                    else
                     {
                         $equal[] = false;
                     }
@@ -715,5 +734,18 @@
             }
         }
 
-        return ( in_array( false, $equal ) ) ? false : true;
+        return verify_array( $equal );
+    }
+
+
+    function verify_array ( $array )
+    {
+        return ( in_array( false, $array ) ) ? false : true;
+    }
+
+
+    add_action('init', 'lpt_admin_only');
+    function lpt_admin_only()
+    {
+        return "Function test";
     }
