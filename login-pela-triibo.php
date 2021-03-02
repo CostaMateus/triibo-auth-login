@@ -31,7 +31,7 @@
 
     // UID = "s6gQlMxJK8RbBSO641my8JdAK0q2"; // Mateus
 
-    add_action('init', 'lpt_init_status_global');
+    add_action( 'init', 'lpt_init_status_global' );
     function lpt_init_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
@@ -65,7 +65,7 @@
 
 
 
-    // Override default template
+    // Override default template if active
     // themes/martfury/woocommerce/myaccount/form-login.php
     // plugins/woocommerce/templates/myaccount/form-login.php
     add_filter( 'woocommerce_locate_template', 'lptriibo_woocommerce_locate_template', 999, 3 );
@@ -737,15 +737,7 @@
         return verify_array( $equal );
     }
 
-
     function verify_array ( $array )
     {
         return ( in_array( false, $array ) ) ? false : true;
-    }
-
-
-    add_action('init', 'lpt_admin_only');
-    function lpt_admin_only()
-    {
-        return "Function test";
     }
