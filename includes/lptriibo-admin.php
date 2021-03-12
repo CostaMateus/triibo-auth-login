@@ -3,32 +3,42 @@
 
     if ( $_STATUS_PLUGIN == 'active' )
     {
-        // $status  = false;
         $stt_txt = 'ATIVO';
         $btn_msg = 'Desativar login Triibo';
     }
     else
     {
-        // $status  = true;
         $stt_txt = 'INATIVO';
         $btn_msg = 'Ativar login Triibo';
     }
 ?>
 
 <style>
-    .msg-status { font-weight: bold !important; }
-    h4 { margin-bottom: 8px !important; }
+    #msg-status        { margin-bottom: 8px !important; }
+    #msg-status span   { font-weight: bold !important; }
     #btn-triibo-status { margin-bottom: 20px; }
+
+    .d-none    { display: none !important; }
+    .set-spin  { display: flex!important; justify-content: center; }
+    .spin-load { width: 8px; height: 8px; margin: auto 5px; border: 3px solid #AEAEAE; border-top: 3px solid #0071A1; border-radius: 50%; -webkit-animation: spin 1s linear infinite; /* Safari */ animation: spin 1s linear infinite; }
+
+    @-webkit-keyframes spin {
+        0%   { -webkit-transform: rotate(0deg);   }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+    @keyframes spin {
+        0%   { transform: rotate(0deg);   }
+        100% { transform: rotate(360deg); }
+    }
 </style>
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script> -->
 <script>
     jQuery( '.notice, .error' ).css( "display", "none" );
 
-    console.log('<?=get_transient( '_STATUS_PLUGIN' )?>');
-
     window.onload = function() {
         jQuery( '#btn-triibo-status' ).on( 'click', function ( e ) {
+
+            jQuery( '#btn-triibo-status' ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
 
             jQuery.ajax({
                 url : '/wp-admin/admin-ajax.php',
@@ -37,11 +47,25 @@
                     action : 'lpt_set_status_global'
                 },
                 success: function( data ) {
-                    console.log( data );
-                    window.location.reload();
+                    // console.log( data );
+                    // window.location.reload();
+
+                    switch ( data ) {
+                        case 'active':
+                            jQuery('#txt-triibo-status').html('ATIVO');
+                            jQuery('#btn-triibo-status').html('Desativar login Triibo <div class="d-none spin-load">');
+                            break;
+                        case 'inactive':
+                            jQuery('#txt-triibo-status').html('INATIVO');
+                            jQuery('#btn-triibo-status').html('Ativar login Triibo <div class="d-none spin-load">');
+                            break;
+                    }
+
+                    jQuery( '#btn-triibo-status' ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
                 },
                 error: function( data ) {
                     console.log( data );
+                    jQuery( '#btn-triibo-status' ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
                 }
             });
         });
@@ -50,8 +74,8 @@
 
 <div class="wrap">
     <h1>Login pela Triibo</h1>
-    <h4>O plugin está: <span class="msg-status" ><?=$stt_txt?></span></h4>
-    <button type="button" id="btn-triibo-status" class="woocommerce-Button button" ><?=$btn_msg?></button>
+    <h4 id="msg-status" >O plugin está: <span id="txt-triibo-status" ><?=$stt_txt?></span></h4>
+    <button type="button" id="btn-triibo-status" class="woocommerce-Button button set-spin" ><?=$btn_msg?> <div class="d-none spin-load"></div></button>
 
     <p>O plugin tem por finalidade habilitar no marketplace a posibilidade de se realizar o login pela Triibo.</p>
     <p>Quando ativado, o plugin irá inserir o botão "Entrar com Triibo" na página de login, como mostra a imagem.</p>
