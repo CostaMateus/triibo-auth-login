@@ -29,7 +29,7 @@
     // define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
     // define( 'LPT_UID',            null                                                          ); // HOMOLOG
 
-    // UID = "s6gQlMxJK8RbBSO641my8JdAK0q2"; // Mateus hml
+    // UID = "C4kNtsVlN1fKi4AFV4tIjt7vQID3"; // Mateus hml
     // UID = "K4uLXGE8diaOr70n9abQoLt9tmA3"; // Mateus prod
 
     add_action( 'init', 'lpt_init_consts_global' );
