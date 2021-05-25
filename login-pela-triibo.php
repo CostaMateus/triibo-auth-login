@@ -2,7 +2,7 @@
     /**
     * Plugin Name: #Login pela Triibo
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 1.0
+    * Version: 2.0
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
@@ -21,24 +21,92 @@
     // define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
     // define( 'LPT_UID',            null                                                          ); // PROD
 
-    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
-    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
-    define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
-    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
-    define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
-    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
-    define( 'LPT_UID',            null                                                          ); // HOMOLOG
+    // define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
+    // define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
+    // define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
+    // define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
+    // define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
+    // define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
+    // define( 'LPT_UID',            null                                                          ); // HOMOLOG
 
     // UID = "s6gQlMxJK8RbBSO641my8JdAK0q2"; // Mateus hml
     // UID = "K4uLXGE8diaOr70n9abQoLt9tmA3"; // Mateus prod
+
+    add_action( 'init', 'lpt_init_consts_global' );
+    function lpt_init_consts_global()
+    {
+        $_LPT_ENV = get_transient( '_LPT_ENV' );
+
+        if ( $_LPT_ENV === false )
+        {
+            set_transient( '_LPT_ENV', 'hml' ); // hml-prod
+        }
+        else
+        {
+            $aux_LPT_CHANNEL_ID    = '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070';
+            $aux_LPT_CHANNEL_GROUP = 'triibo-webapp';
+            $aux_LPT_CHANNEL_NAME  = 'triibo-webapp';
+            $aux_LPT_UID           = NULL;
+
+            set_transient( '_LPT_ENV_CHANNEL_ID',    $aux_LPT_CHANNEL_ID    );
+            set_transient( '_LPT_ENV_CHANNEL_GROUP', $aux_LPT_CHANNEL_GROUP );
+            set_transient( '_LPT_ENV_CHANNEL_NAME',  $aux_LPT_CHANNEL_NAME  );
+            set_transient( '_LPT_ENV_UID',           $aux_LPT_UID           );
+
+            define( 'LPT_CHANNEL_ID',    $aux_LPT_CHANNEL_ID    );
+            define( 'LPT_CHANNEL_GROUP', $aux_LPT_CHANNEL_GROUP );
+            define( 'LPT_CHANNEL_NAME',  $aux_LPT_CHANNEL_NAME  );
+            define( 'LPT_UID',           $aux_LPT_UID           );
+
+            if ( $_LPT_ENV == 'prod' )
+            {
+                $aux_LPT_API_URL       = 'https://triibo-api-gateway.triibo.com.br/';
+                $aux_LPT_API_TOKEN     = ''; // 57336266417050612750524C4170495029
+                $aux_LPT_CHANNEL_TOKEN = ''; // 38522162405733624170505052236368403138
+
+                set_transient( '_LPT_PROD_API_URL',       $aux_LPT_API_URL       );
+                set_transient( '_LPT_PROD_API_TOKEN',     $aux_LPT_API_TOKEN     );
+                set_transient( '_LPT_PROD_CHANNEL_TOKEN', $aux_LPT_CHANNEL_TOKEN );
+
+                define( 'LPT_API_URL',                    $aux_LPT_API_URL       ); // PROD
+                define( 'LPT_API_TOKEN',                  $aux_LPT_API_TOKEN     ); // PROD
+                define( 'LPT_CHANNEL_TOKEN',              $aux_LPT_CHANNEL_TOKEN ); // PROD
+            }
+            else
+            {
+                $aux_LPT_API_URL       = 'https://triibo-api-gateway-hml.triibo.com.br/';
+                $aux_LPT_API_TOKEN     = ''; // 7472216240776562417070486d4c6170693139
+                $aux_LPT_CHANNEL_TOKEN = ''; // 305221624057656241707021403131
+
+                set_transient( '_LPT_HML_API_URL',        $aux_LPT_API_URL       );
+                set_transient( '_LPT_HML_API_TOKEN',      $aux_LPT_API_TOKEN     );
+                set_transient( '_LPT_HML_CHANNEL_TOKEN',  $aux_LPT_CHANNEL_TOKEN );
+
+                define( 'LPT_API_URL',                    $aux_LPT_API_URL       ); // HML
+                define( 'LPT_API_TOKEN',                  $aux_LPT_API_TOKEN     ); // HML
+                define( 'LPT_CHANNEL_TOKEN',              $aux_LPT_CHANNEL_TOKEN ); // HML
+            }
+        }
+    }
+    lpt_init_consts_global();
+
+    add_action( 'wp_ajax_lpt_set_status_global', 'lpt_set_consts_global' );
+    function lpt_set_consts_global()
+    {
+        $env = $_POST['env'];
+
+        $api_token     = ($env = 'hml') ? $_POST['hml-api-token']     : $_POST['prod-api-token'];
+        $channel_token = ($env = 'hml') ? $_POST['hml-channel-token'] : $_POST['prod-channel-token'];
+    }
+
 
     add_action( 'init', 'lpt_init_status_global' );
     function lpt_init_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
-        if ( false === $_STATUS_PLUGIN ) {
-            set_transient( '_STATUS_PLUGIN', 'active' ); // inactive
+        if ( $_STATUS_PLUGIN === false ) {
+            set_transient( '_STATUS_PLUGIN', 'inactive' ); // active
         }
     }
     lpt_init_status_global();
