@@ -372,6 +372,8 @@
         window.haveCode = function () {
             $( modal_auth  ).addClass( 'd-none' );
             $( modal_valid ).removeClass( 'd-none' );
+
+            $( '#code' ).focus();
         }
 
 
@@ -414,6 +416,8 @@
         {
             // exibe modal para informar o celular
             $( modal_auth ).removeClass( 'd-none' );
+
+            $( '#cellphone' ).focus();
 
             // verifica variaveis de controle
             // exibe botão para mudar para o modal de informar o cod
@@ -535,6 +539,8 @@
                         // fecha modal atual e abre o modal do cod
                         $( modal_auth  ).addClass('d-none');
                         $( modal_valid ).removeClass('d-none');
+
+                        $( '#code' ).focus();
 
                         $( btn_auth ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
                     }
