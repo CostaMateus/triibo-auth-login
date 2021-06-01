@@ -2,7 +2,7 @@
     /**
     * Plugin Name: #Login pela Triibo
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 1.1
+    * Version: 1.1.2
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
