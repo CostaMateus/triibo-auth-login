@@ -32,6 +32,10 @@
     // UID = "C4kNtsVlN1fKi4AFV4tIjt7vQID3"; // Mateus hml
     // UID = "K4uLXGE8diaOr70n9abQoLt9tmA3"; // Mateus prod
 
+
+    /**
+     * Registrando variavel para controle de status do plugin | atiivo - inativo
+     */
     add_action( 'init', 'lpt_init_status_global' );
     function lpt_init_status_global()
     {
@@ -44,6 +48,9 @@
     lpt_init_status_global();
 
 
+    /**
+     * Alterna o sttus do plugin | ativo - inativo
+     */
     add_action( 'wp_ajax_lpt_set_status_global', 'lpt_set_status_global' );
     function lpt_set_status_global()
     {
@@ -65,58 +72,44 @@
     }
 
 
-
-    // Override default template if active
-    // themes/martfury/woocommerce/myaccount/form-login.php
-    // plugins/woocommerce/templates/myaccount/form-login.php
-    add_filter( 'woocommerce_locate_template', 'lptriibo_woocommerce_locate_template', 999, 3 );
-    function lptriibo_woocommerce_locate_template( $template, $template_name, $template_path )
+    /**
+     * Adiciona o botão "Entrar com Triibo" ao formulário de login
+     */
+    add_action( 'woocommerce_login_form_end', 'lpt_woocommerce_login_form_end' );
+    function lpt_woocommerce_login_form_end() 
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
         if ( $_STATUS_PLUGIN == 'active' )
         {
-            global $woocommerce;
-            $_template = $template;
-
-            if ( ! $template_path ) $template_path = $woocommerce->template_url;
-
-            $plugin_path  = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/woocommerce/';
-
-            if ( $template_name == 'myaccount/form-login.php' )
-            {
-                $template = $plugin_path . $template_name;
-            }
-            else
-            {
-                // Look within passed path within the theme - this is priority
-                $template = locate_template( array( $template_path . $template_name, $template_name ) );
-
-                // Modification: Get the template from this plugin, if it exists
-                if ( ! $template && file_exists( $plugin_path . $template_name ) )
-                {
-                    $template = $plugin_path . $template_name;
-                }
-                // Use default template
-                if ( ! $template )
-                {
-                    $template = $_template;
-                }
-            }
-
-            // Return what we found
-            return $template;
+            echo "
+                <p class=\"form-row\">                                
+                    <button type=\"button\" class=\"woocommerce-Button button set-spin\" style=\"margin-top:0px!important;\" name=\"triibo-login\"
+                        id=\"btn-triibo-login\" >Entrar com Triibo <div class=\"d-none spin-load\"></div></button>
+                </p>
+            ";
         }
-        else
+    }
+    
+    
+    /**
+     * Inclui o trecho de código necessário para fazer o login com Triibo
+     */
+    add_action( 'martfury_after_login_form', 'lpt_martfury_after_login_form' );
+    function lpt_martfury_after_login_form()
+    {
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
+
+        if ( $_STATUS_PLUGIN == 'active' )
         {
-            return $template;
+            include_once( plugin_dir_path( __FILE__ ) . 'includes/pages/modal-login.html' );
         }
     }
 
 
-    /*
-    * Add new menu to the Admin Control Panel
-    */
+    /**
+     * Add new menu to the Admin Control Panel
+     */
     // Hook the 'admin_menu' action hook, run the function named 'lptriibo_add_admin_link()'
     add_action( 'admin_menu', 'lptriibo_add_admin_link' );
     // Add a new top level menu link to the ACP
@@ -143,6 +136,9 @@
     }
 
 
+    /**
+     * Envia códgio por sms
+     */
     add_action( 'wp_ajax_authSMS_v1',        'authSMS_v1' );
     add_action( 'wp_ajax_nopriv_authSMS_v1', 'authSMS_v1' );
     function authSMS_v1()
@@ -188,6 +184,9 @@
     }
 
 
+    /**
+     * valida código recebido por sms
+     */
     add_action( 'wp_ajax_validateSMS_v1',        'validateSMS_v1' );
     add_action( 'wp_ajax_nopriv_validateSMS_v1', 'validateSMS_v1' );
     function validateSMS_v1()
@@ -234,6 +233,9 @@
     }
 
 
+    /**
+     * Recuper dados do usuario
+     */
     add_action( 'wp_ajax_userInfo_v1',        'userInfo_v1' );
     add_action( 'wp_ajax_nopriv_userInfo_v1', 'userInfo_v1' );
     function userInfo_v1()
@@ -342,6 +344,9 @@
         echo json_encode( $result );
         die();
     }
+
+    
+    
 
     function getChannelToken_v1( $uId )
     {
