@@ -2,36 +2,43 @@
     /**
     * Plugin Name: #Login pela Triibo
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 1.1.2
+    * Version: 2.0
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
 
     // don't call the file directly
-    if ( ! defined( 'ABSPATH' ) )
+    if ( ! defined( 'ABSPATH' ) ) exit;
+
+    /**
+     * Verifica o ambiente que está
+     * $isDev = strpos(home_url(), "dev-");
+     */
+    if (strpos(home_url(), "dev-") !== false)
     {
-        exit;
+        // $isDev = "TRUE";
+        define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
+        define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
+        define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
+        define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
+        define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
+        define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
+        define( 'LPT_UID',            null                                                          ); // HOMOLOG
     }
-
-    // define( 'LPT_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
-    // define( 'LPT_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
-    // define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // PROD
-    // define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
-    // define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
-    // define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
-    // define( 'LPT_UID',            null                                                          ); // PROD
-
-    define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
-    define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
-    define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
-    define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
-    define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
-    define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
-    define( 'LPT_UID',            null                                                          ); // HOMOLOG
+    else
+    {
+        // $isDev = "FALSE";
+        define( 'LPT_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
+        define( 'LPT_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
+        define( 'LPT_CHANNEL_ID',    '21726962305052442443686E336C6C573342417050'                   ); // PROD
+        define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
+        define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
+        define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
+        define( 'LPT_UID',            null                                                          ); // PROD
+    }
 
     // UID = "C4kNtsVlN1fKi4AFV4tIjt7vQID3"; // Mateus hml
     // UID = "K4uLXGE8diaOr70n9abQoLt9tmA3"; // Mateus prod
-
 
     /**
      * Registrando variavel para controle de status do plugin | atiivo - inativo
@@ -41,9 +48,7 @@
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
-        if ( $_STATUS_PLUGIN === false ) {
-            set_transient( '_STATUS_PLUGIN', 'inactive' ); // active
-        }
+        if ( $_STATUS_PLUGIN === false ) set_transient( '_STATUS_PLUGIN', 'inactive' ); // active
     }
     lpt_init_status_global();
 
@@ -76,22 +81,25 @@
      * Adiciona o botão "Entrar com Triibo" ao formulário de login
      */
     add_action( 'woocommerce_login_form_end', 'lpt_woocommerce_login_form_end' );
-    function lpt_woocommerce_login_form_end() 
+    function lpt_woocommerce_login_form_end()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
         if ( $_STATUS_PLUGIN == 'active' )
         {
-            echo "
-                <p class=\"form-row\">                                
-                    <button type=\"button\" class=\"woocommerce-Button button set-spin\" style=\"margin-top:0px!important;\" name=\"triibo-login\"
-                        id=\"btn-triibo-login\" >Entrar com Triibo <div class=\"d-none spin-load\"></div></button>
+            echo '
+                <p class="form-row">
+                    <button type="button" class="woocommerce-Button button set-spin"
+                        style="margin-top:0px!important;" name="triibo-login"
+                        id="btn-triibo-login" >
+                        Entrar com Triibo <div class="d-none spin-load"></div>
+                    </button>
                 </p>
-            ";
+            ';
         }
     }
-    
-    
+
+
     /**
      * Inclui o trecho de código necessário para fazer o login com Triibo
      */
@@ -100,37 +108,28 @@
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
-        if ( $_STATUS_PLUGIN == 'active' )
-        {
-            include_once( plugin_dir_path( __FILE__ ) . 'includes/pages/modal-login.html' );
-        }
+        if ( $_STATUS_PLUGIN == 'active' ) include_once( plugin_dir_path( __FILE__ ) . 'includes/pages/modal-login.html' );
     }
 
 
     /**
      * Add new menu to the Admin Control Panel
      */
-    // Hook the 'admin_menu' action hook, run the function named 'lptriibo_add_admin_link()'
     add_action( 'admin_menu', 'lptriibo_add_admin_link' );
-    // Add a new top level menu link to the ACP
     function lptriibo_add_admin_link()
     {
         add_menu_page(
-            'Login pela Triibo', // The text to be displayed in the title tags of the page when the menu is selected
-            'Login Triibo',      // The text to be used for the menu
-            'manage_options',    // The capability required for this menu to be displayed to the user
-            'login-pela-triibo', // The slug name to refer to this menu by
-            'lptriibo_admin',    // The function to be called to output the content for this page
+            'Login pela Triibo',
+            'Login Triibo',
+            'manage_options',
+            'login-pela-triibo',
+            'lptriibo_admin',
             plugin_dir_url( __FILE__ ) . 'includes/images/triibo20.png'
         );
     }
-    // Call the template of admin page
     function lptriibo_admin()
     {
-        if ( ! current_user_can( 'manage_options' ) )
-        {
-            wp_die( __( 'Você não tem permissões suficientes para acessar esta página.' ) );
-        }
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( __( 'Você não tem permissões suficientes para acessar esta página.' ) );
 
         include_once( plugin_dir_path( __FILE__ ) . 'includes/lptriibo-admin.php' );
     }
@@ -234,7 +233,7 @@
 
 
     /**
-     * Recuper dados do usuario
+     * Recupera dados do usuario na Triibo
      */
     add_action( 'wp_ajax_userInfo_v1',        'userInfo_v1' );
     add_action( 'wp_ajax_nopriv_userInfo_v1', 'userInfo_v1' );
@@ -312,8 +311,13 @@
 
         if ( count( $r_signin['metaDataAddrs'] ) > 0 )
         {
+			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return setUserAddress" . PHP_EOL;
             $set = setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
+            file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($set, true), FILE_APPEND);
+
+			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return setPreferAddress" . PHP_EOL;
             $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
+            file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($adr, true), FILE_APPEND);
         }
 
         if ( ! $r_signin['error'] )
@@ -345,8 +349,8 @@
         die();
     }
 
-    
-    
+
+
 
     function getChannelToken_v1( $uId )
     {
@@ -386,6 +390,9 @@
         $result = curl_exec( $token_ch );
         curl_close( $token_ch );
 
+        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Return channel" . PHP_EOL;
+        file_put_contents(ABSPATH . 'zLog_LPT_channel.txt', $ql . print_r( json_decode( $result ), true), FILE_APPEND);
+
         return json_decode( $result );
     }
 
@@ -396,6 +403,9 @@
         return $challenge2;
     }
 
+    /**
+     * Efetua login do usuário no wordpress
+     */
     function signIn( $data )
     {
         if ( ! username_exists( $data['username'] ) )
@@ -472,7 +482,10 @@
         }
     }
 
-    function setUserAddress ( $info, $addrs )
+    /**
+     * Manda os endereços do usuário para a Triibo
+     */
+    function setUserAddress( $info, $addrs )
     {
         $channelTokenId   = getChannelToken_v1( $info['uId'] );
 
@@ -502,6 +515,18 @@
         $i = 0;
         foreach ($addrs as $key => $value)
         {
+            if (empty($value['postcode']) &&
+                empty($value['address_1']) &&
+                empty($value['address_2']) &&
+                empty($value['number']) &&
+                empty($value['neighborhood']) &&
+                empty($value['city']) &&
+                empty($value['state']) &&
+                empty($value['country'])
+            ) {
+                continue;
+            }
+
             $set_triiboHeader['userInfo']['addressList'][$i++] = [
                 'zipCode'      => $value['postcode'],
                 'streetAve'    => $value['address_1'],
@@ -516,6 +541,9 @@
                 'origin'       => 'marketplace', // marketplace,
             ];
         }
+
+        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Header setUserInfo_v1" . PHP_EOL;
+        file_put_contents(ABSPATH . 'zLog_LPT_header.txt', $ql . print_r($set_triiboHeader, true), FILE_APPEND);
 
         $set_ch = curl_init();
 		curl_setopt_array( $set_ch, array(
@@ -541,7 +569,7 @@
         return $set_curl;
     }
 
-    function setPreferAddress ( $uId, $addrs )
+    function setPreferAddress( $uId, $addrs )
     {
         $channelTokenId    = getChannelToken_v1( $uId );
 
@@ -571,6 +599,8 @@
 
         foreach ($addrs as $key => $value)
         {
+            if (empty($value['postcode'])) continue;
+
             $pref_triiboHeader['addresses'][] = [
                 'origin'  => 'marketplace',
                 'zipCode' => $value['postcode'],
@@ -578,9 +608,13 @@
             ];
         }
 
+        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Header preferentialAddress" . PHP_EOL;
+        file_put_contents(ABSPATH . 'zLog_LPT_header.txt', $ql . print_r($pref_triiboHeader, true), FILE_APPEND);
+
         $pref_ch = curl_init();
         curl_setopt_array( $pref_ch, array(
-            CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
+            // CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
+            CURLOPT_URL            => LPT_API_URL . 'preferentialAddress',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING       => "",
             CURLOPT_MAXREDIRS      => 10,
@@ -608,7 +642,7 @@
     /**
      * Funções internas
      */
-    function getEmail ( $data )
+    function getEmail( $data )
     {
         $email = null;
 
@@ -626,14 +660,14 @@
         return $email;
     }
 
-    function getPhone ( $data )
+    function getPhone( $data )
     {
         $phone = explode( '@', $data )[0];
 
         return substr( $phone, 3 );
     }
 
-    function getCpf ( $data )
+    function getCpf( $data )
     {
         $cpf = '';
 
@@ -651,7 +685,7 @@
         return $cpf;
     }
 
-    function getUserMeta ( $user_id )
+    function getUserMeta( $user_id )
     {
         $data = array_map( function( $a ) {
             return $a[0];
@@ -660,7 +694,7 @@
         return $data;
     }
 
-    function getBillingShipping ( $user_id )
+    function getBillingShipping( $user_id )
     {
         $data = getUserMeta( $user_id );
         $meta = [];
@@ -684,66 +718,4 @@
         }
 
         return $meta;
-    }
-
-
-    function compareAddresses ( $fire, $mkt )
-    {
-        $equal        = [ true ];
-
-        $metaBilling  = isset( $mkt['billing'] )  ? $mkt['billing']  : null;
-        $metaShipping = isset( $mkt['shipping'] ) ? $mkt['shipping'] : null;
-
-        foreach ( $fire as $addr )
-        {
-            switch ( $addr['type'] )
-            {
-                case 'billing':
-                    if ( $metaBilling )
-                    {
-                        $b = [];
-                        $b[] = ( $addr['zipCode']      == $metaBilling['postcode'] )     ? true : false;
-                        $b[] = ( $addr['streetAve']    == $metaBilling['address_1'] )    ? true : false;
-                        $b[] = ( $addr['number']       == $metaBilling['number'] )       ? true : false;
-                        $b[] = ( $addr['extra']        == $metaBilling['address_2'] )    ? true : false;
-                        $b[] = ( $addr['neighborhood'] == $metaBilling['neighborhood'] ) ? true : false;
-                        $b[] = ( $addr['city']         == $metaBilling['city'] )         ? true : false;
-                        $b[] = ( $addr['state']        == $metaBilling['state'] )        ? true : false;
-
-                        $equal[] = verify_array( $b );
-                    }
-                    else
-                    {
-                        $equal[] = false;
-                    }
-                    break;
-
-                case 'shipping':
-                    if ( $metaShipping )
-                    {
-                        $s = [];
-                        $s[] = ( $addr['zipCode']      == $metaShipping['postcode'] )     ? true : false;
-                        $s[] = ( $addr['streetAve']    == $metaShipping['address_1'] )    ? true : false;
-                        $s[] = ( $addr['number']       == $metaShipping['number'] )       ? true : false;
-                        $s[] = ( $addr['extra']        == $metaShipping['address_2'] )    ? true : false;
-                        $s[] = ( $addr['neighborhood'] == $metaShipping['neighborhood'] ) ? true : false;
-                        $s[] = ( $addr['city']         == $metaShipping['city'] )         ? true : false;
-                        $s[] = ( $addr['state']        == $metaShipping['state'] )        ? true : false;
-
-                        $equal[] = verify_array( $s );
-                    }
-                    else
-                    {
-                        $equal[] = false;
-                    }
-                    break;
-            }
-        }
-
-        return verify_array( $equal );
-    }
-
-    function verify_array ( $array )
-    {
-        return ( in_array( false, $array ) ) ? false : true;
     }
