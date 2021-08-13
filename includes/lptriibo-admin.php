@@ -82,4 +82,5 @@
     <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>" width="325px" >
 
     <hr>
+    <?php echo LPT_API_URL; ?>
 </div>
