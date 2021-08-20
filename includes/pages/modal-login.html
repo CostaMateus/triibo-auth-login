@@ -325,7 +325,7 @@
                 url : '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
-                    action    : 'authSMS_v1',
+                    action    : 'LPT_authSMS_v1',
                     cellphone : cellphone
                 },
                 success: function( data ) {
@@ -388,7 +388,7 @@
                 url : '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
-                    action        : 'validateSMS_v1',
+                    action        : 'LPT_validateSMS_v1',
                     code          : code,
                     cellphone     : cellphone,
                     transactionId : transactionId
@@ -487,7 +487,7 @@
                 url : '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
-                    action    : 'userInfo_v1',
+                    action    : 'LPT_userInfo_v1',
                     cellphone : cellphone,
                 },
                 success: function( data ) {
