@@ -43,21 +43,21 @@
     /**
      * Registrando variavel para controle de status do plugin | atiivo - inativo
      */
-    add_action( 'init', 'lpt_init_status_global' );
-    function lpt_init_status_global()
+    add_action( 'init', 'LPT_init_status_global' );
+    function LPT_init_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
         if ( $_STATUS_PLUGIN === false ) set_transient( '_STATUS_PLUGIN', 'inactive' ); // active
     }
-    lpt_init_status_global();
+    LPT_init_status_global();
 
 
     /**
      * Alterna o sttus do plugin | ativo - inativo
      */
-    add_action( 'wp_ajax_lpt_set_status_global', 'lpt_set_status_global' );
-    function lpt_set_status_global()
+    add_action( 'wp_ajax_lpt_set_status_global', 'LPT_set_status_global' );
+    function LPT_set_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -80,8 +80,8 @@
     /**
      * Adiciona o botão "Entrar com Triibo" ao formulário de login
      */
-    add_action( 'woocommerce_login_form_end', 'lpt_woocommerce_login_form_end' );
-    function lpt_woocommerce_login_form_end()
+    add_action( 'woocommerce_login_form_end', 'LPT_woocommerce_login_form_end' );
+    function LPT_woocommerce_login_form_end()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -103,8 +103,8 @@
     /**
      * Inclui o trecho de código necessário para fazer o login com Triibo
      */
-    add_action( 'martfury_after_login_form', 'lpt_martfury_after_login_form' );
-    function lpt_martfury_after_login_form()
+    add_action( 'martfury_after_login_form', 'LPT_martfury_after_login_form' );
+    function LPT_martfury_after_login_form()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -115,19 +115,19 @@
     /**
      * Add new menu to the Admin Control Panel
      */
-    add_action( 'admin_menu', 'lptriibo_add_admin_link' );
-    function lptriibo_add_admin_link()
+    add_action( 'admin_menu', 'LPTriibo_add_admin_link' );
+    function LPTriibo_add_admin_link()
     {
         add_menu_page(
             'Login pela Triibo',
             'Login Triibo',
             'manage_options',
             'login-pela-triibo',
-            'lptriibo_admin',
+            'LPTriibo_admin',
             plugin_dir_url( __FILE__ ) . 'includes/images/triibo20.png'
         );
     }
-    function lptriibo_admin()
+    function LPTriibo_admin()
     {
         if ( ! current_user_can( 'manage_options' ) ) wp_die( __( 'Você não tem permissões suficientes para acessar esta página.' ) );
 
@@ -138,13 +138,13 @@
     /**
      * Envia códgio por sms
      */
-    add_action( 'wp_ajax_authSMS_v1',        'authSMS_v1' );
-    add_action( 'wp_ajax_nopriv_authSMS_v1', 'authSMS_v1' );
-    function authSMS_v1()
+    add_action( 'wp_ajax_LPT_authSMS_v1',        'LPT_authSMS_v1' );
+    add_action( 'wp_ajax_nopriv_LPT_authSMS_v1', 'LPT_authSMS_v1' );
+    function LPT_authSMS_v1()
     {
         $cellphone = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId = getChannelToken_v1( null );
+        $channelTokenId = LPT_getChannelToken_v1( null );
 
         $auth_triiboHeader = [
             'triiboHeader' => [
@@ -154,31 +154,13 @@
                 'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
-                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
+                'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
             ],
             'cellphone'   => $cellphone,
             'platform'    => 'web'
         ];
 
-        $auth_ch = curl_init();
-
-		curl_setopt_array( $auth_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'authSMS_v1',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING       => "",
-			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false ,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "POST",
-			CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $auth_triiboHeader )
-        ));
-
-        echo curl_exec( $auth_ch );
-        curl_close( $auth_ch );
+        echo json_encode( LPT_exec("authSMS_v1", $auth_triiboHeader) );
         die();
     }
 
@@ -186,13 +168,13 @@
     /**
      * valida código recebido por sms
      */
-    add_action( 'wp_ajax_validateSMS_v1',        'validateSMS_v1' );
-    add_action( 'wp_ajax_nopriv_validateSMS_v1', 'validateSMS_v1' );
-    function validateSMS_v1()
+    add_action( 'wp_ajax_LPT_validateSMS_v1',        'LPT_validateSMS_v1' );
+    add_action( 'wp_ajax_nopriv_LPT_validateSMS_v1', 'LPT_validateSMS_v1' );
+    function LPT_validateSMS_v1()
     {
         $cellphone      = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId = getChannelToken_v1( null );
+        $channelTokenId = LPT_getChannelToken_v1( null );
 
         $validate_triiboHeader = [
             'triiboHeader'   => [
@@ -202,32 +184,14 @@
                 'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
-                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
+                'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
             ],
             'transactionId' => $_POST['transactionId'],
             'cellphone'     => $cellphone,
             'code'          => $_POST['code']
         ];
 
-        $validate_ch = curl_init();
-
-		curl_setopt_array( $validate_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'validateSMS_v1',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING       => "",
-			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "POST",
-			CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $validate_triiboHeader )
-        ));
-
-        echo curl_exec( $validate_ch );
-        curl_close( $validate_ch );
+        echo  json_encode( LPT_exec( "validateSMS_v1", $validate_triiboHeader ) );
         die();
     }
 
@@ -235,13 +199,13 @@
     /**
      * Recupera dados do usuario na Triibo
      */
-    add_action( 'wp_ajax_userInfo_v1',        'userInfo_v1' );
-    add_action( 'wp_ajax_nopriv_userInfo_v1', 'userInfo_v1' );
-    function userInfo_v1()
+    add_action( 'wp_ajax_LPT_userInfo_v1',        'LPT_userInfo_v1' );
+    add_action( 'wp_ajax_nopriv_LPT_userInfo_v1', 'LPT_userInfo_v1' );
+    function LPT_userInfo_v1()
     {
         $cellphone         = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId    = getChannelToken_v1( null );
+        $channelTokenId    = LPT_getChannelToken_v1( null );
 
         $user_triiboHeader = [
             'triiboHeader'    => [
@@ -251,7 +215,7 @@
                 'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
-                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId
+                'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
             ],
             'queryPartnerAPI' => [
                 'getUserInfo'
@@ -266,31 +230,11 @@
             ],
         ];
 
-        $user_ch  = curl_init();
-
-		curl_setopt_array( $user_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'getUserInfo_v1',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING       => "",
-			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false ,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "POST",
-			CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $user_triiboHeader )
-        ));
-
-        $r_curl   = curl_exec( $user_ch );
-        curl_close( $user_ch );
-
-        $r_curl   = json_decode( $r_curl, true );
+        $r_curl   = LPT_exec("getUserInfo_v1", $user_triiboHeader);
         $r_curl   = $r_curl['success']['userInfo'];
 
         $auxName  = explode( ' ', $r_curl['name'] );
-        $auxPhone = getPhone( $r_curl['triiboId'] );
+        $auxPhone = LPT_getPhone( $r_curl['triiboId'] );
         $auxAddr  = ( isset( $r_curl['addressList'] ) ? $r_curl['addressList'] : null );
 
         $data     = [
@@ -300,23 +244,23 @@
             'display_name' => $r_curl['name'],
             'first_name'   => $auxName[0],
             'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
-            'cpf'          => ( isset( $r_curl['documentList'] ) ? getCpf( $r_curl['documentList'] ) : '' ),
+            'cpf'          => ( isset( $r_curl['documentList'] ) ? LPT_getCpf( $r_curl['documentList'] ) : '' ),
             'country'      => 'BR',
             'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
-            'email'        => ( isset( $r_curl['contactList'] ) ? getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
+            'LPT_email'        => ( isset( $r_curl['contactList'] ) ? LPT_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
         ];
 
-        $r_signin = signIn( $data );
+        $r_signin = LPT_signIn( $data );
 
         if ( count( $r_signin['metaDataAddrs'] ) > 0 )
         {
-			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return setUserAddress" . PHP_EOL;
-            $set = setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
+			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return LPT_setUserAddress" . PHP_EOL;
+            $set = LPT_setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
             file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($set, true), FILE_APPEND);
 
-			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return setPreferAddress" . PHP_EOL;
-            $adr = setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
+			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return LPT_setPreferAddress" . PHP_EOL;
+            $adr = LPT_setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
             file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($adr, true), FILE_APPEND);
         }
 
@@ -352,10 +296,10 @@
 
 
 
-    function getChannelToken_v1( $uId )
+    function LPT_getChannelToken_v1( $uId )
     {
         $passPhrase         = floor( rand( 1000000000, 9999999999 ) ) . $uId . floor( rand( 1000000000, 9999999999 ) );
-        $challenge          = hashTriibo1( LPT_API_TOKEN, $passPhrase, LPT_CHANNEL_TOKEN );
+        $challenge          = LPT_hashTriibo1( LPT_API_TOKEN, $passPhrase, LPT_CHANNEL_TOKEN );
         $token_triiboHeader = [
             'triiboHeader' => [
                 'apiToken'      => LPT_API_TOKEN,
@@ -370,33 +314,10 @@
             ],
         ];
 
-        $token_ch = curl_init();
-
-		curl_setopt_array( $token_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'getChannelToken_v1',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING       => "",
-			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false ,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "POST",
-			CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $token_triiboHeader )
-        ));
-
-        $result = curl_exec( $token_ch );
-        curl_close( $token_ch );
-
-        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Return channel" . PHP_EOL;
-        file_put_contents(ABSPATH . 'zLog_LPT_channel.txt', $ql . print_r( json_decode( $result ), true), FILE_APPEND);
-
-        return json_decode( $result );
+        return LPT_exec("getChannelToken_v1", $token_triiboHeader);
     }
 
-    function hashTriibo1( $apiToken, $passPhrase, $channelToken )
+    function LPT_hashTriibo1( $apiToken, $passPhrase, $channelToken )
     {
         $challenge1 = md5( $passPhrase . $apiToken     );
         $challenge2 = md5( $challenge1 . $channelToken );
@@ -406,7 +327,7 @@
     /**
      * Efetua login do usuário no wordpress
      */
-    function signIn( $data )
+    function LPT_signIn( $data )
     {
         if ( ! username_exists( $data['username'] ) )
         {
@@ -465,7 +386,7 @@
             wp_set_current_user( $user->ID );
             wp_set_auth_cookie( $user->ID );
 
-            $metaDataAddrs = getBillingShipping( $user->ID );
+            $metaDataAddrs = LPT_getBillingShipping( $user->ID );
 
             return [
                 'error'         => false,
@@ -485,9 +406,9 @@
     /**
      * Manda os endereços do usuário para a Triibo
      */
-    function setUserAddress( $info, $addrs )
+    function LPT_setUserAddress( $info, $addrs )
     {
-        $channelTokenId   = getChannelToken_v1( $info['uId'] );
+        $channelTokenId   = LPT_getChannelToken_v1( $info['uId'] );
 
         $set_triiboHeader = [
             'triiboHeader'    => [
@@ -497,7 +418,7 @@
                 'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
-                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId,
+                'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
                 'uId'            => $info['uId']
             ],
             'queryPartnerAPI' => [
@@ -542,36 +463,12 @@
             ];
         }
 
-        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Header setUserInfo_v1" . PHP_EOL;
-        file_put_contents(ABSPATH . 'zLog_LPT_header.txt', $ql . print_r($set_triiboHeader, true), FILE_APPEND);
-
-        $set_ch = curl_init();
-		curl_setopt_array( $set_ch, array(
-			CURLOPT_URL            => LPT_API_URL . 'setUserInfo_v1',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING       => "",
-			CURLOPT_MAXREDIRS      => 10,
-			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false ,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "POST",
-			CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $set_triiboHeader )
-        ));
-
-        $set_curl = curl_exec( $set_ch );
-        curl_close( $set_ch );
-
-        $set_curl = json_decode( $set_curl, true );
-
-        return $set_curl;
+        return LPT_exec("setUserInfo_v1", $set_triiboHeader);
     }
 
-    function setPreferAddress( $uId, $addrs )
+    function LPT_setPreferAddress( $uId, $addrs )
     {
-        $channelTokenId    = getChannelToken_v1( $uId );
+        $channelTokenId    = LPT_getChannelToken_v1( $uId );
 
         $pref_triiboHeader = [
             'triiboHeader'    => [
@@ -581,7 +478,7 @@
                 'channelId'      => LPT_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
-                'channelTokenId' => $channelTokenId->success->newToken->channelTokenId,
+                'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
                 'uId'            => $uId
             ],
             'uId'          => $uId,
@@ -595,7 +492,6 @@
             ]
         ];
 
-        $result = [];
 
         foreach ($addrs as $key => $value)
         {
@@ -608,32 +504,30 @@
             ];
         }
 
-        $ql  = PHP_EOL . "==========================" . PHP_EOL . "Header preferentialAddress" . PHP_EOL;
-        file_put_contents(ABSPATH . 'zLog_LPT_header.txt', $ql . print_r($pref_triiboHeader, true), FILE_APPEND);
+        return LPT_exec("preferentialAddress", $pref_triiboHeader);
+    }
 
-        $pref_ch = curl_init();
-        curl_setopt_array( $pref_ch, array(
-            // CURLOPT_URL            => 'https://us-central1-triibo-homol.cloudfunctions.net/preferentialAddress',
-            CURLOPT_URL            => LPT_API_URL . 'preferentialAddress',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING       => "",
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => 60,
-            CURLOPT_SSL_VERIFYPEER => false ,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST  => "POST",
-            CURLOPT_HTTPHEADER     => array(
-                "Content-type: application/json"
-            ),
-            CURLOPT_POSTFIELDS     => json_encode( $pref_triiboHeader )
-        ));
+    function LPT_exec($api, $params)
+    {
+        $ch = curl_init();
 
-        $pref_curl = curl_exec( $pref_ch );
-        curl_close( $pref_ch );
+		curl_setopt_array( $ch, [
+			CURLOPT_URL            => IMT_API_URL . $api,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING       => "",
+			CURLOPT_MAXREDIRS      => 10,
+			CURLOPT_TIMEOUT        => 60,
+			CURLOPT_SSL_VERIFYPEER => false ,
+			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST  => "POST",
+			CURLOPT_HTTPHEADER     => [ "Content-type: application/json" ],
+            CURLOPT_POSTFIELDS     => json_encode( $params )
+        ]);
 
-        $result[] = json_decode( $pref_curl, true );
+        $result = curl_exec( $ch );
+        curl_close( $ch );
 
-        return $result;
+        return json_decode( $result, true );
     }
 
 
@@ -642,7 +536,7 @@
     /**
      * Funções internas
      */
-    function getEmail( $data )
+    function LPT_getEmail( $data )
     {
         $email = null;
 
@@ -660,14 +554,14 @@
         return $email;
     }
 
-    function getPhone( $data )
+    function LPT_getPhone( $data )
     {
         $phone = explode( '@', $data )[0];
 
         return substr( $phone, 3 );
     }
 
-    function getCpf( $data )
+    function LPT_getCpf( $data )
     {
         $cpf = '';
 
@@ -685,7 +579,7 @@
         return $cpf;
     }
 
-    function getUserMeta( $user_id )
+    function LPT_getUserMeta( $user_id )
     {
         $data = array_map( function( $a ) {
             return $a[0];
@@ -694,9 +588,9 @@
         return $data;
     }
 
-    function getBillingShipping( $user_id )
+    function LPT_getBillingShipping( $user_id )
     {
-        $data = getUserMeta( $user_id );
+        $data = LPT_getUserMeta( $user_id );
         $meta = [];
 
         $bill = 'billing_';
