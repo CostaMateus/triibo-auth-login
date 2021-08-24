@@ -77,8 +77,44 @@
     }
 
 
+    add_action( 'woocommerce_login_form_start', 'LPT_woocommerce_login_form_start' );
+    function LPT_woocommerce_login_form_start()
+    {
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
+
+        if ( $_STATUS_PLUGIN == 'active' )
+        {
+            echo '<hr><p class="title-optin" >Entrar com Login e Senha</p>';
+        }
+    }
+
+
     /**
-     * Adiciona o botão "Entrar com Triibo" ao formulário de login
+     * Altera o titulo do card do formulario de login
+     * De   "Entrar em Sua Conta"
+     * Para "Escolha como acessar sua conta"
+     */
+    add_filter( 'gettext', 'LPT_text_strings', 20, 3 );
+    function LPT_text_strings( $translated_text, $text, $domain )
+    {
+        $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
+
+        if ( $_STATUS_PLUGIN == 'active' )
+        {
+            switch ( $translated_text )
+            {
+                case 'Entrar em Sua Conta' :
+                    $translated_text = __( 'Escolha como acessar sua conta', 'woocommerce' );
+                break;
+            }
+        }
+
+        return $translated_text;
+    }
+
+
+    /**
+     *
      */
     add_action( 'woocommerce_login_form_end', 'LPT_woocommerce_login_form_end' );
     function LPT_woocommerce_login_form_end()
@@ -88,13 +124,23 @@
         if ( $_STATUS_PLUGIN == 'active' )
         {
             echo '
-                <p class="form-row">
-                    <button type="button" class="woocommerce-Button button set-spin"
-                        style="margin-top:0px!important;" name="triibo-login"
-                        id="btn-triibo-login" >
-                        Entrar com Triibo <div class="d-none spin-load"></div>
-                    </button>
-                </p>
+                <hr>
+                <p class="title-optin" >Entrar por código SMS</p>
+                <form id="form-auth" method="post" >
+                    <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide" >
+                        <input type="hidden" name="form-auth">
+                        <input id="cellphone" type="text" class="woocommerce-Input woocommerce-Input--text input-text" required name="cellphone" placeholder="+55 (XX) XXXXX-XXXX" />
+                        <!-- Error message -->
+                        <p id= "error-auth" class="bg-transp text-center text-danger pt-8 mb-0 d-none" ></p>
+                        <!-- Já tem código? -->
+                        <a id="haveCode" class="bg-transp float-right pointer d-none pb-20 mt-20 mb-0" onclick="haveCode()" >Tenho código</a>
+                    </p>
+                    <p class="form-row">
+                        <button id="btn-form-auth" type="submit" class="woocommerce-Button button set-spin" >Enviar código <div class="d-none spin-load"></div></button>
+                    </p>
+                </form>
+                <hr>
+                <p class="title-optin" >Entrar por rede social</p>
             ';
         }
     }
@@ -512,7 +558,7 @@
         $ch = curl_init();
 
 		curl_setopt_array( $ch, [
-			CURLOPT_URL            => IMT_API_URL . $api,
+			CURLOPT_URL            => LPT_API_URL . $api,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
