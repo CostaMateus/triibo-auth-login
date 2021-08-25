@@ -22,6 +22,28 @@
         </div>
     </div>
 
+    <div id="modal-form-register" class="bg-modal-login d-none">
+        <div class="bg-modal-login-child">
+            <div class="modal-header">
+                <h2>Cadastrar</h2>
+                <span id="close-form-register" aria-hidden="true">&times;</span>
+            </div>
+            <form id="form-register" method="post" >
+                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                    <input type="hidden" name="form-register">
+
+                    <input type="email" class="woocommerce-Input woocommerce-Input--text input-text" requered placeholder="Endereço de e-mail"
+                           name="email" id="form-register-email" autocomplete="email" autofocus >
+
+                    <!-- Error message -->
+                    <p id="error-register" class="bg-transp text-center text-danger pt-8 mb-0 " >Teste</p>
+
+                </p>
+                <button id="btn-form-register" type="submit" class="woocommerce-Button button set-spin" >Cadastrar <div class="d-none spin-load"></div></button>
+            </form>
+        </div>
+    </div>
+
     <style>
         #register-now, .title-optin {
             font-weight: 650 !important;
@@ -123,10 +145,12 @@
 
         // vars de controle dos modais
         let modal_valid   = document.getElementById( "modal-form-validate" );
+        let modal_regis   = document.getElementById( "modal-form-register" );
 
         // vars de controle do envio do celular e do cod
         let btn_auth      = document.getElementById( "btn-form-auth"     );
         let btn_valid     = document.getElementById( "btn-form-validate" );
+        let btn_regis     = document.getElementById( "btn-form-register" );
 
         // vars de controle de erros
         let error_login   = document.getElementById( "error-login" );
@@ -148,6 +172,7 @@
                 // case "modal-form-validate":
                 case "close-form-auth":
                 case "close-form-validate":
+                case "close-form-register":
                     window.closeModal();
                 break;
 
@@ -167,10 +192,10 @@
 
 
         /**
-         * Fecha modal do numero e abre modal do cod
-         *
+         * Fecha modal do numero e abre modal do codigo
          */
-        window.haveCode = function () {
+        window.haveCode = function ()
+        {
             // jQuery( modal_auth  ).addClass( "d-none" );
             jQuery( modal_valid ).removeClass( "d-none" );
 
@@ -179,9 +204,10 @@
 
 
         /**
-         * Reenvia cod
+         * Reenvia codigo
          */
-        window.resendCode = function () {
+        window.resendCode = function ()
+        {
             jQuery( btn_auth  ).click();
             jQuery( btn_valid ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
@@ -195,7 +221,7 @@
 
 
         /**
-         *
+         * Fecha modais
          */
         window.closeModal = function()
         {
@@ -207,11 +233,13 @@
 
             // jQuery( modal_auth  ).addClass( "d-none" );
             jQuery( modal_valid ).addClass( "d-none" );
+            jQuery( modal_regis ).addClass( "d-none" );
         }
 
 
         /**
-         *
+         * Verifica se o celular foi informado
+         * e chama a função de envio do codigo
          */
         window.submitAuth = function()
         {
@@ -240,7 +268,8 @@
 
 
         /**
-         *
+         * Verifca se o codigo foi informado
+         * e chama a função de validação do codigo
          */
         window.submitValidate = function()
         {
@@ -279,7 +308,8 @@
         /**
          * Função de envio do cod para o celular
          */
-        window.callAuthAjax = function () {
+        window.callAuthAjax = function ()
+        {
             jQuery.ajax({
                 url : "/wp-admin/admin-ajax.php",
                 type: "POST",
@@ -339,9 +369,10 @@
 
 
         /**
-         * Função de validação do cod
+         * Função de validação do coddo
          */
-        window.callValidateSMS = function () {
+        window.callValidateSMS = function ()
+        {
             jQuery.ajax({
                 url : "/wp-admin/admin-ajax.php",
                 type: "POST",
@@ -436,7 +467,8 @@
         /**
          * Função de recuperação de dados dos usuário e redirecionamento
          */
-        window.callUserInfo = function() {
+        window.callUserInfo = function()
+        {
             jQuery.ajax({
                 url : "/wp-admin/admin-ajax.php",
                 type: "POST",
@@ -460,6 +492,8 @@
                         // exibe erro
                         jQuery( error_auth   ).html( "Número não cadastrado no Triibo!" );
                         jQuery( "#cellphone" ).addClass( "error-border" );
+
+                        jQuery( "#btn-form-register" ).removeClass( "d-none" );
                     }
                     else
                     {
@@ -484,6 +518,15 @@
                     jQuery( error_auth ).html( genericError );
                 }
             });
+        }
+
+
+        /**
+         * Exibe modal de cadastro
+         */
+        window.openRegister()
+        {
+            jQuery( modal_regis ).removeClass( "d-none" );
         }
 
     </script>
