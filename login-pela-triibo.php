@@ -136,8 +136,9 @@
                         <a id="haveCode" class="bg-transp float-right pointer d-none pb-20 mt-20 mb-0" onclick="haveCode()" >Tenho código</a>
                     </p>
 
+                    <!-- Já tem código? -->
                     <p class="form-row text-center">
-                        <a id="register-now" class="bg-transp pt-8 mb-0" onclick="openRegister()" >Deseja se cadastrar agora?</a>
+                        <a id="register-now" class="bg-transp pointer pt-8 mb-0 d-none" >Deseja se cadastrar agora?</a>
                     </p>
 
                     <p class="form-row">
@@ -299,7 +300,7 @@
             'country'      => 'BR',
             'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
-            'LPT_email'        => ( isset( $r_curl['contactList'] ) ? LPT_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
+            'email'        => ( isset( $r_curl['contactList'] ) ? LPT_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
         ];
 
         $r_signin = LPT_signIn( $data );
@@ -344,6 +345,136 @@
         die();
     }
 
+
+    /**
+     * Cadastra usuario na Triibo
+     */
+    add_action( 'wp_ajax_LPT_registerUserTriibo',        'LPT_registerUserTriibo' );
+    add_action( 'wp_ajax_nopriv_LPT_registerUserTriibo', 'LPT_registerUserTriibo' );
+    function LPT_registerUserTriibo()
+    {
+        $cellphone = "+" . preg_replace( '/\D/', '', $_POST['cellphone'] );
+        $name      = explode("@", $_POST['email'])[0];
+        $email     = [
+            "type"     => "email",
+            "value"    => $_POST['email'],
+            "verified" => false,
+        ];
+
+        $channelTokenId_1 = LPT_getChannelToken_v1( null );
+        $registerUser     = [
+            "triiboHeader"    => [
+                "apiToken"       => LPT_API_TOKEN,
+                "channelGroup"   => LPT_CHANNEL_GROUP,
+                "channelName"    => LPT_CHANNEL_NAME,
+                "channelId"      => LPT_CHANNEL_ID,
+                "sessionId"      => "001",
+                "transactionId"  => "002",
+                "channelTokenId" => $channelTokenId_1["success"]["newToken"]["channelTokenId"]
+            ],
+            "linkedAccount" => null,
+            "cellphone"     => $cellphone,
+        ];
+
+        // cria usuário se não existir e retorna as informações
+        $resp1 = LPT_exec("login", $registerUser);
+
+        if ($resp1["success"])
+        {
+            $uId         = $resp1["user"]["uId"];
+            $contactList = $resp1["user"]["contactList"];
+
+            if ( count( $contactList ) > 1 )
+            {
+                foreach ( $contactList as &$c )
+                {
+                    if ( $c["type"] == "email" ) $c["value"] = $email["value"];
+                }
+            }
+            else
+            {
+                $contactList = array_merge( $contactList, [ $email ] );
+            }
+        }
+
+        $channelTokenId_2 = LPT_getChannelToken_v1( $uId );
+        $setUserInfo    = [
+            "triiboHeader"    => [
+                "apiToken"       => LPT_API_TOKEN,
+                "channelGroup"   => LPT_CHANNEL_GROUP,
+                "channelName"    => LPT_CHANNEL_NAME,
+                "channelId"      => LPT_CHANNEL_ID,
+                "sessionId"      => "001",
+                "transactionId"  => "002",
+                "channelTokenId" => $channelTokenId_2["success"]["newToken"]["channelTokenId"],
+                'uId'            => $uId
+            ],
+            "queryPartnerAPI" => [
+                "setUserInfo"
+            ],
+            "userInfo"        => [
+                "syncType"    => "merge",
+                'uId'         => $uId,
+                "name"        => $name,
+                "aliasName"   => $name,
+                "contactList" => [
+                    ... $contactList
+                ],
+            ],
+        ];
+
+        // atualiza informações do usuario
+        $resp2 = LPT_exec("setUserInfo_v1", $setUserInfo);
+
+        $ql = PHP_EOL . "==========================" . PHP_EOL . "Return IMTriibo_created_customer" . PHP_EOL;
+        file_put_contents(ABSPATH . 'zLog_IMT.txt', $ql . print_r($resp2, true), FILE_APPEND);
+
+        $auxPhone = str_replace( "+55", "", $cellphone );
+
+        $data  = [
+            'username'     => $uId,
+            'nicename'     => $name,
+            'nickname'     => $name,
+            'display_name' => $name,
+            'first_name'   => $name,
+            'last_name'    => "",
+            'cpf'          => "",
+            'country'      => "BR",
+            'phone'        => $auxPhone,
+            'cellphone'    => $auxPhone,
+            'email'        => $_POST['email'],
+        ];
+
+        $r_signin = LPT_signIn( $data );
+
+        if ( ! $r_signin['error'] )
+        {
+            $result = [
+                'success' => [
+                    'username' => $data['username'],
+                    'email'    => $data['email'],
+                    'name'     => $data['display_name'],
+                    'nickname' => $data['nickname'],
+                    'redirect' => $r_signin['url'],
+                ],
+                'error'   => null,
+                'alert'   => null,
+            ];
+        }
+        else
+        {
+            $result = [
+                'success' => null,
+                'error'   => [
+                    'message' => $r_signin['message']
+                ],
+                'alert'   => 'login-pela-triibo.php',
+            ];
+        }
+
+        echo json_encode( $result );
+        die();
+    }
 
 
 
