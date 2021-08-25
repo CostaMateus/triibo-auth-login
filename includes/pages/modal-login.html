@@ -36,7 +36,7 @@
                            name="email" id="form-register-email" autocomplete="email" autofocus >
 
                     <!-- Error message -->
-                    <p id="error-register" class="bg-transp text-center text-danger pt-8 mb-0 " >Teste</p>
+                    <p id="error-register" class="bg-transp text-center text-danger pt-20 mb-0 " ></p>
 
                 </p>
                 <button id="btn-form-register" type="submit" class="woocommerce-Button button set-spin" >Cadastrar <div class="d-none spin-load"></div></button>
@@ -139,6 +139,7 @@
 
         // variaveis de controle entre as chamadas ajax
         let code          = null;
+        let email         = null;
         let cellphone     = null;
         let transactionId = null;
         let codeSent      = false;
@@ -186,6 +187,15 @@
                 case "btn-form-validate":
                     e.preventDefault();
                     window.submitValidate();
+                break;
+
+                case "btn-form-register":
+                    e.preventDefault();
+                    window.submitRegister();
+                break;
+
+                case "register-now":
+                    jQuery( modal_regis ).removeClass( "d-none" );
                 break;
             }
         }, false);
@@ -239,7 +249,7 @@
 
         /**
          * Verifica se o celular foi informado
-         * e chama a função de envio do codigo
+         * e chama a função de envio do codigo (callAuthAjax)
          */
         window.submitAuth = function()
         {
@@ -247,7 +257,7 @@
             jQuery( btn_auth ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
             // recupera o numero informado
-            cellphone = document.getElementById( "cellphone" ).value;
+            cellphone = jQuery( "#cellphone" ).val();
 
             // valida se o numero não é vazio.
             if ( cellphone == "" )
@@ -269,7 +279,7 @@
 
         /**
          * Verifca se o codigo foi informado
-         * e chama a função de validação do codigo
+         * e chama a função de validação do codigo (callValidateSMS)
          */
         window.submitValidate = function()
         {
@@ -277,7 +287,7 @@
             jQuery( btn_valid ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
             // recupera cod informado
-            code = document.getElementById( "code" ).value;
+            code = jQuery( "#code" ).val();
 
             // valida se cod não é vazio
             if ( code == "" )
@@ -369,7 +379,8 @@
 
 
         /**
-         * Função de validação do coddo
+         * Função de validação do codigo
+         * e chama a função que loga o usuario (callUserInfo)
          */
         window.callValidateSMS = function ()
         {
@@ -493,7 +504,7 @@
                         jQuery( error_auth   ).html( "Número não cadastrado no Triibo!" );
                         jQuery( "#cellphone" ).addClass( "error-border" );
 
-                        jQuery( "#btn-form-register" ).removeClass( "d-none" );
+                        jQuery( "#register-now" ).removeClass( "d-none" );
                     }
                     else
                     {
@@ -524,9 +535,61 @@
         /**
          * Exibe modal de cadastro
          */
-        window.openRegister()
+        window.submitRegister = function()
         {
-            jQuery( modal_regis ).removeClass( "d-none" );
+            // desabilita o botão
+            jQuery( btn_regis ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+
+            // recupera email informado
+            email = jQuery( "#form-register-email" ).val();
+
+            jQuery.ajax({
+                url : "/wp-admin/admin-ajax.php",
+                type: "POST",
+                data: {
+                    action    : "LPT_registerUserTriibo",
+                    cellphone : cellphone,
+                    email     : email,
+                },
+                success: function( data ) {
+                    console.log( JSON.parse( data ) );
+
+                    let user = JSON.parse( data );
+
+                    // valida se o retorno da função tem erros
+                    if ( user.error != null )
+                    {
+                        jQuery( btn_regis    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+
+                        jQuery( error_auth   ).removeClass( "d-none" );
+                        // exibe erro
+                        jQuery( error_auth   ).html( "Não foi possível concluir o cadastro!" );
+                        jQuery( "#cellphone" ).removeClass( "error-border" );
+                    }
+                    else
+                    {
+                        // recarrega a página com o login efetuado
+                        window.location.reload();
+                    }
+                },
+                error: function( data ) {
+                    console.log( data );
+
+                    // habilita botoes modais
+                    jQuery( btn_auth    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                    jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                    jQuery( btn_regis   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+
+                    // esconde modais
+                    jQuery( modal_valid ).addClass( "d-none" );
+                    jQuery( modal_regis ).addClass( "d-none" );
+
+                    jQuery( error_auth ).removeClass( "d-none" );
+                    // exibe erro generico, caso problema na chamada
+                    jQuery( error_auth ).html( genericError );
+                    jQuery( "#cellphone" ).removeClass( "error-border" );
+                }
+            });
         }
 
     </script>
