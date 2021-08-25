@@ -23,9 +23,11 @@
     </div>
 
     <style>
-        .title-optin {
+        #register-now, .title-optin {
             font-weight: 650 !important;
             font-size: 15px !important;
+        }
+        .title-optin {
             margin: 0 0 10px !important;
         }
 
@@ -98,16 +100,16 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" ></script>
     <script>
-        jQuery( '#cellphone' ).mask( '+55 (00) 00000-0000' );
-        jQuery( '#cellphone' ).blur( function( event ) {
+        jQuery( "#cellphone" ).mask( "+55 (00) 00000-0000" );
+        jQuery( "#cellphone" ).blur( function( event ) {
             if( jQuery(this).val().length == 19 )
             {
                 // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
-                jQuery( '#cellphone' ).mask( '+55 (00) 00000-0009' );
+                jQuery( "#cellphone" ).mask( "+55 (00) 00000-0009" );
             }
             else
             {
-                jQuery( '#cellphone' ).mask( '+55 (00) 0000-00009' );
+                jQuery( "#cellphone" ).mask( "+55 (00) 0000-00009" );
             }
         });
 
@@ -120,16 +122,16 @@
         let codeSent      = false;
 
         // vars de controle dos modais
-        let modal_valid   = document.getElementById( 'modal-form-validate' );
+        let modal_valid   = document.getElementById( "modal-form-validate" );
 
         // vars de controle do envio do celular e do cod
-        let btn_auth      = document.getElementById( 'btn-form-auth'     );
-        let btn_valid     = document.getElementById( 'btn-form-validate' );
+        let btn_auth      = document.getElementById( "btn-form-auth"     );
+        let btn_valid     = document.getElementById( "btn-form-validate" );
 
         // vars de controle de erros
-        let error_login   = document.getElementById( 'error-login' );
-        let error_auth    = document.getElementById( 'error-auth'  );
-        let error_valid   = document.getElementById( 'error-valid' );
+        let error_login   = document.getElementById( "error-login" );
+        let error_auth    = document.getElementById( "error-auth"  );
+        let error_valid   = document.getElementById( "error-valid" );
 
 
 
@@ -137,29 +139,29 @@
          * Monitora todos os clicks na página
          * Verifica IDs especificos
          */
-        window.addEventListener( 'click', function ( e ) {
+        window.addEventListener( "click", function ( e ) {
             // habilita botões de envio
             switch ( e.target.id )
             {
                 // verifica se click foi fora do modal ou no X do modal, fecha o respectivo
                 // click fora do modal, desativado
-                // case 'modal-form-validate':
-                case 'close-form-auth':
-                case 'close-form-validate':
+                // case "modal-form-validate":
+                case "close-form-auth":
+                case "close-form-validate":
                     window.closeModal();
-                    break;
+                break;
 
                 // verifica se o click foi no botão do modal do celular
-                case 'btn-form-auth':
+                case "btn-form-auth":
                     e.preventDefault();
                     window.submitAuth();
-                    break;
+                break;
 
                 // verifica se o click foi no botão do modal do cod
-                case 'btn-form-validate':
+                case "btn-form-validate":
                     e.preventDefault();
                     window.submitValidate();
-                    break;
+                break;
             }
         }, false);
 
@@ -169,10 +171,10 @@
          *
          */
         window.haveCode = function () {
-            // jQuery( modal_auth  ).addClass( 'd-none' );
-            jQuery( modal_valid ).removeClass( 'd-none' );
+            // jQuery( modal_auth  ).addClass( "d-none" );
+            jQuery( modal_valid ).removeClass( "d-none" );
 
-            jQuery( '#code' ).focus();
+            jQuery( "#code" ).focus();
         }
 
 
@@ -181,13 +183,13 @@
          */
         window.resendCode = function () {
             jQuery( btn_auth  ).click();
-            jQuery( btn_valid ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
+            jQuery( btn_valid ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
-            jQuery( error_valid ).addClass( 'd-none' );
-            jQuery( '#code' ).removeClass( 'error-border' );
+            jQuery( error_valid ).addClass( "d-none" );
+            jQuery( "#code" ).removeClass( "error-border" );
 
             setTimeout( function() {
-                jQuery( btn_valid ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                jQuery( btn_valid ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
             }, 4000 );
         }
 
@@ -197,14 +199,14 @@
          */
         window.closeModal = function()
         {
-            jQuery( btn_auth    ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-            jQuery( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+            jQuery( btn_auth    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+            jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
-            jQuery( error_auth  ).addClass( 'd-none' ).html( '' );
-            jQuery( error_valid ).addClass( 'd-none' ).html( '' );
+            jQuery( error_auth  ).addClass( "d-none" ).html( "" );
+            jQuery( error_valid ).addClass( "d-none" ).html( "" );
 
-            // jQuery( modal_auth  ).addClass( 'd-none' );
-            jQuery( modal_valid ).addClass( 'd-none' );
+            // jQuery( modal_auth  ).addClass( "d-none" );
+            jQuery( modal_valid ).addClass( "d-none" );
         }
 
 
@@ -214,23 +216,23 @@
         window.submitAuth = function()
         {
             // desabilita o botão
-            jQuery( btn_auth ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
+            jQuery( btn_auth ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
             // recupera o numero informado
-            cellphone = document.getElementById( 'cellphone' ).value;
+            cellphone = document.getElementById( "cellphone" ).value;
 
             // valida se o numero não é vazio.
-            if ( cellphone == '' )
+            if ( cellphone == "" )
             {
-                jQuery( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                jQuery( error_auth   ).removeClass( 'd-none' );
+                jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                jQuery( error_auth   ).removeClass( "d-none" );
                 // exibe o erro
-                jQuery( error_auth   ).html( 'Insira um número de celular.' );
+                jQuery( error_auth   ).html( "Insira um número de celular." );
             }
             else
             {
-                jQuery( error_auth   ).addClass( 'd-none' );
-                jQuery( '#cellphone' ).removeClass( 'error-border' );
+                jQuery( error_auth   ).addClass( "d-none" );
+                jQuery( "#cellphone" ).removeClass( "error-border" );
                 // executa o ajax para o envio do sms
                 callAuthAjax();
             }
@@ -243,31 +245,31 @@
         window.submitValidate = function()
         {
             // desabilita o botão
-            jQuery( btn_valid ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
+            jQuery( btn_valid ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
             // recupera cod informado
-            code = document.getElementById( 'code' ).value;
+            code = document.getElementById( "code" ).value;
 
             // valida se cod não é vazio
-            if ( code == '' )
+            if ( code == "" )
             {
-                jQuery( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                jQuery( error_valid ).removeClass( 'd-none' );
+                jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                jQuery( error_valid ).removeClass( "d-none" );
                 // exibe erro
-                jQuery( error_valid ).html( 'Insira código recebido.' );
+                jQuery( error_valid ).html( "Insira código recebido." );
             }
             // valida se o cod é menor ou maior que 6
             else if ( code.length != 6 )
             {
-                jQuery( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                jQuery( error_valid ).removeClass( 'd-none' );
+                jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                jQuery( error_valid ).removeClass( "d-none" );
                 // exibe erro
-                jQuery( error_valid ).html( 'O código tem 6 dígitos.' );
+                jQuery( error_valid ).html( "O código tem 6 dígitos." );
             }
             else
             {
-                jQuery( error_valid ).addClass( 'd-none' );
-                jQuery( '#code' ).removeClass( 'error-border' );
+                jQuery( error_valid ).addClass( "d-none" );
+                jQuery( "#code" ).removeClass( "error-border" );
                 // executa o ajax para validar o cod informado
                 callValidateSMS();
             }
@@ -279,10 +281,10 @@
          */
         window.callAuthAjax = function () {
             jQuery.ajax({
-                url : '/wp-admin/admin-ajax.php',
-                type: 'POST',
+                url : "/wp-admin/admin-ajax.php",
+                type: "POST",
                 data: {
-                    action    : 'LPT_authSMS_v1',
+                    action    : "LPT_authSMS_v1",
                     cellphone : cellphone
                 },
                 success: function( data ) {
@@ -295,16 +297,16 @@
                     {
                         if ( result.error.errorCode == 1005 )
                         {
-                            jQuery( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                            jQuery( error_auth   ).removeClass( 'd-none' );
+                            jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                            jQuery( error_auth   ).removeClass( "d-none" );
                             // exibe erro
-                            jQuery( error_auth   ).html( 'Quantidade de tentativas excedida, tente novamente em 15min.' );
-                            jQuery( '#cellphone' ).addClass( 'error-border' );
+                            jQuery( error_auth   ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
+                            jQuery( "#cellphone" ).addClass( "error-border" );
                         }
                         else
                         {
-                            jQuery( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                            jQuery( error_auth ).removeClass( 'd-none' );
+                            jQuery( btn_auth   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                            jQuery( error_auth ).removeClass( "d-none" );
                             // exibe erro generico
                             jQuery( error_auth ).html( genericError );
                         }
@@ -317,18 +319,18 @@
                         codeSent      = true;
 
                         // fecha modal atual e abre o modal do cod
-                        jQuery( modal_valid ).removeClass('d-none');
+                        jQuery( modal_valid ).removeClass("d-none");
 
-                        jQuery( '#code' ).focus();
+                        jQuery( "#code" ).focus();
 
-                        jQuery( btn_auth ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                        jQuery( btn_auth ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
                     }
                 },
                 error  : function( data ) {
                     console.log( data );
 
-                    jQuery( btn_auth   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                    jQuery( error_auth ).removeClass( 'd-none' );
+                    jQuery( btn_auth   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                    jQuery( error_auth ).removeClass( "d-none" );
                     // exibe erro generico, caso problema na chamada
                     jQuery( error_auth ).html( genericError );
                 }
@@ -341,10 +343,10 @@
          */
         window.callValidateSMS = function () {
             jQuery.ajax({
-                url : '/wp-admin/admin-ajax.php',
-                type: 'POST',
+                url : "/wp-admin/admin-ajax.php",
+                type: "POST",
                 data: {
-                    action        : 'LPT_validateSMS_v1',
+                    action        : "LPT_validateSMS_v1",
                     code          : code,
                     cellphone     : cellphone,
                     transactionId : transactionId
@@ -358,58 +360,58 @@
                     if ( result.error != null )
                     {
                         // habilita os botões de envio
-                        jQuery( btn_auth  ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                        jQuery( btn_valid ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                        jQuery( btn_auth  ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                        jQuery( btn_valid ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
                         // valida qual o cod do erro
                         switch ( result.error.errorCode )
                         {
                             case 1006:
-                                jQuery( error_valid  ).removeClass( 'd-none' );
+                                jQuery( error_valid  ).removeClass( "d-none" );
                                 // exibe erro
-                                jQuery( error_valid  ).html( 'Código inválido.' );
-                                jQuery( '#code'      ).addClass( 'error-border' );
+                                jQuery( error_valid  ).html( "Código inválido." );
+                                jQuery( "#code"      ).addClass( "error-border" );
                             break;
 
                             case 1007:
-                                jQuery( error_valid  ).removeClass( 'd-none' );
+                                jQuery( error_valid  ).removeClass( "d-none" );
                                 // exibe erro
-                                jQuery( error_valid  ).html( 'Código expirado.' );
-                                jQuery( '#code'      ).addClass( 'error-border' );
+                                jQuery( error_valid  ).html( "Código expirado." );
+                                jQuery( "#code"      ).addClass( "error-border" );
                             break;
 
                             case 1009:
-                                jQuery( modal_valid  ).addClass('d-none');
-                                jQuery( error_auth   ).removeClass( 'd-none' );
+                                jQuery( modal_valid  ).addClass("d-none");
+                                jQuery( error_auth   ).removeClass( "d-none" );
                                 // exibe erro
-                                jQuery( error_auth   ).html( 'Código expirado.' );
-                                jQuery( '#cellphone' ).addClass( 'error-border' );
+                                jQuery( error_auth   ).html( "Código expirado." );
+                                jQuery( "#cellphone" ).addClass( "error-border" );
                             break;
 
                             case 1005:
-                                jQuery( modal_valid  ).addClass('d-none');
-                                jQuery( error_auth   ).removeClass( 'd-none' );
+                                jQuery( modal_valid  ).addClass("d-none");
+                                jQuery( error_auth   ).removeClass( "d-none" );
                                 // exibe erro
-                                jQuery( error_auth   ).html( 'Quantidade de tentativas excedida, tente novamente em 15min.' );
-                                jQuery( '#cellphone' ).addClass( 'error-border' );
+                                jQuery( error_auth   ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
+                                jQuery( "#cellphone" ).addClass( "error-border" );
                             break;
 
                             case 1004:
                             case 1008:
                             default:
-                                jQuery( modal_valid  ).addClass('d-none');
-                                jQuery( error_auth   ).removeClass( 'd-none' );
+                                jQuery( modal_valid  ).addClass("d-none");
+                                jQuery( error_auth   ).removeClass( "d-none" );
                                 // exibe erro
-                                jQuery( error_auth   ).html( 'Algo de erro, tente novamente.' );
-                                jQuery( '#cellphone' ).addClass( 'error-border' );
+                                jQuery( error_auth   ).html( "Algo de erro, tente novamente." );
+                                jQuery( "#cellphone" ).addClass( "error-border" );
                             break;
                         }
                     }
                     else
                     {
-                        jQuery( btn_auth                ).prop( 'disabled', 'disabled' ).find( 'div' ).removeClass( 'd-none' );
-                        jQuery( '#modal-load-next-page' ).addClass( 'd-flex' );
-                        jQuery( modal_valid             ).addClass( 'd-none' );
+                        jQuery( btn_auth                ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+                        jQuery( "#modal-load-next-page" ).addClass( "d-flex" );
+                        jQuery( modal_valid             ).addClass( "d-none" );
 
                         // executa o ajax para recuperar as informações do usuário
                         callUserInfo();
@@ -418,12 +420,12 @@
                 error: function( data ) {
                     console.log( data );
 
-                    jQuery( btn_auth    ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                    jQuery( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                    jQuery( btn_auth    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                    jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
-                    jQuery( modal_valid ).addClass('d-none');
+                    jQuery( modal_valid ).addClass("d-none");
 
-                    jQuery( error_auth  ).removeClass( 'd-none' );
+                    jQuery( error_auth  ).removeClass( "d-none" );
                     // exibe erro generico, caso problema na chamada
                     jQuery( error_auth  ).html( genericError );
                 }
@@ -436,10 +438,10 @@
          */
         window.callUserInfo = function() {
             jQuery.ajax({
-                url : '/wp-admin/admin-ajax.php',
-                type: 'POST',
+                url : "/wp-admin/admin-ajax.php",
+                type: "POST",
                 data: {
-                    action    : 'LPT_userInfo_v1',
+                    action    : "LPT_userInfo_v1",
                     cellphone : cellphone,
                 },
                 success: function( data ) {
@@ -450,14 +452,14 @@
                     // valida se o retorno da função tem erros
                     if ( user.error != null )
                     {
-                        jQuery( '#modal-load-next-page' ).removeClass( 'd-flex' );
+                        jQuery( "#modal-load-next-page" ).removeClass( "d-flex" );
 
-                        jQuery( btn_auth     ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                        jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
-                        jQuery( error_auth   ).removeClass( 'd-none' );
+                        jQuery( error_auth   ).removeClass( "d-none" );
                         // exibe erro
-                        jQuery( error_auth   ).html( 'Número não cadastrado no Triibo!' );
-                        jQuery( '#cellphone' ).addClass( 'error-border' );
+                        jQuery( error_auth   ).html( "Número não cadastrado no Triibo!" );
+                        jQuery( "#cellphone" ).addClass( "error-border" );
                     }
                     else
                     {
@@ -468,16 +470,16 @@
                 error: function( data ) {
                     console.log( data );
 
-                    jQuery( '#modal-load-next-page' ).removeClass( 'd-flex' );
+                    jQuery( "#modal-load-next-page" ).removeClass( "d-flex" );
 
                     // habilita botoes modais
-                    jQuery( btn_auth    ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
-                    jQuery( btn_valid   ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
+                    jQuery( btn_auth    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                    jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
                     // esconde modais
-                    jQuery( modal_valid ).addClass( 'd-none' );
+                    jQuery( modal_valid ).addClass( "d-none" );
 
-                    jQuery( error_auth ).removeClass( 'd-none' );
+                    jQuery( error_auth ).removeClass( "d-none" );
                     // exibe erro generico, caso problema na chamada
                     jQuery( error_auth ).html( genericError );
                 }
