@@ -135,6 +135,11 @@
                         <!-- Já tem código? -->
                         <a id="haveCode" class="bg-transp float-right pointer d-none pb-20 mt-20 mb-0" onclick="haveCode()" >Tenho código</a>
                     </p>
+
+                    <p class="form-row text-center">
+                        <a id="register-now" class="bg-transp pt-8 mb-0" onclick="openRegister()" >Deseja se cadastrar agora?</a>
+                    </p>
+
                     <p class="form-row">
                         <button id="btn-form-auth" type="submit" class="woocommerce-Button button set-spin" >Enviar código <div class="d-none spin-load"></div></button>
                     </p>
