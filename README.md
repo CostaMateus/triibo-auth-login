@@ -1,2 +1,2 @@
-# login-pela-triibo
-Plugin para WP Woocommerce de login pela Triibo para o Marketplace.Triibo
+# triibo-auth-login
+Plugin para WP Woocommerce de autênticação e login pela Triibo para o Marketplace da Triibo
