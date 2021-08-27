@@ -2,7 +2,7 @@
     /**
     * Plugin Name: #Triibo Auth Login
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 2.1
+    * Version: 2.3
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
@@ -517,6 +517,7 @@
 
                 if ( ! is_wp_error( $user_id ) )
                 {
+                    // campo padronizado com o plugin triibo-integration-user
                     add_user_meta( $user_id, 'triiboId_phone', $data['cellphone'] );
 
                     $user = get_user_by( 'id', $user_id );
