@@ -283,7 +283,7 @@
         $r_curl   = $r_curl['success']['userInfo'];
 
         $auxName  = explode( ' ', $r_curl['name'] );
-        $auxPhone = TAL_getPhone( $r_curl['triiboId'] );
+        $auxPhone = explode( '@', $r_curl['triiboId'] )[0];
         $auxAddr  = ( isset( $r_curl['addressList'] ) ? $r_curl['addressList'] : null );
 
         $data     = [
@@ -295,7 +295,6 @@
             'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
             'cpf'          => ( isset( $r_curl['documentList'] ) ? TAL_getCpf( $r_curl['documentList'] ) : '' ),
             'country'      => 'BR',
-            'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
             'email'        => ( isset( $r_curl['contactList'] ) ? TAL_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
         ];
@@ -418,8 +417,6 @@
         // atualiza informações do usuario
         $resp2 = TAL_exec("setUserInfo_v1", $setUserInfo);
 
-        $auxPhone = str_replace( "+55", "", $cellphone );
-
         $data  = [
             'username'     => $uId,
             'nicename'     => $name,
@@ -429,8 +426,7 @@
             'last_name'    => "",
             'cpf'          => "",
             'country'      => "BR",
-            'phone'        => $auxPhone,
-            'cellphone'    => $auxPhone,
+            'cellphone'    => $cellphone,
             'email'        => $_POST['email'],
         ];
 
@@ -521,6 +517,8 @@
 
                 if ( ! is_wp_error( $user_id ) )
                 {
+                    add_user_meta( $user_id, 'triiboId_phone', $data['cellphone'] );
+
                     $user = get_user_by( 'id', $user_id );
 
                     $user->set_role( 'subscriber' );
@@ -723,13 +721,6 @@
         }
 
         return $email;
-    }
-
-    function TAL_getPhone( $data )
-    {
-        $phone = explode( '@', $data )[0];
-
-        return substr( $phone, 3 );
     }
 
     function TAL_getCpf( $data )
