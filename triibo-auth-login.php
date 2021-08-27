@@ -1,8 +1,8 @@
 <?php
     /**
-    * Plugin Name: #Login pela Triibo
+    * Plugin Name: #Triibo Auth Login
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 2.0
+    * Version: 2.1
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
@@ -17,47 +17,44 @@
     if (strpos(home_url(), "dev-") !== false)
     {
         // $isDev = "TRUE";
-        define( 'LPT_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
-        define( 'LPT_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
-        define( 'LPT_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
-        define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
-        define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
-        define( 'LPT_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
-        define( 'LPT_UID',            null                                                          ); // HOMOLOG
+        define( 'TAL_API_URL',       'https://triibo-api-gateway-hml.triibo.com.br/'                ); // HOMOLOG
+        define( 'TAL_API_TOKEN',     '7472216240776562417070486d4c6170693139'                       ); // HOMOLOG
+        define( 'TAL_CHANNEL_ID',    '54522121626f2d416854682d4150312d4368614e4e656c2d776562417070' ); // HOMOLOG
+        define( 'TAL_CHANNEL_GROUP', 'triibo-webapp'                                                ); // HOMOLOG
+        define( 'TAL_CHANNEL_NAME',  'triibo-webapp'                                                ); // HOMOLOG
+        define( 'TAL_CHANNEL_TOKEN', '305221624057656241707021403131'                               ); // HOMOLOG
+        define( 'TAL_UID',            null                                                          ); // HOMOLOG
     }
     else
     {
         // $isDev = "FALSE";
-        define( 'LPT_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
-        define( 'LPT_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
-        define( 'LPT_CHANNEL_ID',    '21726962305052442443686E336C6C573342417050'                   ); // PROD
-        define( 'LPT_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
-        define( 'LPT_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
-        define( 'LPT_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
-        define( 'LPT_UID',            null                                                          ); // PROD
+        define( 'TAL_API_URL',       'https://triibo-api-gateway.triibo.com.br/'                    ); // PROD
+        define( 'TAL_API_TOKEN',     '57336266417050612750524C4170495029'                           ); // PROD
+        define( 'TAL_CHANNEL_ID',    '21726962305052442443686E336C6C573342417050'                   ); // PROD
+        define( 'TAL_CHANNEL_GROUP', 'triibo-webapp'                                                ); // PROD
+        define( 'TAL_CHANNEL_NAME',  'triibo-webapp'                                                ); // PROD
+        define( 'TAL_CHANNEL_TOKEN', '38522162405733624170505052236368403138'                       ); // PROD
+        define( 'TAL_UID',            null                                                          ); // PROD
     }
-
-    // UID = "C4kNtsVlN1fKi4AFV4tIjt7vQID3"; // Mateus hml
-    // UID = "K4uLXGE8diaOr70n9abQoLt9tmA3"; // Mateus prod
 
     /**
      * Registrando variavel para controle de status do plugin | atiivo - inativo
      */
-    add_action( 'init', 'LPT_init_status_global' );
-    function LPT_init_status_global()
+    add_action( 'init', 'TAL_init_status_global' );
+    function TAL_init_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
         if ( $_STATUS_PLUGIN === false ) set_transient( '_STATUS_PLUGIN', 'inactive' ); // active
     }
-    LPT_init_status_global();
+    TAL_init_status_global();
 
 
     /**
      * Alterna o sttus do plugin | ativo - inativo
      */
-    add_action( 'wp_ajax_lpt_set_status_global', 'LPT_set_status_global' );
-    function LPT_set_status_global()
+    add_action( 'wp_ajax_TAL_set_status_global', 'TAL_set_status_global' );
+    function TAL_set_status_global()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -77,8 +74,8 @@
     }
 
 
-    add_action( 'woocommerce_login_form_start', 'LPT_woocommerce_login_form_start' );
-    function LPT_woocommerce_login_form_start()
+    add_action( 'woocommerce_login_form_start', 'TAL_woocommerce_login_form_start' );
+    function TAL_woocommerce_login_form_start()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -94,8 +91,8 @@
      * De   "Entrar em Sua Conta"
      * Para "Escolha como acessar sua conta"
      */
-    add_filter( 'gettext', 'LPT_text_strings', 20, 3 );
-    function LPT_text_strings( $translated_text, $text, $domain )
+    add_filter( 'gettext', 'TAL_text_strings', 20, 3 );
+    function TAL_text_strings( $translated_text, $text, $domain )
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -116,8 +113,8 @@
     /**
      *
      */
-    add_action( 'woocommerce_login_form_end', 'LPT_woocommerce_login_form_end' );
-    function LPT_woocommerce_login_form_end()
+    add_action( 'woocommerce_login_form_end', 'TAL_woocommerce_login_form_end' );
+    function TAL_woocommerce_login_form_end()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -155,8 +152,8 @@
     /**
      * Inclui o trecho de código necessário para fazer o login com Triibo
      */
-    add_action( 'martfury_after_login_form', 'LPT_martfury_after_login_form' );
-    function LPT_martfury_after_login_form()
+    add_action( 'martfury_after_login_form', 'TAL_martfury_after_login_form' );
+    function TAL_martfury_after_login_form()
     {
         $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
 
@@ -175,35 +172,35 @@
             'Login Triibo',
             'manage_options',
             'login-pela-triibo',
-            'LPTriibo_admin',
+            'TAL_admin',
             plugin_dir_url( __FILE__ ) . 'includes/images/triibo20.png'
         );
     }
-    function LPTriibo_admin()
+    function TAL_admin()
     {
         if ( ! current_user_can( 'manage_options' ) ) wp_die( __( 'Você não tem permissões suficientes para acessar esta página.' ) );
 
-        include_once( plugin_dir_path( __FILE__ ) . 'includes/lptriibo-admin.php' );
+        include_once( plugin_dir_path( __FILE__ ) . 'includes/TAL-admin.php' );
     }
 
 
     /**
      * Envia códgio por sms
      */
-    add_action( 'wp_ajax_LPT_authSMS_v1',        'LPT_authSMS_v1' );
-    add_action( 'wp_ajax_nopriv_LPT_authSMS_v1', 'LPT_authSMS_v1' );
-    function LPT_authSMS_v1()
+    add_action( 'wp_ajax_TAL_authSMS_v1',        'TAL_authSMS_v1' );
+    add_action( 'wp_ajax_nopriv_TAL_authSMS_v1', 'TAL_authSMS_v1' );
+    function TAL_authSMS_v1()
     {
         $cellphone = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId = LPT_getChannelToken_v1( null );
+        $channelTokenId = TAL_getChannelToken_v1( null );
 
         $auth_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => TAL_API_TOKEN,
+                'channelGroup'   => TAL_CHANNEL_GROUP,
+                'channelName'    => TAL_CHANNEL_NAME,
+                'channelId'      => TAL_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
@@ -212,7 +209,7 @@
             'platform'    => 'web'
         ];
 
-        echo json_encode( LPT_exec("authSMS_v1", $auth_triiboHeader) );
+        echo json_encode( TAL_exec("authSMS_v1", $auth_triiboHeader) );
         die();
     }
 
@@ -220,20 +217,20 @@
     /**
      * valida código recebido por sms
      */
-    add_action( 'wp_ajax_LPT_validateSMS_v1',        'LPT_validateSMS_v1' );
-    add_action( 'wp_ajax_nopriv_LPT_validateSMS_v1', 'LPT_validateSMS_v1' );
-    function LPT_validateSMS_v1()
+    add_action( 'wp_ajax_TAL_validateSMS_v1',        'TAL_validateSMS_v1' );
+    add_action( 'wp_ajax_nopriv_TAL_validateSMS_v1', 'TAL_validateSMS_v1' );
+    function TAL_validateSMS_v1()
     {
         $cellphone      = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId = LPT_getChannelToken_v1( null );
+        $channelTokenId = TAL_getChannelToken_v1( null );
 
         $validate_triiboHeader = [
             'triiboHeader'   => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => TAL_API_TOKEN,
+                'channelGroup'   => TAL_CHANNEL_GROUP,
+                'channelName'    => TAL_CHANNEL_NAME,
+                'channelId'      => TAL_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
@@ -243,7 +240,7 @@
             'code'          => $_POST['code']
         ];
 
-        echo  json_encode( LPT_exec( "validateSMS_v1", $validate_triiboHeader ) );
+        echo  json_encode( TAL_exec( "validateSMS_v1", $validate_triiboHeader ) );
         die();
     }
 
@@ -251,20 +248,20 @@
     /**
      * Recupera dados do usuario na Triibo
      */
-    add_action( 'wp_ajax_LPT_userInfo_v1',        'LPT_userInfo_v1' );
-    add_action( 'wp_ajax_nopriv_LPT_userInfo_v1', 'LPT_userInfo_v1' );
-    function LPT_userInfo_v1()
+    add_action( 'wp_ajax_TAL_userInfo_v1',        'TAL_userInfo_v1' );
+    add_action( 'wp_ajax_nopriv_TAL_userInfo_v1', 'TAL_userInfo_v1' );
+    function TAL_userInfo_v1()
     {
         $cellphone         = preg_replace( '/\D/', '', $_POST['cellphone'] );
 
-        $channelTokenId    = LPT_getChannelToken_v1( null );
+        $channelTokenId    = TAL_getChannelToken_v1( null );
 
         $user_triiboHeader = [
             'triiboHeader'    => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => TAL_API_TOKEN,
+                'channelGroup'   => TAL_CHANNEL_GROUP,
+                'channelName'    => TAL_CHANNEL_NAME,
+                'channelId'      => TAL_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
@@ -282,11 +279,11 @@
             ],
         ];
 
-        $r_curl   = LPT_exec("getUserInfo_v1", $user_triiboHeader);
+        $r_curl   = TAL_exec("getUserInfo_v1", $user_triiboHeader);
         $r_curl   = $r_curl['success']['userInfo'];
 
         $auxName  = explode( ' ', $r_curl['name'] );
-        $auxPhone = LPT_getPhone( $r_curl['triiboId'] );
+        $auxPhone = TAL_getPhone( $r_curl['triiboId'] );
         $auxAddr  = ( isset( $r_curl['addressList'] ) ? $r_curl['addressList'] : null );
 
         $data     = [
@@ -296,24 +293,19 @@
             'display_name' => $r_curl['name'],
             'first_name'   => $auxName[0],
             'last_name'    => ( count( $auxName ) > 1 ) ? end( $auxName ) : '',
-            'cpf'          => ( isset( $r_curl['documentList'] ) ? LPT_getCpf( $r_curl['documentList'] ) : '' ),
+            'cpf'          => ( isset( $r_curl['documentList'] ) ? TAL_getCpf( $r_curl['documentList'] ) : '' ),
             'country'      => 'BR',
             'phone'        => $auxPhone,
             'cellphone'    => $auxPhone,
-            'email'        => ( isset( $r_curl['contactList'] ) ? LPT_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
+            'email'        => ( isset( $r_curl['contactList'] ) ? TAL_getEmail( $r_curl['contactList'] ) : str_replace( ',', '.', $r_curl['triiboId'] ) ),
         ];
 
-        $r_signin = LPT_signIn( $data );
+        $r_signin = TAL_signIn( $data );
 
         if ( count( $r_signin['metaDataAddrs'] ) > 0 )
         {
-			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return LPT_setUserAddress" . PHP_EOL;
-            $set = LPT_setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
-            file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($set, true), FILE_APPEND);
-
-			$ql  = PHP_EOL . "==========================" . PHP_EOL . "Return LPT_setPreferAddress" . PHP_EOL;
-            $adr = LPT_setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
-            file_put_contents(ABSPATH . 'zLog_LPT.txt', $ql . print_r($adr, true), FILE_APPEND);
+            $set = TAL_setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
+            $adr = TAL_setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
         }
 
         if ( ! $r_signin['error'] )
@@ -349,9 +341,9 @@
     /**
      * Cadastra usuario na Triibo
      */
-    add_action( 'wp_ajax_LPT_registerUserTriibo',        'LPT_registerUserTriibo' );
-    add_action( 'wp_ajax_nopriv_LPT_registerUserTriibo', 'LPT_registerUserTriibo' );
-    function LPT_registerUserTriibo()
+    add_action( 'wp_ajax_TAL_registerUserTriibo',        'TAL_registerUserTriibo' );
+    add_action( 'wp_ajax_nopriv_TAL_registerUserTriibo', 'TAL_registerUserTriibo' );
+    function TAL_registerUserTriibo()
     {
         $cellphone = "+" . preg_replace( '/\D/', '', $_POST['cellphone'] );
         $name      = explode("@", $_POST['email'])[0];
@@ -361,13 +353,13 @@
             "verified" => false,
         ];
 
-        $channelTokenId_1 = LPT_getChannelToken_v1( null );
+        $channelTokenId_1 = TAL_getChannelToken_v1( null );
         $registerUser     = [
             "triiboHeader"    => [
-                "apiToken"       => LPT_API_TOKEN,
-                "channelGroup"   => LPT_CHANNEL_GROUP,
-                "channelName"    => LPT_CHANNEL_NAME,
-                "channelId"      => LPT_CHANNEL_ID,
+                "apiToken"       => TAL_API_TOKEN,
+                "channelGroup"   => TAL_CHANNEL_GROUP,
+                "channelName"    => TAL_CHANNEL_NAME,
+                "channelId"      => TAL_CHANNEL_ID,
                 "sessionId"      => "001",
                 "transactionId"  => "002",
                 "channelTokenId" => $channelTokenId_1["success"]["newToken"]["channelTokenId"]
@@ -377,7 +369,7 @@
         ];
 
         // cria usuário se não existir e retorna as informações
-        $resp1 = LPT_exec("login", $registerUser);
+        $resp1 = TAL_exec("login", $registerUser);
 
         if ($resp1["success"])
         {
@@ -397,13 +389,13 @@
             }
         }
 
-        $channelTokenId_2 = LPT_getChannelToken_v1( $uId );
+        $channelTokenId_2 = TAL_getChannelToken_v1( $uId );
         $setUserInfo    = [
             "triiboHeader"    => [
-                "apiToken"       => LPT_API_TOKEN,
-                "channelGroup"   => LPT_CHANNEL_GROUP,
-                "channelName"    => LPT_CHANNEL_NAME,
-                "channelId"      => LPT_CHANNEL_ID,
+                "apiToken"       => TAL_API_TOKEN,
+                "channelGroup"   => TAL_CHANNEL_GROUP,
+                "channelName"    => TAL_CHANNEL_NAME,
+                "channelId"      => TAL_CHANNEL_ID,
                 "sessionId"      => "001",
                 "transactionId"  => "002",
                 "channelTokenId" => $channelTokenId_2["success"]["newToken"]["channelTokenId"],
@@ -424,10 +416,7 @@
         ];
 
         // atualiza informações do usuario
-        $resp2 = LPT_exec("setUserInfo_v1", $setUserInfo);
-
-        $ql = PHP_EOL . "==========================" . PHP_EOL . "Return IMTriibo_created_customer" . PHP_EOL;
-        file_put_contents(ABSPATH . 'zLog_IMT.txt', $ql . print_r($resp2, true), FILE_APPEND);
+        $resp2 = TAL_exec("setUserInfo_v1", $setUserInfo);
 
         $auxPhone = str_replace( "+55", "", $cellphone );
 
@@ -445,7 +434,7 @@
             'email'        => $_POST['email'],
         ];
 
-        $r_signin = LPT_signIn( $data );
+        $r_signin = TAL_signIn( $data );
 
         if ( ! $r_signin['error'] )
         {
@@ -478,16 +467,16 @@
 
 
 
-    function LPT_getChannelToken_v1( $uId )
+    function TAL_getChannelToken_v1( $uId )
     {
         $passPhrase         = floor( rand( 1000000000, 9999999999 ) ) . $uId . floor( rand( 1000000000, 9999999999 ) );
-        $challenge          = LPT_hashTriibo1( LPT_API_TOKEN, $passPhrase, LPT_CHANNEL_TOKEN );
+        $challenge          = TAL_hashTriibo1( TAL_API_TOKEN, $passPhrase, TAL_CHANNEL_TOKEN );
         $token_triiboHeader = [
             'triiboHeader' => [
-                'apiToken'      => LPT_API_TOKEN,
-                'channelGroup'  => LPT_CHANNEL_GROUP,
-                'channelName'   => LPT_CHANNEL_NAME,
-                'channelId'     => LPT_CHANNEL_ID,
+                'apiToken'      => TAL_API_TOKEN,
+                'channelGroup'  => TAL_CHANNEL_GROUP,
+                'channelName'   => TAL_CHANNEL_NAME,
+                'channelId'     => TAL_CHANNEL_ID,
                 'sessionId'     => '001',
                 'transactionId' => '002',
                 'uId'           => $uId,
@@ -496,10 +485,10 @@
             ],
         ];
 
-        return LPT_exec("getChannelToken_v1", $token_triiboHeader);
+        return TAL_exec("getChannelToken_v1", $token_triiboHeader);
     }
 
-    function LPT_hashTriibo1( $apiToken, $passPhrase, $channelToken )
+    function TAL_hashTriibo1( $apiToken, $passPhrase, $channelToken )
     {
         $challenge1 = md5( $passPhrase . $apiToken     );
         $challenge2 = md5( $challenge1 . $channelToken );
@@ -509,7 +498,7 @@
     /**
      * Efetua login do usuário no wordpress
      */
-    function LPT_signIn( $data )
+    function TAL_signIn( $data )
     {
         if ( ! username_exists( $data['username'] ) )
         {
@@ -568,7 +557,7 @@
             wp_set_current_user( $user->ID );
             wp_set_auth_cookie( $user->ID );
 
-            $metaDataAddrs = LPT_getBillingShipping( $user->ID );
+            $metaDataAddrs = TAL_getBillingShipping( $user->ID );
 
             return [
                 'error'         => false,
@@ -588,16 +577,16 @@
     /**
      * Manda os endereços do usuário para a Triibo
      */
-    function LPT_setUserAddress( $info, $addrs )
+    function TAL_setUserAddress( $info, $addrs )
     {
-        $channelTokenId   = LPT_getChannelToken_v1( $info['uId'] );
+        $channelTokenId   = TAL_getChannelToken_v1( $info['uId'] );
 
         $set_triiboHeader = [
             'triiboHeader'    => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => TAL_API_TOKEN,
+                'channelGroup'   => TAL_CHANNEL_GROUP,
+                'channelName'    => TAL_CHANNEL_NAME,
+                'channelId'      => TAL_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
@@ -645,19 +634,19 @@
             ];
         }
 
-        return LPT_exec("setUserInfo_v1", $set_triiboHeader);
+        return TAL_exec("setUserInfo_v1", $set_triiboHeader);
     }
 
-    function LPT_setPreferAddress( $uId, $addrs )
+    function TAL_setPreferAddress( $uId, $addrs )
     {
-        $channelTokenId    = LPT_getChannelToken_v1( $uId );
+        $channelTokenId    = TAL_getChannelToken_v1( $uId );
 
         $pref_triiboHeader = [
             'triiboHeader'    => [
-                'apiToken'       => LPT_API_TOKEN,
-                'channelGroup'   => LPT_CHANNEL_GROUP,
-                'channelName'    => LPT_CHANNEL_NAME,
-                'channelId'      => LPT_CHANNEL_ID,
+                'apiToken'       => TAL_API_TOKEN,
+                'channelGroup'   => TAL_CHANNEL_GROUP,
+                'channelName'    => TAL_CHANNEL_NAME,
+                'channelId'      => TAL_CHANNEL_ID,
                 'sessionId'      => '001',
                 'transactionId'  => '002',
                 'channelTokenId' => $channelTokenId["success"]["newToken"]["channelTokenId"],
@@ -686,15 +675,15 @@
             ];
         }
 
-        return LPT_exec("preferentialAddress", $pref_triiboHeader);
+        return TAL_exec("preferentialAddress", $pref_triiboHeader);
     }
 
-    function LPT_exec($api, $params)
+    function TAL_exec($api, $params)
     {
         $ch = curl_init();
 
 		curl_setopt_array( $ch, [
-			CURLOPT_URL            => LPT_API_URL . $api,
+			CURLOPT_URL            => TAL_API_URL . $api,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
@@ -718,7 +707,7 @@
     /**
      * Funções internas
      */
-    function LPT_getEmail( $data )
+    function TAL_getEmail( $data )
     {
         $email = null;
 
@@ -736,14 +725,14 @@
         return $email;
     }
 
-    function LPT_getPhone( $data )
+    function TAL_getPhone( $data )
     {
         $phone = explode( '@', $data )[0];
 
         return substr( $phone, 3 );
     }
 
-    function LPT_getCpf( $data )
+    function TAL_getCpf( $data )
     {
         $cpf = '';
 
@@ -761,7 +750,7 @@
         return $cpf;
     }
 
-    function LPT_getUserMeta( $user_id )
+    function TAL_getUserMeta( $user_id )
     {
         $data = array_map( function( $a ) {
             return $a[0];
@@ -770,9 +759,9 @@
         return $data;
     }
 
-    function LPT_getBillingShipping( $user_id )
+    function TAL_getBillingShipping( $user_id )
     {
-        $data = LPT_getUserMeta( $user_id );
+        $data = TAL_getUserMeta( $user_id );
         $meta = [];
 
         $bill = 'billing_';

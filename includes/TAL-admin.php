@@ -44,7 +44,7 @@
                 url : '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
-                    action: 'lpt_set_status_global'
+                    action: 'TAL_set_status_global'
                 },
                 success: function( data ) {
                     // console.log( data );
@@ -82,5 +82,5 @@
     <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>" width="325px" >
 
     <hr>
-    <?php echo LPT_API_URL; ?>
+    <?php echo TAL_API_URL; ?>
 </div>
