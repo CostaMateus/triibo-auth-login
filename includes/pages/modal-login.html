@@ -6,7 +6,7 @@
                 <span id="close-form-validate" aria-hidden="true">&times;</span>
             </div>
             <form id="form-validate" method="post" >
-                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-0">
                     <input type="hidden" name="form-validate">
                     <input id="code" type="number" class="woocommerce-Input woocommerce-Input--text input-text" required
                            name="code" placeholder="Código" pattern="[0-9]{6}" min=0 max=999999 title="O código tem seis (6) números" autofocus />
@@ -29,14 +29,16 @@
                 <span id="close-form-register" aria-hidden="true">&times;</span>
             </div>
             <form id="form-register" method="post" >
-                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <p class="mb-15" >Notamos que seu número ainda não está associado a uma conta Triibo, informe seu e-mail para completarmos seu cadastro.</p>
+
+                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-0">
                     <input type="hidden" name="form-register">
 
                     <input type="email" class="woocommerce-Input woocommerce-Input--text input-text" requered placeholder="Endereço de e-mail"
                            name="email" id="form-register-email" autocomplete="email" autofocus >
 
                     <!-- Error message -->
-                    <p id="error-register" class="bg-transp text-center text-danger pt-20 mb-0 " ></p>
+                    <p id="error-register" class="bg-transp text-center text-danger pt-20 mb-0 d-none" ></p>
 
                 </p>
                 <button id="btn-form-register" type="submit" class="woocommerce-Button button set-spin" >Cadastrar <div class="d-none spin-load"></div></button>
@@ -71,6 +73,7 @@
 
         .mt-20        { margin-top: 20px !important; }
         .mb-0         { margin-bottom: 0 !important; }
+        .mb-15        { margin-bottom: 15px !important; }
 
         .pointer      { cursor: pointer; }
 
@@ -82,7 +85,7 @@
         .bg-modal-login-child h2 { text-align: left; margin: 0 0 25px 0 !important; }
         .bg-modal-login-child .modal-header { display: flex; flex-direction: row; justify-content: space-between; }
         .bg-modal-login-child .modal-header span { font-size: 20px; cursor: pointer; }
-        .bg-modal-login-child p { margin-bottom: 0 !important; }
+        /* .bg-modal-login-child p { margin-bottom: 0 !important; } */
         .bg-modal-login-child .button { width: 100%; font-size: 16px; margin-top: 20px !important; border-radius: 3px; height: 53px; line-height: 53px; }
 
         /* tamanho do checchout-child de acordo com a tela */
@@ -452,8 +455,8 @@
                     else
                     {
                         jQuery( btn_auth                ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-                        jQuery( "#modal-load-next-page" ).addClass( "d-flex" );
-                        jQuery( modal_valid             ).addClass( "d-none" );
+                        jQuery( "#modal-load-next-page" ).removeClass( "bgml-d-none" );
+                        // jQuery( modal_valid             ).addClass( "d-none" );
 
                         // executa o ajax para recuperar as informações do usuário
                         callUserInfo();
@@ -495,16 +498,18 @@
                     // valida se o retorno da função tem erros
                     if ( user.error != null )
                     {
-                        jQuery( "#modal-load-next-page" ).removeClass( "d-flex" );
+                        jQuery( btn_auth ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
-                        jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+                        jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
+                        jQuery( modal_valid             ).addClass( "d-none" );
 
-                        jQuery( error_auth   ).removeClass( "d-none" );
-                        // exibe erro
-                        jQuery( error_auth   ).html( "Número não cadastrado no Triibo!" );
-                        jQuery( "#cellphone" ).addClass( "error-border" );
+                        jQuery( modal_regis             ).removeClass( "d-none" );
 
-                        jQuery( "#register-now" ).removeClass( "d-none" );
+                        // jQuery( error_auth   ).removeClass( "d-none" );
+                        // // exibe erro
+                        // jQuery( error_auth   ).html( "Número não cadastrado no Triibo!" );
+                        // jQuery( "#cellphone" ).addClass( "error-border" );
+                        // jQuery( "#register-now" ).removeClass( "d-none" );
                     }
                     else
                     {
