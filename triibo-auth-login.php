@@ -126,7 +126,7 @@
                 <form id="form-auth" method="post" >
                     <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide" >
                         <input type="hidden" name="form-auth">
-                        <input id="cellphone" type="text" class="woocommerce-Input woocommerce-Input--text input-text" required name="cellphone" placeholder="+55 (XX) XXXXX-XXXX" />
+                        <input id="cellphone" type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="cellphone" placeholder="+55 (XX) XXXXX-XXXX" />
                         <!-- Error message -->
                         <p id= "error-auth" class="bg-transp text-center text-danger pt-8 mb-0 d-none" ></p>
                         <!-- Já tem código? -->
