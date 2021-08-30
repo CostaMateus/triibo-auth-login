@@ -134,12 +134,14 @@
                     </p>
 
                     <!-- Já tem código? -->
+                    <!--
                     <p class="form-row text-center">
                         <a id="register-now" class="bg-transp pointer pt-8 mb-0 d-none" >Deseja se cadastrar agora?</a>
                     </p>
+                    -->
 
                     <p class="form-row">
-                        <button id="btn-form-auth" type="submit" class="woocommerce-Button button set-spin" >Enviar código <div class="d-none spin-load"></div></button>
+                        <button id="btn-form-auth" type="submit" class="woocommerce-Button button set-spin" >Solicitar código <div class="d-none spin-load"></div></button>
                     </p>
                 </form>
                 <hr>
