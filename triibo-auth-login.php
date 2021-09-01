@@ -303,11 +303,11 @@
 
         $r_signin = TAL_signIn( $data );
 
-        if ( count( $r_signin['metaDataAddrs'] ) > 0 )
-        {
-            $set = TAL_setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
-            $adr = TAL_setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
-        }
+        // if ( count( $r_signin['metaDataAddrs'] ) > 0 )
+        // {
+        //     $set = TAL_setUserAddress( $r_curl, $r_signin['metaDataAddrs'] );
+        //     $adr = TAL_setPreferAddress( $r_curl['uId'], $r_signin['metaDataAddrs'] );
+        // }
 
         if ( ! $r_signin['error'] )
         {
