@@ -10,6 +10,8 @@
     // don't call the file directly
     if ( ! defined( 'ABSPATH' ) ) exit;
 
+    date_default_timezone_set('America/Sao_Paulo');
+
     /**
      * Verifica o ambiente que está
      * $isDev = strpos(home_url(), "dev-");
