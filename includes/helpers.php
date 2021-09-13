@@ -135,7 +135,7 @@
 
         $to      = $email;
         $subject = "Seu código de ativação";
-        $body    = "<html lang="pt-br"><body><p>Seu código de ativação do Marketplace Triibo é:</p><p style="font-size:18px;margin:0"><b>$validCode</b></p></body></html>";
+        $body    = "<html lang='pt-br'><body><p>Seu código de ativação do Marketplace Triibo é:</p><p style='font-size:18px;margin:0'><b>$validCode</b></p></body></html>";
         $headers = array("Content-Type: text/html; charset=UTF-8","From: Marketplace Triibo <equipemarketplace@triibo.com.br>");
 
         return wp_mail( $to, $subject, $body, $headers );
