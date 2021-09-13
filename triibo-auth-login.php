@@ -2,7 +2,7 @@
     /**
     * Plugin Name: #Triibo Auth Login
     * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 3.0
+    * Version: 3.1
     * Author: Mateus Costa
     * Author URI: https://costamateus.com.br/
     **/
@@ -39,8 +39,11 @@
         define( "TAL_UID",            null                                                          ); // PROD
     }
 
+    // ====================== Funções internas ====================== //
     include_once( plugin_dir_path( __FILE__ ) . "includes/helpers.php" );
 
+
+    // ==================== Acitons adicionadas ==================== //
     /**
      * Registrando variavel para controle de status do plugin | atiivo - inativo
      */
@@ -77,7 +80,9 @@
         die();
     }
 
-
+    /**
+     * Adiciona um titulo antes do campos de email e senha, no formulario de login
+     */
     add_action( "woocommerce_login_form_start", "TAL_woocommerce_login_form_start" );
     function TAL_woocommerce_login_form_start()
     {
@@ -115,7 +120,8 @@
 
 
     /**
-     *
+     * Adiciona ao formulário de login, campo celular
+     * Separa o trecho do login por rede social
      */
     add_action( "woocommerce_login_form_end", "TAL_woocommerce_login_form_end" );
     function TAL_woocommerce_login_form_end()
@@ -152,7 +158,7 @@
 
 
     /**
-     * Inclui o trecho de código necessário para fazer o login com Triibo
+     * Inclui código necessário para o login pela Triibo
      */
     add_action( "martfury_after_login_form", "TAL_martfury_after_login_form" );
     function TAL_martfury_after_login_form()
@@ -217,7 +223,7 @@
 
 
     /**
-     * valida código recebido por sms
+     * Valida código enviado por sms
      */
     add_action( "wp_ajax_TAL_validate_sms",        "TAL_validate_sms" );
     add_action( "wp_ajax_nopriv_TAL_validate_sms", "TAL_validate_sms" );
@@ -247,7 +253,7 @@
     }
 
     /**
-     * valida código recebido por email
+     * Valida código enviado por email
      */
     add_action( "wp_ajax_TAL_validate_code_email",        "TAL_validate_code_email" );
     add_action( "wp_ajax_nopriv_TAL_validate_code_email", "TAL_validate_code_email" );
@@ -291,7 +297,7 @@
 
 
     /**
-     * Recupera dados do usuario na Triibo
+     * Recupera dados do usuário na Triibo
      */
     add_action( "wp_ajax_TAL_user_info",        "TAL_user_info" );
     add_action( "wp_ajax_nopriv_TAL_user_info", "TAL_user_info" );
@@ -394,7 +400,7 @@
 
 
     /**
-     * Cadastra usuario na Triibo
+     * Cadastra usuário na Triibo
      */
     add_action( "wp_ajax_TAL_resend_email_code",        "TAL_resend_email_code" );
     add_action( "wp_ajax_nopriv_TAL_resend_email_code", "TAL_resend_email_code" );
@@ -429,7 +435,7 @@
     }
 
     /**
-     * Cadastra usuario na Triibo
+     * Cadastra usuário na Triibo
      */
     add_action( "wp_ajax_TAL_find_user",        "TAL_find_user" );
     add_action( "wp_ajax_nopriv_TAL_find_user", "TAL_find_user" );
@@ -482,195 +488,10 @@
     }
 
 
-    /**
-     * Funções internas
-     */
-    function TAL_create_user_marketplace( $uId, $cellphone, $email, $pass )
-    {
-        $cellphone = "+" . preg_replace( "/\D/", "", $cellphone );
-        $name      = explode("@", $email)[0];
-
-        $user_id   = wp_insert_user([
-            "user_login"    => $uId,
-            "user_pass"     => wp_hash_password( "Triibo2021" ),
-            "user_nicename" => $name,
-            "user_email"    => $email,
-            "display_name"  => $name,
-            "nickname"      => $name,
-            "first_name"    => $name,
-            "last_name"     => "",
-        ]);
-
-        if ( ! is_wp_error( $user_id ) )
-        {
-            wp_set_password( $pass, $user_id );
-
-            // campo padronizado com o plugin triibo-integration-user
-            add_user_meta( $user_id, "triiboId_phone", $cellphone );
-
-            $user = get_user_by( "id", $user_id );
-
-            $user->set_role( "subscriber" );
-            if ( class_exists( "WooCommerce" ) ) $user->set_role( "customer" );
-        }
-
-        return TAL_login_by_triibo( "id", $user_id );
-    }
-
-    function TAL_create_or_update_user_triibo( $cellphone, $email, $name = null, $nick = null )
-    {
-        $cellphone = "+" . preg_replace( "/\D/", "", $cellphone );
-        $name      = $name ? $name : explode("@", $email)[0];
-        $nick      = $nick ? $nick : $name;
-        $emails    = [
-            [
-                "type"     => "email",
-                "value"    => $email,
-                "verified" => true,
-            ], [
-                "type"     => "emailMarketplace",
-                "value"    => $email,
-                "verified" => true,
-            ]
-        ];
-
-        $channelTokenId_1 = TAL_get_channel_token( null );
-        $registerUser     = [
-            "triiboHeader"    => [
-                "apiToken"       => TAL_API_TOKEN,
-                "channelGroup"   => TAL_CHANNEL_GROUP,
-                "channelName"    => TAL_CHANNEL_NAME,
-                "channelId"      => TAL_CHANNEL_ID,
-                "sessionId"      => "001",
-                "transactionId"  => "002",
-                "channelTokenId" => $channelTokenId_1["success"]["newToken"]["channelTokenId"]
-            ],
-            "linkedAccount" => null,
-            "cellphone"     => $cellphone,
-        ];
-
-        // cria usuário se não existir e retorna as informações
-        $resp1 = TAL_exec("login", $registerUser);
-
-        if ( $resp1["success"] )
-        {
-            $user        = $resp1["user"];
-            $uId         = $user["uId"];
-            $contactList = $user["contactList"];
-
-            if ( count( $contactList ) > 1 )
-            {
-                foreach ( $contactList as &$c )
-                {
-                    if ( $c["type"] == "email" ) $c["value"] = $emails[0]["value"];
-                }
-            }
-            else
-            {
-                $contactList = array_merge( $contactList, $emails );
-            }
-        }
-
-        $channelTokenId_2 = TAL_get_channel_token( $uId );
-        $setUserInfo    = [
-            "triiboHeader"    => [
-                "apiToken"       => TAL_API_TOKEN,
-                "channelGroup"   => TAL_CHANNEL_GROUP,
-                "channelName"    => TAL_CHANNEL_NAME,
-                "channelId"      => TAL_CHANNEL_ID,
-                "sessionId"      => "001",
-                "transactionId"  => "002",
-                "channelTokenId" => $channelTokenId_2["success"]["newToken"]["channelTokenId"],
-                "uId"            => $uId
-            ],
-            "queryPartnerAPI" => [
-                "setUserInfo"
-            ],
-            "userInfo"        => [
-                "syncType"    => "merge",
-                "uId"         => $uId,
-                "name"        => ( $user["name"] && $user["name"] != "Triiber" ) ? $user["name"]      : $name,
-                "aliasName"   => ( $user["aliasName"] )                          ? $user["aliasName"] : $nick,
-                "contactList" => [
-                    ... $contactList
-                ],
-            ],
-        ];
-
-        // atualiza informações do usuario
-        $resp2 = TAL_exec("setUserInfo_v1", $setUserInfo);
-
-        return $uId;
-    }
 
     /**
-     * Envia código de validação por email
+     * Registra logs
      */
-    function TAL_send_email_code( $email )
-    {
-        $validCode = str_pad(mt_rand(0, 999999), 6, "0", STR_PAD_LEFT);
-
-        set_transient( "_triibo_code", $validCode );
-
-        $to      = $email;
-        $subject = "Seu código de ativação";
-        $body    = "<html lang="pt-br"><body><p>Seu código de ativação do Marketplace Triibo é:</p><p style="font-size:18px;margin:0"><b>$validCode</b></p></body></html>";
-        $headers = array("Content-Type: text/html; charset=UTF-8","From: Marketplace Triibo <equipemarketplace@triibo.com.br>");
-
-        return wp_mail( $to, $subject, $body, $headers );
-    }
-
-    function TAL_email_verified( $data )
-    {
-        $email = null;
-
-        foreach ( $data as $c )
-        {
-            if ( $c["type"] == "emailMarketplace" && $c["verified"] ) $email = $c["value"];
-        }
-
-        return $email;
-    }
-
-    function TAL_login_by_triibo( $field, $value )
-    {
-        $user = get_user_by( $field, $value );
-
-        return TAL_login( $user, "Login by field_$field" );
-    }
-
-    function TAL_login( $user, $alert )
-    {
-        if ( ! is_wp_error( $user ) )
-        {
-            wp_clear_auth_cookie();
-            wp_set_current_user( $user->ID );
-            wp_set_auth_cookie( $user->ID );
-
-            $result = [
-                "success" => [
-                    "redirect" => home_url( "/my-account" ),
-                ],
-                "error"   => null,
-                "alert"   => null,
-            ];
-        }
-        else
-        {
-            $result = [
-                "success" => null,
-                "error"   => [
-                    "code"    => 500,
-                    "message" => "Error login",
-                ],
-                "alert"   => $alert,
-            ];
-            TAL_register_log( "TAL_login", [ $user, $result ] );
-        }
-
-        return $result;
-    }
-
     function TAL_register_log( $function, $data )
     {
         $nl = PHP_EOL . "==========================" . PHP_EOL . "Return $function" . PHP_EOL . date("Y-m-d H:i:s") . PHP_EOL;
