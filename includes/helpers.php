@@ -5,16 +5,16 @@
         $passPhrase         = floor( rand( 1000000000, 9999999999 ) ) . $uId . floor( rand( 1000000000, 9999999999 ) );
         $challenge          = TAL_hash_triibo( TAL_API_TOKEN, $passPhrase, TAL_CHANNEL_TOKEN );
         $token_triiboHeader = [
-            'triiboHeader' => [
-                'apiToken'      => TAL_API_TOKEN,
-                'channelGroup'  => TAL_CHANNEL_GROUP,
-                'channelName'   => TAL_CHANNEL_NAME,
-                'channelId'     => TAL_CHANNEL_ID,
-                'sessionId'     => '001',
-                'transactionId' => '002',
-                'uId'           => $uId,
-                'passPhrase'    => $passPhrase,
-                'challenge'     => $challenge
+            "triiboHeader" => [
+                "apiToken"      => TAL_API_TOKEN,
+                "channelGroup"  => TAL_CHANNEL_GROUP,
+                "channelName"   => TAL_CHANNEL_NAME,
+                "channelId"     => TAL_CHANNEL_ID,
+                "sessionId"     => "001",
+                "transactionId" => "002",
+                "uId"           => $uId,
+                "passPhrase"    => $passPhrase,
+                "challenge"     => $challenge
             ],
         ];
 
