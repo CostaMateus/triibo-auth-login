@@ -38,7 +38,7 @@
     /**
      * Cria ou atualiza usuario na Triibo
      */
-    function TAL_create_or_update_user_triibo( $cellphone, $email, $name = null, $nick = null )
+    function TAL_create_or_update_user_triibo( $cellphone, $email, $name = NULL, $nick = NULL )
     {
         $cellphone = "+" . preg_replace( "/\D/", "", $cellphone );
         $name      = $name ? $name : explode("@", $email)[0];
@@ -47,15 +47,15 @@
             [
                 "type"     => "email",
                 "value"    => $email,
-                "verified" => true,
+                "verified" => TRUE,
             ], [
                 "type"     => "emailMarketplace",
                 "value"    => $email,
-                "verified" => true,
+                "verified" => TRUE,
             ]
         ];
 
-        $channelTokenId_1 = TAL_get_channel_token( null );
+        $channelTokenId_1 = TAL_get_channel_token( NULL );
         $registerUser     = [
             "triiboHeader"    => [
                 "apiToken"       => TAL_API_TOKEN,
@@ -66,7 +66,7 @@
                 "transactionId"  => "002",
                 "channelTokenId" => $channelTokenId_1["success"]["newToken"]["channelTokenId"]
             ],
-            "linkedAccount" => null,
+            "linkedAccount" => NULL,
             "cellphone"     => $cellphone,
         ];
 
@@ -146,7 +146,7 @@
      */
     function TAL_email_verified( $data )
     {
-        $email = null;
+        $email = NULL;
 
         foreach ( $data as $c )
         {
@@ -181,14 +181,14 @@
                 "success" => [
                     "redirect" => home_url( "/my-account" ),
                 ],
-                "error"   => null,
-                "alert"   => null,
+                "error"   => NULL,
+                "alert"   => NULL,
             ];
         }
         else
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 500,
                     "message" => "Error login",
@@ -248,11 +248,11 @@
 
 		curl_setopt_array( $ch, [
 			CURLOPT_URL            => TAL_API_URL . $api,
-			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING       => "",
 			CURLOPT_MAXREDIRS      => 10,
 			CURLOPT_TIMEOUT        => 60,
-			CURLOPT_SSL_VERIFYPEER => false ,
+			CURLOPT_SSL_VERIFYPEER => FALSE ,
 			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST  => "POST",
 			CURLOPT_HTTPHEADER     => [ "Content-type: application/json" ],
@@ -262,7 +262,7 @@
         $result = curl_exec( $ch );
         curl_close( $ch );
 
-        return json_decode( $result, true );
+        return json_decode( $result, TRUE );
     }
 
 
@@ -361,7 +361,7 @@
     // }
     // function TAL_getEmail( $data )
     // {
-    //     $email = null;
+    //     $email = NULL;
     //     foreach( $data as $temp )
     //     {
     //         foreach ( $temp as $key => $value )

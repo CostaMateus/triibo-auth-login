@@ -7,7 +7,7 @@
     * Author URI: https://costamateus.com.br/
     **/
 
-    // don"t call the file directly
+    // don't call the file directly
     if ( ! defined( "ABSPATH" ) ) exit;
 
     date_default_timezone_set("America/Sao_Paulo");
@@ -16,7 +16,7 @@
      * Verifica o ambiente que está
      * $isDev = strpos(home_url(), "dev-");
      */
-    if (strpos(home_url(), "dev-") !== false)
+    if ( strpos( home_url(), "dev-" ) !== FALSE )
     {
         // $isDev = "TRUE";
         define( "TAL_API_URL",       "https://triibo-api-gateway-hml.triibo.com.br/"                ); // HOMOLOG
@@ -25,7 +25,7 @@
         define( "TAL_CHANNEL_GROUP", "triibo-webapp"                                                ); // HOMOLOG
         define( "TAL_CHANNEL_NAME",  "triibo-webapp"                                                ); // HOMOLOG
         define( "TAL_CHANNEL_TOKEN", "305221624057656241707021403131"                               ); // HOMOLOG
-        define( "TAL_UID",            null                                                          ); // HOMOLOG
+        define( "TAL_UID",            NULL                                                          ); // HOMOLOG
     }
     else
     {
@@ -36,7 +36,7 @@
         define( "TAL_CHANNEL_GROUP", "triibo-webapp"                                                ); // PROD
         define( "TAL_CHANNEL_NAME",  "triibo-webapp"                                                ); // PROD
         define( "TAL_CHANNEL_TOKEN", "38522162405733624170505052236368403138"                       ); // PROD
-        define( "TAL_UID",            null                                                          ); // PROD
+        define( "TAL_UID",            NULL                                                          ); // PROD
     }
 
     // ====================== Funções internas ====================== //
@@ -52,7 +52,7 @@
     {
         $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
 
-        if ( $_STATUS_PLUGIN === false ) set_transient( "_STATUS_PLUGIN", "inactive" ); // active
+        if ( $_STATUS_PLUGIN === FALSE ) set_transient( "_STATUS_PLUGIN", "inactive" ); // active
     }
     TAL_init_status_global();
 
@@ -201,7 +201,7 @@
     {
         $cellphone = preg_replace( "/\D/", "", $_POST["cellphone"] );
 
-        $channelTokenId = TAL_get_channel_token( null );
+        $channelTokenId = TAL_get_channel_token( NULL );
 
         $auth_triiboHeader = [
             "triiboHeader" => [
@@ -231,7 +231,7 @@
     {
         $cellphone      = preg_replace( "/\D/", "", $_POST["cellphone"] );
 
-        $channelTokenId = TAL_get_channel_token( null );
+        $channelTokenId = TAL_get_channel_token( NULL );
 
         $validate_triiboHeader = [
             "triiboHeader"   => [
@@ -262,10 +262,10 @@
         $code         = $_POST["codeEmail"];
         $_triibo_code = get_transient( "_triibo_code" );
 
-        if ( $_triibo_code === false )
+        if ( $_triibo_code === FALSE )
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 500,
                     "message" => "Não foi possível validar o código.",
@@ -277,12 +277,12 @@
         {
             $uId    = TAL_create_or_update_user_triibo( $_POST["cellphone"], $_POST["email"] );
             $result = TAL_create_user_marketplace( $uId, $_POST["cellphone"], $_POST["email"], $_POST["password"] );
-            set_transient( "_triibo_code", null );
+            set_transient( "_triibo_code", NULL );
         }
         else
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 401,
                     "message" => "Código inválido.",
@@ -305,7 +305,7 @@
     {
         $cellphone         = preg_replace( "/\D/", "", $_POST["cellphone"] );
 
-        $channelTokenId    = TAL_get_channel_token( null );
+        $channelTokenId    = TAL_get_channel_token( NULL );
 
         $user_triiboHeader = [
             "triiboHeader"    => [
@@ -335,7 +335,7 @@
         if ( empty( $r_curl["error"] ) && empty( $r_curl["success"]["userInfo"] ) )
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 404,
                     "message" => $r_curl["alert"][0]["errorMsg"],
@@ -345,7 +345,7 @@
         elseif ( ! empty( $r_curl["error"] ) )
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 500,
                     "message" => "Server error",
@@ -370,7 +370,7 @@
                 else
                 {
                     $result = [
-                        "success" => null,
+                        "success" => NULL,
                         "error"   => [
                             "message" => "E-mail não encontrado", // pedir email/senha
                             "code"    => 401,
@@ -383,7 +383,7 @@
             else
             {
                 $result = [
-                    "success" => null,
+                    "success" => NULL,
                     "error"   => [
                         "message" => "E-mail não verificado", // pedir email/senha
                         "code"    => 401,
@@ -413,13 +413,13 @@
                     "code"      => 200,
                     "message"   => "Código reenviado",
                 ],
-                "error"   => null,
+                "error"   => NULL,
             ];
         }
         else
         {
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "code"    => 500,
                     "message" => "Falha ao reenviar do código por e-mail",
@@ -449,7 +449,7 @@
             TAL_send_email_code( $_POST["email"] );
 
             $result = [
-                "success" => null,
+                "success" => NULL,
                 "error"   => [
                     "message" => "Usuário inexistente",
                     "code"    => 301,
@@ -471,7 +471,7 @@
             else
             {
                 $result = [
-                    "success" => null,
+                    "success" => NULL,
                     "error"   => [
                         "message" => "Senha incorreta",
                         "code"    => 401,
@@ -495,5 +495,5 @@
     function TAL_register_log( $function, $data )
     {
         $nl = PHP_EOL . "==========================" . PHP_EOL . "Return $function" . PHP_EOL . date("Y-m-d H:i:s") . PHP_EOL;
-        file_put_contents( plugin_dir_path( __FILE__ ) . "log.txt", $nl . print_r( $data, true ), FILE_APPEND );
+        file_put_contents( plugin_dir_path( __FILE__ ) . "log.txt", $nl . print_r( $data, TRUE ), FILE_APPEND );
     }
