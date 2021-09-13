@@ -47,18 +47,16 @@
                     action: 'TAL_set_status_global'
                 },
                 success: function( data ) {
-                    // console.log( data );
-                    // window.location.reload();
-
-                    switch ( data ) {
+                    switch ( data )
+                    {
                         case 'active':
                             jQuery('#txt-triibo-status').html('ATIVO');
                             jQuery('#btn-triibo-status').html('Desativar login Triibo <div class="d-none spin-load">');
-                            break;
+                        break;
                         case 'inactive':
                             jQuery('#txt-triibo-status').html('INATIVO');
                             jQuery('#btn-triibo-status').html('Ativar login Triibo <div class="d-none spin-load">');
-                            break;
+                        break;
                     }
 
                     jQuery( '#btn-triibo-status' ).prop( 'disabled', null ).find( 'div' ).addClass( 'd-none' );
@@ -80,6 +78,15 @@
     <p>O plugin tem por finalidade habilitar no marketplace a posibilidade de se realizar o login pela Triibo.</p>
     <p>Quando ativado, o plugin irá inserir o botão "Entrar com Triibo" na página de login, como mostra a imagem.</p>
     <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>" width="325px" >
+
+    <p>Exemplo dos modais de login</p>
+    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_cod_sms.png'; ?>" width="325px" >
+    <br>
+    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_cod_email.png'; ?>" width="325px" >
+    <br>
+    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_contas_nao_associadas.png'; ?>" width="325px" >
+    <br>
+    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_nao_cadastrado_na_triibo.png'; ?>" width="325px" >
 
     <hr>
     <?php echo TAL_API_URL; ?>
