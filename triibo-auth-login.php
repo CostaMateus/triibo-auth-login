@@ -270,6 +270,7 @@
                     "code"    => 500,
                     "message" => "Não foi possível validar o código.",
                 ],
+                "alert"   => "TAL_validate_code_email",
             ];
             TAL_register_log( "TAL_validate_code_email", [ $result ] );
         }
@@ -287,6 +288,7 @@
                     "code"    => 401,
                     "message" => "Código inválido.",
                 ],
+                "alert"   => "TAL_validate_code_email",
             ];
             TAL_register_log( "TAL_validateCodeEmail", [ $result ] );
         }
@@ -323,7 +325,7 @@
             "userInfo"        => [
                 "contactList" => [
                     [
-                        "type"  => "cellphone",
+                        "type"  => "cellPhone",
                         "value" => $cellphone
                     ]
                 ]
@@ -340,6 +342,7 @@
                     "code"    => 404,
                     "message" => $r_curl["alert"][0]["errorMsg"],
                 ],
+                "alert"   => "TAL_user_info",
             ];
         }
         elseif ( ! empty( $r_curl["error"] ) )
@@ -350,6 +353,7 @@
                     "code"    => 500,
                     "message" => "Server error",
                 ],
+                "alert"   => "TAL_user_info",
             ];
 
             TAL_register_log( "TAL_user_info", [ $r_curl, $result ] );
@@ -410,10 +414,11 @@
         {
             $result = [
                 "success" => [
-                    "code"      => 200,
-                    "message"   => "Código reenviado",
+                    "message" => "Código reenviado",
+                    "code"    => 200,
                 ],
                 "error"   => NULL,
+                "alert"   => NULL,
             ];
         }
         else
@@ -421,9 +426,10 @@
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 500,
                     "message" => "Falha ao reenviar do código por e-mail",
+                    "code"    => 500,
                 ],
+                "alert"   => "TAL_resend_email_code",
             ];
             TAL_register_log( "TAL_resend_email_code", [ $_POST["email"], $result ] );
         }
