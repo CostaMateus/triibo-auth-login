@@ -45,10 +45,10 @@
         $nick      = $nick ? $nick : $name;
         $emails    = [
             [
-                "type"     => "email",
-                "value"    => $email,
-                "verified" => TRUE,
-            ], [
+            //     "type"     => "email",
+            //     "value"    => $email,
+            //     "verified" => TRUE,
+            // ], [
                 "type"     => "emailMarketplace",
                 "value"    => $email,
                 "verified" => TRUE,
@@ -79,17 +79,26 @@
             $uId         = $user["uId"];
             $contactList = $user["contactList"];
 
-            if ( count( $contactList ) > 1 )
+            if ( count( $contactList ) <= 1 )
             {
-                foreach ( $contactList as &$c )
-                {
-                    if ( $c["type"] == "email" ) $c["value"] = $emails[0]["value"];
-                }
+                array_push($emails, [
+                    "type"     => "email",
+                    "value"    => $email,
+                    "verified" => TRUE,
+                ]);
+                //     foreach ( $contactList as &$c )
+                //     {
+                //         if ( $c["type"] == "email" ) $c["value"] = $emails[0]["value"];
+                //     }
+                //     TAL_register_log( "TAL_create_or_update_user_triibo - L90", [ $contactList ] );
+                // }
+                // else
+                // {
+                //     $contactList = array_merge( $contactList, $emails );
+                //     TAL_register_log( "TAL_create_or_update_user_triibo - L95", [ $contactList ] );
             }
-            else
-            {
-                $contactList = array_merge( $contactList, $emails );
-            }
+
+            $contactList = array_merge( $contactList, $emails );
         }
 
         $channelTokenId_2 = TAL_get_channel_token( $uId );
@@ -184,18 +193,19 @@
                 "error"   => NULL,
                 "alert"   => NULL,
             ];
+            TAL_register_log( "TAL_login - L187", [ $user, $result ] );
         }
         else
         {
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 500,
                     "message" => "Error login",
+                    "code"    => 500,
                 ],
                 "alert"   => $alert,
             ];
-            TAL_register_log( "TAL_login", [ $user, $result ] );
+            TAL_register_log( "TAL_login - L199", [ $user, $result ] );
         }
 
         return $result;
