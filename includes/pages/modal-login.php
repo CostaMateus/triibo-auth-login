@@ -74,6 +74,11 @@
                     <p id="error-register" class="bg-transp text-center text-danger pt-20 mb-0 d-none" ></p>
                 </p>
 
+                <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-0">
+                    <a id="lost-pass"   class="bg-transp float-right pointer pb-20 mb-0" onclick="closeModal()"
+                        href="<?= esc_url( home_url( "/minha-conta/lost-password/" ) ); ?>" >Esqueceu a senha?</a>
+                </p>
+
                 <button id="btn-form-register" type="submit" class="woocommerce-Button button set-spin" >Entrar <div class="d-none spin-load"></div></button>
             </form>
         </div>
