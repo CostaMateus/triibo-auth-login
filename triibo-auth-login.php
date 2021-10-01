@@ -165,7 +165,7 @@
     {
         $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
 
-        if ( $_STATUS_PLUGIN == "active" ) include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.html" );
+        if ( $_STATUS_PLUGIN == "active" ) include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
     }
 
 
@@ -267,12 +267,12 @@
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 500,
                     "message" => "Não foi possível validar o código.",
+                    "code"    => 500,
                 ],
                 "alert"   => "TAL_validate_code_email",
             ];
-            TAL_register_log( "TAL_validate_code_email", [ $result ] );
+            TAL_register_log( "TAL_validate_code_email - L275", [ $result ] );
         }
         elseif ($_triibo_code == $code)
         {
@@ -285,12 +285,12 @@
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 401,
                     "message" => "Código inválido.",
+                    "code"    => 401,
                 ],
                 "alert"   => "TAL_validate_code_email",
             ];
-            TAL_register_log( "TAL_validateCodeEmail", [ $result ] );
+            TAL_register_log( "TAL_validateCodeEmail - L293", [ $result ] );
         }
 
         echo  json_encode( $result );
@@ -339,8 +339,8 @@
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 404,
                     "message" => $r_curl["alert"][0]["errorMsg"],
+                    "code"    => 404,
                 ],
                 "alert"   => "TAL_user_info",
             ];
@@ -350,13 +350,13 @@
             $result = [
                 "success" => NULL,
                 "error"   => [
-                    "code"    => 500,
                     "message" => "Server error",
+                    "code"    => 500,
                 ],
                 "alert"   => "TAL_user_info",
             ];
 
-            TAL_register_log( "TAL_user_info", [ $r_curl, $result ] );
+            TAL_register_log( "TAL_user_info - L359", [ $r_curl, $result ] );
         }
         else
         {
@@ -381,7 +381,7 @@
                         ],
                         "alert"   => "TAL_user_info",
                     ];
-                    TAL_register_log( "TAL_user_info", [ $r_curl, $result ] );
+                    TAL_register_log( "TAL_user_info - L384", [ $r_curl, $result ] );
                 }
             }
             else
@@ -394,7 +394,7 @@
                     ],
                     "alert"   => "TAL_user_info",
                 ];
-                TAL_register_log( "TAL_user_info", [ $r_curl, $result ] );
+                TAL_register_log( "TAL_user_info - L397", [ $r_curl, $result ] );
             }
         }
 
@@ -431,7 +431,7 @@
                 ],
                 "alert"   => "TAL_resend_email_code",
             ];
-            TAL_register_log( "TAL_resend_email_code", [ $_POST["email"], $result ] );
+            TAL_register_log( "TAL_resend_email_code - L434", [ $_POST["email"], $result ] );
         }
 
         $result["alert"] = "TAL_resend_email_code";
@@ -462,6 +462,7 @@
                 ],
                 "alert"   => "TAL_find_user",
             ];
+            TAL_register_log( "TAL_find_user - L465", [ $user, $result ] );
         }
         else
         {
@@ -473,6 +474,8 @@
                 update_user_meta( $user->ID, "triiboId_phone", $cellphone );
 
                 $result = TAL_login_by_triibo( "id", $user->ID );
+
+                TAL_register_log( "TAL_find_user - L478", [ $user, $result ] );
             }
             else
             {
@@ -485,7 +488,7 @@
                     "alert"   => "TAL_find_user",
                 ];
 
-                TAL_register_log( "TAL_find_user", [ $user, $result ] );
+                TAL_register_log( "TAL_find_user - L491", [ $user, $result ] );
             }
         }
 
@@ -501,5 +504,5 @@
     function TAL_register_log( $function, $data )
     {
         $nl = PHP_EOL . "==========================" . PHP_EOL . "Return $function" . PHP_EOL . date("Y-m-d H:i:s") . PHP_EOL;
-        file_put_contents( plugin_dir_path( __FILE__ ) . "log.txt", $nl . print_r( $data, TRUE ), FILE_APPEND );
+        file_put_contents( plugin_dir_path( __FILE__ ) . "log5.txt", $nl . print_r( $data, TRUE ), FILE_APPEND );
     }
