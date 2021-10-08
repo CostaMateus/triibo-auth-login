@@ -193,7 +193,7 @@
                 "error"   => NULL,
                 "alert"   => NULL,
             ];
-            TAL_register_log( "TAL_login - L187", [ $user, $result ] );
+            // TAL_register_log( "TAL_login - L187", [ $user, $result ] );
         }
         else
         {
@@ -205,7 +205,7 @@
                 ],
                 "alert"   => $alert,
             ];
-            TAL_register_log( "TAL_login - L199", [ $user, $result ] );
+            // TAL_register_log( "TAL_login - L199", [ $user, $result ] );
         }
 
         return $result;
