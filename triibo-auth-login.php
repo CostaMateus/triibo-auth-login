@@ -159,9 +159,11 @@
 
     /**
      * Inclui código necessário para o login pela Triibo
+     * Página de login e de checkout
      */
-    add_action( "martfury_after_login_form", "TAL_martfury_after_login_form" );
-    function TAL_martfury_after_login_form()
+    add_action( "martfury_after_login_form",       "TAL_modais_login_sms" );
+    add_action( "woocommerce_after_checkout_form", "TAL_modais_login_sms" );
+    function TAL_modais_login_sms()
     {
         $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
 
