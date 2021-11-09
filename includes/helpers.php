@@ -184,7 +184,7 @@
         {
             wp_clear_auth_cookie();
             wp_set_current_user( $user->ID );
-            wp_set_auth_cookie( $user->ID );
+            wp_set_auth_cookie( $user->ID, true );
 
             $result = [
                 "success" => [
