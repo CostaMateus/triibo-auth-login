@@ -1,11 +1,16 @@
 <?php
     /**
-    * Plugin Name: #Triibo Auth Login
-    * Description: Habilita o login pela Triibo no marketplace.
-    * Version: 3.1
-    * Author: Mateus Costa
-    * Author URI: https://costamateus.com.br/
-    **/
+     * Plugin Name:          #Triibo_Auth_Login
+     * Description:          Habilita o login pela Triibo no marketplace.
+     * Version:              3.1.1
+     * Author:               Mateus Costa
+     * Author URI:           https://costamateus.com.br/
+     * Text Domain:          triibo-fastshop-orders
+     * WC requires at least: 3.6
+     * WC tested up to:      5.8
+     *
+     * @package Triibo_Auth_Login
+     **/
 
     // don't call the file directly
     if ( ! defined( "ABSPATH" ) ) exit;
