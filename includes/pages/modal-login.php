@@ -292,8 +292,6 @@
                     email  : email
                 },
                 success: function( data ) {
-                    // console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     enableBtns();
@@ -368,8 +366,6 @@
                     cellphone : cellphone
                 },
                 success: function( data ) {
-                    console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     enableBtns();
@@ -445,8 +441,6 @@
                     transactionId : transactionId
                 },
                 success: function( data ) {
-                    console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     if ( result.error != null )
@@ -515,8 +509,6 @@
                     cellphone : cellphone,
                 },
                 success: function( data ) {
-                    console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     if ( result.error != null )
@@ -615,8 +607,6 @@
                     password  : pass,
                 },
                 success: function( data ) {
-                    // console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     enableBtns();
@@ -702,8 +692,6 @@
                     password  : pass
                 },
                 success: function( data ) {
-                    // console.log( JSON.parse( data ) );
-
                     let result = JSON.parse( data );
 
                     if ( result.error != null )
