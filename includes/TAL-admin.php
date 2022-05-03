@@ -77,16 +77,16 @@
 
     <p>O plugin tem por finalidade habilitar no marketplace a posibilidade de se realizar o login pela Triibo.</p>
     <p>Quando ativado, o plugin irá inserir o botão "Entrar com Triibo" na página de login, como mostra a imagem.</p>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/exemplo.png'; ?>" width="325px" >
+    <img src="<?php echo TAL_PATH_FILE . 'includes/images/exemplo.png'; ?>" width="325px" >
 
     <p>Exemplo dos modais de login</p>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_cod_sms.png'; ?>" width="325px" >
+    <img src="<?php echo TAL_PATH_FILE . 'includes/images/modal_cod_sms.png'; ?>" width="325px" >
     <br>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_cod_email.png'; ?>" width="325px" >
+    <img src="<?php echo TAL_PATH_FILE . 'includes/images/modal_cod_email.png'; ?>" width="325px" >
     <br>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_contas_nao_associadas.png'; ?>" width="325px" >
+    <img src="<?php echo TAL_PATH_FILE . 'includes/images/modal_contas_nao_associadas.png'; ?>" width="325px" >
     <br>
-    <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'includes/images/modal_nao_cadastrado_na_triibo.png'; ?>" width="325px" >
+    <img src="<?php echo TAL_PATH_FILE . 'includes/images/modal_nao_cadastrado_na_triibo.png'; ?>" width="325px" >
 
     <hr>
     <?php echo TAL_API_URL; ?>
