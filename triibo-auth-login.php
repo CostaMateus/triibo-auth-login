@@ -2,10 +2,10 @@
     /**
      * Plugin Name:          #Triibo_Auth_Login
      * Description:          Habilita o login pela Triibo no marketplace.
-     * Version:              3.1.1
+     * Version:              4.0.0
      * Author:               Mateus Costa
      * Author URI:           https://costamateus.com.br/
-     * Text Domain:          triibo-fastshop-orders
+     * Text Domain:          triibo-auth-login
      * WC requires at least: 3.6
      * WC tested up to:      5.8
      *
@@ -16,6 +16,8 @@
     if ( ! defined( "ABSPATH" ) ) exit;
 
     date_default_timezone_set("America/Sao_Paulo");
+
+    define( "TAL_PATH_FILE", plugin_dir_path( __FILE__ ) );
 
     /**
      * Verifica o ambiente que está
@@ -45,7 +47,12 @@
     }
 
     // ====================== Funções internas ====================== //
-    include_once( plugin_dir_path( __FILE__ ) . "includes/helpers.php" );
+    include_once( TAL_PATH_FILE . "includes/helpers.php" );
+
+    // Login Before Checkout
+    include_once( TAL_PATH_FILE . "includes/login-before-checkout.php" );
+
+
 
 
     // ==================== Acitons adicionadas ==================== //
@@ -162,6 +169,7 @@
     }
 
 
+
     /**
      * Inclui código necessário para o login pela Triibo
      * Página de login e de checkout
@@ -172,7 +180,11 @@
     {
         $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
 
-        if ( $_STATUS_PLUGIN == "active" ) include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
+        if ( $_STATUS_PLUGIN == "active" )
+        {
+            include_once( TAL_PATH_FILE . "includes/css/style.css.php" );
+            include_once( TAL_PATH_FILE . "includes/pages/modal-login.php" );
+        }
     }
 
 
@@ -188,14 +200,14 @@
             "manage_options",
             "login-pela-triibo",
             "TAL_admin",
-            plugin_dir_url( __FILE__ ) . "includes/images/triibo20.png"
+            TAL_PATH_FILE . "includes/images/triibo20.png"
         );
     }
     function TAL_admin()
     {
         if ( ! current_user_can( "manage_options" ) ) wp_die( __( "Você não tem permissões suficientes para acessar esta página." ) );
 
-        include_once( plugin_dir_path( __FILE__ ) . "includes/TAL-admin.php" );
+        include_once( TAL_PATH_FILE . "includes/TAL-admin.php" );
     }
 
 
@@ -412,7 +424,7 @@
 
 
     /**
-     * Cadastra usuário na Triibo
+     * Reenvia código por email
      */
     add_action( "wp_ajax_TAL_resend_email_code",        "TAL_resend_email_code" );
     add_action( "wp_ajax_nopriv_TAL_resend_email_code", "TAL_resend_email_code" );
@@ -514,13 +526,8 @@
         $nl = PHP_EOL . "==========================" . PHP_EOL . "Return $function" . PHP_EOL . date("Y-m-d H:i:s") . PHP_EOL;
 
         file_put_contents(
-            plugin_dir_path( __FILE__ ) . "log-" . date("Ymd") . ".log",
+            TAL_PATH_FILE . "log-" . date("Ymd") . ".log",
             $nl . json_encode( $data, TRUE ),
             FILE_APPEND
         );
-
-        // $data = $nl . json_encode( $data, TRUE );
-        // $fp   = fopen(plugin_dir_path( __FILE__ ) . "log-" . date("Ymd") . ".log", "a");
-        // fwrite($fp, $data);
-        // fclose($fp);
     }
