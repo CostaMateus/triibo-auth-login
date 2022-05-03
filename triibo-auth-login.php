@@ -182,7 +182,8 @@
 
         if ( $_STATUS_PLUGIN == "active" )
         {
-            include_once( TAL_PATH_FILE . "includes/css/style.css.php" );
+            include_once( TAL_PATH_FILE . "includes/css/style.css.php"     );
+            include_once( TAL_PATH_FILE . "includes/js/script.js.php"      );
             include_once( TAL_PATH_FILE . "includes/pages/modal-login.php" );
         }
     }
