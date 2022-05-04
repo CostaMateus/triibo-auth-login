@@ -1,15 +1,13 @@
 <?php
-    $_STATUS_PLUGIN = get_transient( '_STATUS_PLUGIN' );
-
-    if ( $_STATUS_PLUGIN == 'active' )
+    if ( get_transient( "_TAL_STATUS" ) == "active" )
     {
-        $stt_txt = 'ATIVO';
-        $btn_msg = 'Desativar login Triibo';
+        $stt_txt = "ATIVO";
+        $btn_msg = "Desativar login Triibo";
     }
     else
     {
-        $stt_txt = 'INATIVO';
-        $btn_msg = 'Ativar login Triibo';
+        $stt_txt = "INATIVO";
+        $btn_msg = "Ativar login Triibo";
     }
 ?>
 
