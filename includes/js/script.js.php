@@ -1,23 +1,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" ></script>
 <script>
-    jQuery( "#cellphone" ).mask( "+55 (00) 00000-0000" );
-    jQuery( "#cellphone" ).blur( function( event ) {
-        if( jQuery(this).val().length == 19 )
-        {
-            // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
-            jQuery( "#cellphone" ).mask( "+55 (00) 00000-0009" );
-        }
+    jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 00000-0000" );
+    jQuery( "#cellphone,#cellphone-lbc" ).blur( function( event ) {
+        // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
+        if ( jQuery( this ).val().length == 19 )
+            jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 00000-0009" );
         else
-        {
-            jQuery( "#cellphone" ).mask( "+55 (00) 0000-00009" );
-        }
+            jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 0000-00009" );
     });
 
     let genericError1  = "Ocorreu um erro, tente novamente.";
     let genericError2  = "Algo deu errado, tente novamente.";
 
     // vars parametros ajax
+    let lbc           = null;
     let code          = null;
     let codeEmail     = null;
     let email         = null;
@@ -29,6 +26,11 @@
     // vars AUTH
     let error_auth    = document.getElementById( "error-auth"    );
     let btn_auth      = document.getElementById( "btn-form-auth" );
+
+    // vars AUTH-lbc
+    let modal_lbc      = document.getElementById( "modal-form-auth-lbc" );
+    let error_auth_lbc = document.getElementById( "error-auth-lbc"      );
+    let btn_auth_lbc   = document.getElementById( "btn-form-auth-lbc"   );
 
 
     // vars validate
@@ -65,6 +67,12 @@
 
             case "btn-form-auth":
                 e.preventDefault();
+                window.submitAuth();
+            break;
+
+            case "btn-form-auth-lbc":
+                e.preventDefault();
+                lbc = true;
                 window.submitAuth();
             break;
 
@@ -168,12 +176,26 @@
     {
         disableBtns();
 
-        cellphone = jQuery( "#cellphone" ).val();
+        let id  = "";
+        let err = "";
+
+        if ( lbc )
+        {
+            id  = "#cellphone-lbc";
+            err = error_auth_lbc;
+        }
+        else
+        {
+            id  = "#cellphone";
+            err = error_auth;
+        }
+
+        cellphone = jQuery( id ).val();
 
         if ( cellphone != "" )
         {
-            jQuery( error_auth   ).addClass( "d-none" );
-            jQuery( "#cellphone" ).removeClass( "error-border" );
+            jQuery( err ).addClass( "d-none" );
+            jQuery( id  ).removeClass( "error-border" );
 
             // envia o código por sms
             callAuthAjax();
@@ -181,7 +203,7 @@
         else
         {
             enableBtns();
-            jQuery( error_auth ).removeClass( "d-none" ).html( "Insira um número de celular." );
+            jQuery( err ).removeClass( "d-none" ).html( "Insira um número de celular." );
         }
     }
 
@@ -191,6 +213,20 @@
      */
     window.callAuthAjax = function ()
     {
+        let id  = "";
+        let err = "";
+
+        if ( lbc )
+        {
+            id  = "#cellphone-lbc";
+            err = error_auth_lbc;
+        }
+        else
+        {
+            id  = "#cellphone";
+            err = error_auth;
+        }
+
         jQuery.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
@@ -210,18 +246,24 @@
                     if ( result.error.errorCode == 1005 )
                     {
                         errorMsg = "Quantidade de tentativas excedida, tente novamente em 15min.";
-                        jQuery( "#cellphone" ).addClass( "error-border" );
+                        jQuery( id ).addClass( "error-border" );
                     }
                     else
                     {
                         errorMsg = genericError2;
                     }
 
-                    jQuery( error_auth ).removeClass( "d-none" ).html( errorMsg );
+                    jQuery( err ).removeClass( "d-none" ).html( errorMsg );
                 }
                 else
                 {
                     transactionId = result.success.transactionId;
+
+                    if ( lbc )
+                    {
+                        jQuery( modal_valid ).addClass( "bg-modal-white" );
+                        jQuery( modal_lbc   ).addClass( "d-none"         );
+                    }
 
                     jQuery( modal_valid ).removeClass( "d-none" );
                     jQuery( "#code" ).focus();
@@ -264,6 +306,17 @@
      */
     window.callValidateSMS = function ()
     {
+        if ( lbc )
+        {
+            id  = "#cellphone-lbc";
+            err = error_auth_lbc;
+        }
+        else
+        {
+            id  = "#cellphone";
+            err = error_auth;
+        }
+
         jQuery.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
@@ -283,39 +336,40 @@
                     switch ( result.error.errorCode )
                     {
                         case 1006:
-                            jQuery( error_valid  ).removeClass( "d-none" ).html( "Código inválido." );
-                            jQuery( "#code"      ).addClass( "error-border" );
+                            jQuery( error_valid ).removeClass( "d-none" ).html( "Código inválido." );
+                            jQuery( "#code"     ).addClass( "error-border" );
                         break;
 
                         case 1007:
-                            jQuery( error_valid  ).removeClass( "d-none" ).html( "Código expirado." );
-                            jQuery( "#code"      ).addClass( "error-border" );
+                            jQuery( error_valid ).removeClass( "d-none" ).html( "Código expirado." );
+                            jQuery( "#code"     ).addClass( "error-border" );
                         break;
 
                         case 1009:
-                            jQuery( modal_valid  ).addClass("d-none");
-                            jQuery( error_auth   ).removeClass( "d-none" ).html( "Código expirado." );
-                            jQuery( "#cellphone" ).addClass( "error-border" );
+                            jQuery( modal_valid ).addClass( "d-none" );
+                            jQuery( err         ).removeClass( "d-none" ).html( "Código expirado." );
+                            jQuery( id          ).addClass( "error-border" );
                         break;
 
                         case 1005:
-                            jQuery( modal_valid  ).addClass("d-none");
-                            jQuery( error_auth   ).removeClass( "d-none" ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
-                            jQuery( "#cellphone" ).addClass( "error-border" );
+                            jQuery( modal_valid ).addClass( "d-none" );
+                            jQuery( err         ).removeClass( "d-none" ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
+                            jQuery( id          ).addClass( "error-border" );
                         break;
 
                         case 1004:
                         case 1008:
                         default:
-                            jQuery( modal_valid  ).addClass("d-none");
-                            jQuery( error_auth   ).removeClass( "d-none" ).html( "Algo de erro, tente novamente." );
+                            jQuery( modal_valid ).addClass( "d-none" );
+                            jQuery( err         ).removeClass( "d-none" ).html( "Algo de erro, tente novamente." );
                         break;
                     }
                 }
                 else
                 {
                     disableBtns();
-                    jQuery( "#modal-load-next-page" ).removeClass( "bgml-d-none" );
+
+                    jQuery( "#modal-form-load" ).removeClass( "d-none" );
 
                     // busca usuário
                     callUserInfo();
@@ -568,10 +622,11 @@
      */
     window.disableBtns = function ()
     {
-        jQuery( btn_auth    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_valid   ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_v_email ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_regis   ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_auth     ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_auth_lbc ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_valid    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_v_email  ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_regis    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
     }
 
     /**
@@ -579,10 +634,11 @@
      */
     window.enableBtns = function ()
     {
-        jQuery( btn_auth    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_valid   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_v_email ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_regis   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_auth_lbc ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_valid    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_v_email  ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_regis    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
     }
 
     /**
