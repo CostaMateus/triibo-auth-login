@@ -15,9 +15,11 @@
     // don't call the file directly
     if ( ! defined( "ABSPATH" ) ) exit;
 
+    if ( ! is_plugin_active( "woocommerce/woocommerce.php" ) ) exit;
+
     date_default_timezone_set("America/Sao_Paulo");
 
-    define( "TAL_PATH_FILE", plugin_dir_path( __FILE__ ) );
+    define( "TAL_PATH_FILE", __FILE__ );
 
     /**
      * Verifica o ambiente que está
@@ -47,11 +49,15 @@
     }
 
     // ====================== Funções internas ====================== //
-    include_once( TAL_PATH_FILE . "includes/helpers.php" );
+    include_once( plugin_dir_path( __FILE__ ) . "includes/helpers.php" );
 
     // Login Before Checkout
-    include_once( TAL_PATH_FILE . "includes/login-before-checkout.php" );
-
+    // // include_once( plugin_dir_path( __FILE__ ) . "includes/login-before-checkout.php" );
+    if ( ! class_exists( "WC_Login_Before_Checkout" ) )
+    {
+        include_once( plugin_dir_path( __FILE__ ) . "includes/login-before-checkout.php" );
+        add_action( "plugins_loaded", [ "WC_Login_Before_Checkout", "get_instance" ] );
+    }
 
 
 
@@ -62,9 +68,7 @@
     add_action( "init", "TAL_init_status_global" );
     function TAL_init_status_global()
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN === FALSE ) set_transient( "_STATUS_PLUGIN", "inactive" ); // active
+        if ( get_transient( "_TAL_STATUS" ) === FALSE ) set_transient( "_TAL_STATUS", "inactive" ); // active
     }
     TAL_init_status_global();
 
@@ -75,20 +79,18 @@
     add_action( "wp_ajax_TAL_set_status_global", "TAL_set_status_global" );
     function TAL_set_status_global()
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN == "active" )
+        if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
-            set_transient( "_STATUS_PLUGIN", "inactive" );
-            $_STATUS_PLUGIN = "inactive";
+            set_transient( "_TAL_STATUS", "inactive" );
+            $status = "inactive";
         }
         else
         {
-            set_transient( "_STATUS_PLUGIN", "active" );
-            $_STATUS_PLUGIN = "active";
+            set_transient( "_TAL_STATUS", "active" );
+            $status = "active";
         }
 
-        echo $_STATUS_PLUGIN;
+        echo $status;
         die();
     }
 
@@ -98,9 +100,7 @@
     add_action( "woocommerce_login_form_start", "TAL_woocommerce_login_form_start" );
     function TAL_woocommerce_login_form_start()
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN == "active" )
+        if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
             echo "<hr><p class='title-optin' >Entrar com Login e Senha</p>";
         }
@@ -115,9 +115,7 @@
     add_filter( "gettext", "TAL_text_strings", 20, 3 );
     function TAL_text_strings( $translated_text, $text, $domain )
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN == "active" )
+        if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
             switch ( $translated_text )
             {
@@ -138,9 +136,7 @@
     add_action( "woocommerce_login_form_end", "TAL_woocommerce_login_form_end" );
     function TAL_woocommerce_login_form_end()
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN == "active" )
+        if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
             echo "
                 <hr>
@@ -178,13 +174,11 @@
     add_action( "woocommerce_after_checkout_form", "TAL_modais_login_sms" );
     function TAL_modais_login_sms()
     {
-        $_STATUS_PLUGIN = get_transient( "_STATUS_PLUGIN" );
-
-        if ( $_STATUS_PLUGIN == "active" )
+        if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
-            include_once( TAL_PATH_FILE . "includes/css/style.css.php"     );
-            include_once( TAL_PATH_FILE . "includes/js/script.js.php"      );
-            include_once( TAL_PATH_FILE . "includes/pages/modal-login.php" );
+            include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
+            include_once( plugin_dir_path( __FILE__ ) . "includes/css/style.css.php"     );
+            include_once( plugin_dir_path( __FILE__ ) . "includes/js/script.js.php"      );
         }
     }
 
@@ -201,14 +195,14 @@
             "manage_options",
             "login-pela-triibo",
             "TAL_admin",
-            TAL_PATH_FILE . "includes/images/triibo20.png"
+            plugin_dir_url( __FILE__ ) . "includes/images/triibo20.png"
         );
     }
     function TAL_admin()
     {
         if ( ! current_user_can( "manage_options" ) ) wp_die( __( "Você não tem permissões suficientes para acessar esta página." ) );
 
-        include_once( TAL_PATH_FILE . "includes/TAL-admin.php" );
+        include_once( plugin_dir_path( __FILE__ ) . "includes/TAL-admin.php" );
     }
 
 
@@ -219,11 +213,13 @@
     add_action( "wp_ajax_nopriv_TAL_auth_sms", "TAL_auth_sms" );
     function TAL_auth_sms()
     {
-        $cellphone = preg_replace( "/\D/", "", $_POST["cellphone"] );
+        $cellphone         = preg_replace( "/\D/", "", $_POST["cellphone"] );
 
-        $channelTokenId = TAL_get_channel_token( NULL );
+        $channelTokenId    = TAL_get_channel_token( NULL );
 
         $auth_triiboHeader = [
+            "platform"     => "web",
+            "cellphone"    => $cellphone,
             "triiboHeader" => [
                 "apiToken"       => TAL_API_TOKEN,
                 "channelGroup"   => TAL_CHANNEL_GROUP,
@@ -233,11 +229,9 @@
                 "transactionId"  => "002",
                 "channelTokenId" => $channelTokenId["success"]["newToken"]["channelTokenId"],
             ],
-            "cellphone"   => $cellphone,
-            "platform"    => "web"
         ];
 
-        echo json_encode( TAL_exec("authSMS_v1", $auth_triiboHeader) );
+        echo json_encode( TAL_exec( "authSMS_v1", $auth_triiboHeader ) );
         die();
     }
 
@@ -249,11 +243,14 @@
     add_action( "wp_ajax_nopriv_TAL_validate_sms", "TAL_validate_sms" );
     function TAL_validate_sms()
     {
-        $cellphone      = preg_replace( "/\D/", "", $_POST["cellphone"] );
+        $cellphone             = preg_replace( "/\D/", "", $_POST["cellphone"] );
 
-        $channelTokenId = TAL_get_channel_token( NULL );
+        $channelTokenId        = TAL_get_channel_token( NULL );
 
         $validate_triiboHeader = [
+            "code"           => $_POST["code"],
+            "cellphone"      => $cellphone,
+            "transactionId"  => $_POST["transactionId"],
             "triiboHeader"   => [
                 "apiToken"       => TAL_API_TOKEN,
                 "channelGroup"   => TAL_CHANNEL_GROUP,
@@ -263,12 +260,9 @@
                 "transactionId"  => "002",
                 "channelTokenId" => $channelTokenId["success"]["newToken"]["channelTokenId"],
             ],
-            "transactionId" => $_POST["transactionId"],
-            "cellphone"     => $cellphone,
-            "code"          => $_POST["code"]
         ];
 
-        echo  json_encode( TAL_exec( "validateSMS_v1", $validate_triiboHeader ) );
+        echo json_encode( TAL_exec( "validateSMS_v1", $validate_triiboHeader ) );
         die();
     }
 
@@ -527,7 +521,7 @@
         $nl = PHP_EOL . "==========================" . PHP_EOL . "Return $function" . PHP_EOL . date("Y-m-d H:i:s") . PHP_EOL;
 
         file_put_contents(
-            TAL_PATH_FILE . "log-" . date("Ymd") . ".log",
+            plugin_dir_path( __FILE__ ) . "log-" . date("Ymd") . ".log",
             $nl . json_encode( $data, TRUE ),
             FILE_APPEND
         );
