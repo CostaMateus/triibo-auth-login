@@ -83,3 +83,11 @@
             </form>
         </div>
     </div>
+
+    <?php do_action( "wc_login_before_checkout_add_modal" ); ?>
+
+    <div id="modal-form-load" class="bg-modal-login d-none">
+        <div class="bg-modal-form-load-child">
+            <div class="spin-load-lg"></div>
+        </div>
+    </div>
