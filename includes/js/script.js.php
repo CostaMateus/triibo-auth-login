@@ -698,10 +698,15 @@
                 }
                 else
                 {
-                    disableBtns();
+                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+
                     hideModals();
-                    jQuery( "#modal-form-load" ).removeClass( "d-none" );
-                    window.location.reload();
+                    disableBtns();
+
+                    if ( lbc )
+                        window.location.href = url_red;
+                    else
+                        window.location.reload();
                 }
             },
             error: function( err ) {
