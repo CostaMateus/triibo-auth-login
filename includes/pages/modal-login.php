@@ -4,6 +4,13 @@
             <div class="modal-header">
                 <h2>Entre com o código</h2>
                 <span id="close-form-validate" aria-hidden="true">&times;</span>
+
+                <?php
+                    if ( class_exists( "WC_Login_Before_Checkout" ) && ! WC_Login_Before_Checkout::has_query_param() )
+                    {
+                        echo "<span id=\"close-form-validate\" aria-hidden=\"true\">&times;</span>";
+                    }
+                ?>
             </div>
             <form id="form-validate" method="post" >
                 <p class="text-left mb-15" >Enviamos um SMS com seu código de acesso, informe-o abaixo.</p>
@@ -27,7 +34,13 @@
         <div class="bg-modal-login-child">
             <div class="modal-header">
                 <h2>Entre com o código</h2>
-                <span id="close-form-validate-email" aria-hidden="true">&times;</span>
+
+                <?php
+                    if ( class_exists( "WC_Login_Before_Checkout" ) && ! WC_Login_Before_Checkout::has_query_param() )
+                    {
+                        echo "<span id=\"close-form-validate-email\" aria-hidden=\"true\">&times;</span>";
+                    }
+                ?>
             </div>
             <form id="form-validate-email" method="post" >
                 <p class="text-left mb-15" >Enviamos um e-mail com seu código de acesso, informe-o abaixo.</p>
@@ -51,7 +64,13 @@
         <div class="bg-modal-login-child">
             <div class="modal-header">
                 <h2 id="register-title" ></h2>
-                <span id="close-form-register" aria-hidden="true">&times;</span>
+
+                <?php
+                    if ( class_exists( "WC_Login_Before_Checkout" ) && ! WC_Login_Before_Checkout::has_query_param() )
+                    {
+                        echo "<span id=\"close-form-register\" aria-hidden=\"true\">&times;</span>";
+                    }
+                ?>
             </div>
             <form id="form-register" method="post" >
                 <p id="register-p1" class="text-left mb-5" ></p>
