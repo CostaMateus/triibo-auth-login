@@ -52,13 +52,11 @@
     include_once( plugin_dir_path( __FILE__ ) . "includes/helpers.php" );
 
     // Login Before Checkout
-    // // include_once( plugin_dir_path( __FILE__ ) . "includes/login-before-checkout.php" );
     if ( ! class_exists( "WC_Login_Before_Checkout" ) )
     {
         include_once( plugin_dir_path( __FILE__ ) . "includes/login-before-checkout.php" );
         add_action( "plugins_loaded", [ "WC_Login_Before_Checkout", "get_instance" ] );
     }
-
 
 
     // ==================== Acitons adicionadas ==================== //
@@ -93,6 +91,7 @@
         echo $status;
         die();
     }
+
 
     /**
      * Adiciona um titulo antes do campos de email e senha, no formulario de login
@@ -163,7 +162,6 @@
             ";
         }
     }
-
 
 
     /**
@@ -266,6 +264,7 @@
         die();
     }
 
+
     /**
      * Valida código enviado por email
      */
@@ -286,14 +285,14 @@
                 ],
                 "alert"   => "TAL_validate_code_email",
             ];
-            TAL_register_log( "TAL_validate_code_email - L275", [ $result ] );
+
+            TAL_register_log( "TAL_validate_code_email - err 500 - L289", [ $result ] );
         }
         elseif ($_triibo_code == $code)
         {
             $uId    = TAL_create_or_update_user_triibo( $_POST["cellphone"], $_POST["email"] );
             $result = TAL_create_user_marketplace( $uId, $_POST["cellphone"], $_POST["email"], $_POST["password"] );
             set_transient( "_triibo_code", NULL );
-            TAL_register_log( "TAL_validate_code_email - L282", [ $result ] );
         }
         else
         {
@@ -305,10 +304,11 @@
                 ],
                 "alert"   => "TAL_validate_code_email",
             ];
-            TAL_register_log( "TAL_validateCodeEmail - L294", [ $result ] );
+
+            TAL_register_log( "TAL_validate_code_email - err 401 - L308", [ $result ] );
         }
 
-        echo  json_encode( $result );
+        echo json_encode( $result );
         die();
     }
 
@@ -359,6 +359,8 @@
                 ],
                 "alert"   => "TAL_user_info",
             ];
+
+            TAL_register_log( "TAL_user_info - err 404 - L363", [ $r_curl, $result ] );
         }
         elseif ( ! empty( $r_curl["error"] ) )
         {
@@ -371,7 +373,7 @@
                 "alert"   => "TAL_user_info",
             ];
 
-            TAL_register_log( "TAL_user_info - L360", [ $r_curl, $result ] );
+            TAL_register_log( "TAL_user_info - err 500 - L376", [ $r_curl, $result ] );
         }
         else
         {
@@ -384,6 +386,18 @@
 
                 if ( $user_id )
                 {
+                    // add triibo_id qnd lbc true
+                    if ( $_POST["lbc"] )
+                    {
+                        $triibo_id = get_user_meta( $user_id, "triiboId_phone", true );
+
+                        if ( empty( $triibo_id ) )
+                        {
+                            // user sem triibo_id
+                            update_user_meta( $user_id, "triiboId_phone", "+$cellphone" );
+                        }
+                    }
+
                     $result = TAL_login_by_triibo( "id", $user_id );
                 }
                 else
@@ -396,7 +410,6 @@
                         ],
                         "alert"   => "TAL_user_info",
                     ];
-                    TAL_register_log( "TAL_user_info - L385", [ $r_curl, $result ] );
                 }
             }
             else
@@ -409,7 +422,6 @@
                     ],
                     "alert"   => "TAL_user_info",
                 ];
-                TAL_register_log( "TAL_user_info - L398", [ $r_curl, $result ] );
             }
         }
 
@@ -446,7 +458,8 @@
                 ],
                 "alert"   => "TAL_resend_email_code",
             ];
-            TAL_register_log( "TAL_resend_email_code - L435", [ $_POST["email"], $result ] );
+
+            TAL_register_log( "TAL_resend_email_code - err 500 - L462", [ $_POST["email"], $result ] );
         }
 
         $result["alert"] = "TAL_resend_email_code";
@@ -454,6 +467,7 @@
         echo json_encode( $result );
         die();
     }
+
 
     /**
      * Cadastra usuário na Triibo
@@ -477,7 +491,6 @@
                 ],
                 "alert"   => "TAL_find_user",
             ];
-            TAL_register_log( "TAL_find_user - L466", [ $user, $result ] );
         }
         else
         {
@@ -489,8 +502,6 @@
                 update_user_meta( $user->ID, "triiboId_phone", $cellphone );
 
                 $result = TAL_login_by_triibo( "id", $user->ID );
-
-                TAL_register_log( "TAL_find_user - L479", [ $user, $result ] );
             }
             else
             {
@@ -502,8 +513,6 @@
                     ],
                     "alert"   => "TAL_find_user",
                 ];
-
-                TAL_register_log( "TAL_find_user - L492", [ $user, $result ] );
             }
         }
 
@@ -511,6 +520,31 @@
         die();
     }
 
+
+    /**
+     * Cadastra usuário na Triibo
+     */
+    add_action( "wp_ajax_TAL_add_triiboid", "TAL_add_triiboid" );
+    function TAL_add_triiboid()
+    {
+        $user = wp_get_current_user();
+
+        TAL_create_or_update_user_triibo( $_POST["cellphone"], $user->user_email, $user->first_name, $user->nickname );
+
+        $cellphone = "+" . preg_replace( "/\D/", "", $_POST["cellphone"] );
+        update_user_meta( $user->ID, "triiboId_phone", $cellphone );
+
+        $result = [
+            "success" => [
+                "redirect" => "/checkout",
+            ],
+            "error"   => NULL,
+            "alert"   => NULL,
+        ];
+
+        echo json_encode( $result );
+        die();
+    }
 
 
     /**

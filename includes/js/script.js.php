@@ -1,20 +1,40 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" ></script>
 <script>
-    jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 00000-0000" );
-    jQuery( "#cellphone,#cellphone-lbc" ).blur( function( event ) {
+    jQuery( "#cellphone" ).mask( "+55 (00) 00000-0000" );
+    jQuery( "#cellphone" ).blur( function( event ) {
         // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
         if ( jQuery( this ).val().length == 19 )
-            jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 00000-0009" );
+            jQuery( "#cellphone" ).mask( "+55 (00) 00000-0009" );
         else
-            jQuery( "#cellphone,#cellphone-lbc" ).mask( "+55 (00) 0000-00009" );
+            jQuery( "#cellphone" ).mask( "+55 (00) 0000-00009" );
+    });
+
+    jQuery( "#cellphone-lbc" ).mask( "+55 (00) 00000-0000" );
+    jQuery( "#cellphone-lbc" ).blur( function( event ) {
+        // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
+        if ( jQuery( this ).val().length == 19 )
+            jQuery( "#cellphone-lbc" ).mask( "+55 (00) 00000-0009" );
+        else
+            jQuery( "#cellphone-lbc" ).mask( "+55 (00) 0000-00009" );
+    });
+
+    jQuery( "#cellphone-logged" ).mask( "+55 (00) 00000-0000" );
+    jQuery( "#cellphone-logged" ).blur( function( event ) {
+        // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
+        if ( jQuery( this ).val().length == 19 )
+            jQuery( "#cellphone-logged" ).mask( "+55 (00) 00000-0009" );
+        else
+            jQuery( "#cellphone-logged" ).mask( "+55 (00) 0000-00009" );
     });
 
     let genericError1  = "Ocorreu um erro, tente novamente.";
     let genericError2  = "Algo deu errado, tente novamente.";
 
     // vars parametros ajax
-    let lbc           = null;
+    let url_red       = "<?php echo WC_Login_Before_Checkout::get_checkout_url(); ?>";
+    let lbc           = false;
+    let logged        = false;
     let code          = null;
     let codeEmail     = null;
     let email         = null;
@@ -24,31 +44,38 @@
 
 
     // vars AUTH
-    let error_auth    = document.getElementById( "error-auth"    );
-    let btn_auth      = document.getElementById( "btn-form-auth" );
+    let error_auth     = document.getElementById( "error-auth"    );
+    let btn_auth       = document.getElementById( "btn-form-auth" );
 
-    // vars AUTH-lbc
+
+    // vars AUTH-LBC
     let modal_lbc      = document.getElementById( "modal-form-auth-lbc" );
     let error_auth_lbc = document.getElementById( "error-auth-lbc"      );
     let btn_auth_lbc   = document.getElementById( "btn-form-auth-lbc"   );
 
 
+    // vars AUTH-LOGGED
+    let modal_logged   = document.getElementById( "modal-form-auth-logged" );
+    let error_logged   = document.getElementById( "error-auth-logged"      );
+    let btn_logged     = document.getElementById( "btn-form-auth-logged"   );
+
+
     // vars validate
-    let modal_valid   = document.getElementById( "modal-form-validate" );
-    let error_valid   = document.getElementById( "error-valid"         );
-    let btn_valid     = document.getElementById( "btn-form-validate"   );
+    let modal_valid    = document.getElementById( "modal-form-validate" );
+    let error_valid    = document.getElementById( "error-valid"         );
+    let btn_valid      = document.getElementById( "btn-form-validate"   );
 
 
     // vars validate email
-    let modal_v_email = document.getElementById( "modal-form-validate-email" );
-    let error_v_email = document.getElementById( "error-valid-email"         );
-    let btn_v_email   = document.getElementById( "btn-form-validate-email"   );
+    let modal_v_email  = document.getElementById( "modal-form-validate-email" );
+    let error_v_email  = document.getElementById( "error-valid-email"         );
+    let btn_v_email    = document.getElementById( "btn-form-validate-email"   );
 
 
     // vars register
-    let modal_regis   = document.getElementById( "modal-form-register" );
-    let error_regis   = document.getElementById( "error-register"      );
-    let btn_regis     = document.getElementById( "btn-form-register"   );
+    let modal_regis    = document.getElementById( "modal-form-register" );
+    let error_regis    = document.getElementById( "error-register"      );
+    let btn_regis      = document.getElementById( "btn-form-register"   );
 
 
     /**
@@ -67,13 +94,19 @@
 
             case "btn-form-auth":
                 e.preventDefault();
-                window.submitAuth();
+                window.submitAuth( "#cellphone", error_auth );
             break;
 
             case "btn-form-auth-lbc":
                 e.preventDefault();
                 lbc = true;
-                window.submitAuth();
+                window.submitAuth( "#cellphone-lbc", error_auth_lbc );
+            break;
+
+            case "btn-form-auth-logged":
+                e.preventDefault();
+                logged = true;
+                window.submitAuth( "#cellphone-logged", error_logged );
             break;
 
             case "btn-form-validate":
@@ -99,7 +132,18 @@
      */
     window.resendCode = function ()
     {
-        jQuery( btn_auth ).click();
+        if ( lbc && ! logged )
+        {
+            jQuery( btn_auth_lbc ).click();
+        }
+        else if ( ! lbc && logged )
+        {
+            jQuery( btn_logged ).click();
+        }
+        else
+        {
+            jQuery( btn_auth ).click();
+        }
 
         disableBtns();
 
@@ -157,48 +201,44 @@
         });
     }
 
-
     /**
      * Fecha modais
      */
     window.closeModal = function()
     {
-        enableBtns();
-        hideModals();
-        hideErros();
+        if ( ! lbc && ! logged )
+        {
+            enableBtns();
+            hideModals();
+            hideErros();
+        }
     }
 
 
     /**
      * Valida celular e chama função para enviar código por SMS
      */
-    window.submitAuth = function()
+    window.submitAuth = function( id, err )
     {
         disableBtns();
-
-        let id  = "";
-        let err = "";
-
-        if ( lbc )
-        {
-            id  = "#cellphone-lbc";
-            err = error_auth_lbc;
-        }
-        else
-        {
-            id  = "#cellphone";
-            err = error_auth;
-        }
 
         cellphone = jQuery( id ).val();
 
         if ( cellphone != "" )
         {
-            jQuery( err ).addClass( "d-none" );
-            jQuery( id  ).removeClass( "error-border" );
+            if ( cellphone.length == 19 || cellphone.length == 18 )
+            {
+                jQuery( err ).addClass( "d-none" );
+                jQuery( id  ).removeClass( "error-border" );
 
-            // envia o código por sms
-            callAuthAjax();
+                // envia o código por sms
+                callAuthAjax( id, err );
+            }
+            else
+            {
+                enableBtns();
+                jQuery( err ).removeClass( "d-none" ).html( "Insira um número válido." );
+            }
         }
         else
         {
@@ -211,22 +251,8 @@
     /**
      * Envia código por sms e abre modal de validação
      */
-    window.callAuthAjax = function ()
+    window.callAuthAjax = function ( id, err )
     {
-        let id  = "";
-        let err = "";
-
-        if ( lbc )
-        {
-            id  = "#cellphone-lbc";
-            err = error_auth_lbc;
-        }
-        else
-        {
-            id  = "#cellphone";
-            err = error_auth;
-        }
-
         jQuery.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
@@ -259,11 +285,10 @@
                 {
                     transactionId = result.success.transactionId;
 
-                    if ( lbc )
-                    {
-                        jQuery( modal_valid ).addClass( "bg-modal-white" );
-                        jQuery( modal_lbc   ).addClass( "d-none"         );
-                    }
+                    if ( lbc || logged ) jQuery( modal_valid ).addClass( "bg-modal-white" );
+
+                    if ( lbc    ) jQuery( modal_lbc    ).addClass( "d-none" );
+                    if ( logged ) jQuery( modal_logged ).addClass( "d-none" );
 
                     jQuery( modal_valid ).removeClass( "d-none" );
                     jQuery( "#code" ).focus();
@@ -306,10 +331,18 @@
      */
     window.callValidateSMS = function ()
     {
-        if ( lbc )
+        let id  = null;
+        let err = null;
+
+        if ( lbc && ! logged )
         {
             id  = "#cellphone-lbc";
             err = error_auth_lbc;
+        }
+        else if ( ! lbc && logged )
+        {
+            id  = "#cellphone-logged";
+            err = error_logged;
         }
         else
         {
@@ -371,8 +404,17 @@
 
                     jQuery( "#modal-form-load" ).removeClass( "d-none" );
 
-                    // busca usuário
-                    callUserInfo();
+                    if ( logged )
+                    {
+                        // add cellphone ao meta triiboId_phone
+                        callAddTriiboId();
+                    }
+                    else
+                    {
+                        // busca usuário
+                        callUserInfo();
+                    }
+
                 }
             },
             error: function( err ) {
@@ -394,6 +436,7 @@
             data: {
                 action    : "TAL_user_info",
                 cellphone : cellphone,
+                lbc       : lbc,
             },
             success: function( data ) {
                 let result = JSON.parse( data );
@@ -406,32 +449,35 @@
                     {
                         // tem conta na Triibo, mas não tem conta mkt
                         case 401:
-                            jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( modal_regis ).removeClass( "d-none" );
-
                             let t1 = "Complete seu cadastro";
                             let p1 = "Notamos que sua conta Triibo ainda não está associada a uma conta Marketplace.";
                             setRegistertexts( t1, p1 );
+
+                            jQuery( "#modal-form-load" ).addClass( "d-none" );
+                            jQuery( modal_valid ).addClass( "d-none" );
+                            jQuery( modal_regis ).removeClass( "d-none" );
                         break;
 
                         // não encontrou número na Triibo
                         case 404:
-                            jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( modal_regis ).removeClass( "d-none" );
-
                             let t4 = "Complete seu cadastro";
                             let p4 = "Notamos que seu número ainda não está associado a uma conta Triibo.";
                             setRegistertexts( t4, p4 );
+
+                            jQuery( "#modal-form-load" ).addClass( "d-none" );
+                            jQuery( modal_valid ).addClass( "d-none" );
+                            jQuery( modal_regis ).removeClass( "d-none" );
                         break;
 
                         // erro na consulta a Triibo
                         case 500:
                         default:
-                            jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
+                            jQuery( "#modal-form-load" ).addClass( "d-none" );
                             jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( error_auth  ).removeClass( "d-none" ).html( genericError1 );
+
+                            var err = lbc ? error_auth_lbc : error_auth;
+
+                            jQuery( err ).removeClass( "d-none" ).html( genericError1 );
                         break;
                     }
                 }
@@ -439,14 +485,58 @@
                 {
                     disableBtns();
                     hideModals();
-                    jQuery( "#modal-load-next-page" ).removeClass( "bgml-d-none" );
-                    window.location.reload();
+                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+
+                    if ( lbc )
+                        window.location.href = url_red;
+                    else
+                        window.location.reload();
                 }
             },
             error: function( err ) {
                 ajaxError( err );
             }
         });
+    }
+
+    /**
+     *
+     */
+    window.callAddTriiboId = function ()
+    {
+        jQuery.ajax({
+            url : "/wp-admin/admin-ajax.php",
+            type: "POST",
+            data: {
+                action    : "TAL_add_triiboid",
+                cellphone : cellphone
+            },
+            success: function( data ) {
+                let result = JSON.parse( data );
+
+                if ( result.error != null )
+                {
+                    enableBtns();
+
+                    jQuery( "#modal-form-load" ).addClass( "d-none" );
+
+                    console.log( result );
+                }
+                else
+                {
+                    disableBtns();
+                    hideModals();
+
+                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+
+                    window.location.href = url_red;
+                }
+            },
+            error: function( err ) {
+                ajaxError( err );
+            }
+        });
+
     }
 
 
@@ -465,7 +555,7 @@
             jQuery( error_regis ).addClass( "d-none" );
             jQuery( "#form-register-email"    ).removeClass( "error-border" );
             jQuery( "#form-register-password" ).removeClass( "error-border" );
-            jQuery( "#modal-load-next-page"   ).removeClass( "bgml-d-none" );
+            // jQuery( "#modal-form-load"   ).removeClass( "d-none" );
 
             // Busca usuário
             callFindUser();
@@ -500,7 +590,7 @@
 
                 if ( result.error != null )
                 {
-                    jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
+                    jQuery( "#modal-form-load" ).addClass( "d-none" );
 
                     switch ( result.error.code )
                     {
@@ -522,10 +612,15 @@
                 }
                 else
                 {
-                    disableBtns();
+                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+
                     hideModals();
-                    jQuery( "#modal-load-next-page" ).removeClass( "bgml-d-none" );
-                    window.location.reload();
+                    disableBtns();
+
+                    if ( lbc )
+                        window.location.href = url_red;
+                    else
+                        window.location.reload();
                 }
             },
             error: function( err ) {
@@ -566,7 +661,7 @@
      * Caso valide, cria conta na Triibo e no Mkt, e redireciona para o página do perfil do usuário
      * Caso não, exibe erro.
      */
-        window.callValidateEmail = function ()
+    window.callValidateEmail = function ()
     {
         jQuery.ajax({
             url : "/wp-admin/admin-ajax.php",
@@ -605,7 +700,7 @@
                 {
                     disableBtns();
                     hideModals();
-                    jQuery( "#modal-load-next-page" ).removeClass( "bgml-d-none" );
+                    jQuery( "#modal-form-load" ).removeClass( "d-none" );
                     window.location.reload();
                 }
             },
@@ -624,6 +719,8 @@
     {
         jQuery( btn_auth     ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
         jQuery( btn_auth_lbc ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        jQuery( btn_logged   ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+
         jQuery( btn_valid    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
         jQuery( btn_v_email  ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
         jQuery( btn_regis    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
@@ -636,6 +733,8 @@
     {
         jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
         jQuery( btn_auth_lbc ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        jQuery( btn_logged   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+
         jQuery( btn_valid    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
         jQuery( btn_v_email  ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
         jQuery( btn_regis    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
@@ -646,6 +745,8 @@
      */
     window.hideModals = function ()
     {
+        jQuery( modal_lbc     ).addClass( "d-none" );
+        jQuery( modal_logged  ).addClass( "d-none" );
         jQuery( modal_valid   ).addClass( "d-none" );
         jQuery( modal_v_email ).addClass( "d-none" );
         jQuery( modal_regis   ).addClass( "d-none" );
@@ -656,10 +757,12 @@
      */
     window.hideErros = function ()
     {
-        jQuery( error_auth    ).addClass( "d-none" ).html( "" );
-        jQuery( error_valid   ).addClass( "d-none" ).html( "" );
-        jQuery( error_v_email ).addClass( "d-none" ).html( "" );
-        jQuery( error_regis   ).addClass( "d-none" ).html( "" );
+        jQuery( error_auth     ).addClass( "d-none" ).html( "" );
+        jQuery( error_auth_lbc ).addClass( "d-none" ).html( "" );
+        jQuery( error_logged   ).addClass( "d-none" ).html( "" );
+        jQuery( error_valid    ).addClass( "d-none" ).html( "" );
+        jQuery( error_v_email  ).addClass( "d-none" ).html( "" );
+        jQuery( error_regis    ).addClass( "d-none" ).html( "" );
     }
 
     /**
@@ -670,8 +773,20 @@
         console.log( err );
         hideModals();
         enableBtns();
-        jQuery( "#modal-load-next-page" ).addClass( "bgml-d-none" );
-        jQuery( error_auth ).removeClass( "d-none" ).html( genericError1 );
+        jQuery( "#modal-form-load" ).addClass( "d-none" );
+
+        if ( lbc && ! logged )
+        {
+            jQuery( error_auth_lbc ).removeClass( "d-none" ).html( genericError1 );
+        }
+        else if ( ! lbc && logged )
+        {
+            jQuery( error_logged ).removeClass( "d-none" ).html( genericError1 );
+        }
+        else
+        {
+            jQuery( error_auth ).removeClass( "d-none" ).html( genericError1 );
+        }
     }
 
     window.setRegistertexts = function ( t, p )
