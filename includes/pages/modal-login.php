@@ -3,7 +3,6 @@
         <div class="bg-modal-login-child">
             <div class="modal-header">
                 <h2>Entre com o código</h2>
-                <span id="close-form-validate" aria-hidden="true">&times;</span>
 
                 <?php
                     if ( class_exists( "WC_Login_Before_Checkout" ) && ! WC_Login_Before_Checkout::has_query_param() )

@@ -50,7 +50,11 @@
         text-align: center;
         justify-content: space-between;
     }
-    .bg-modal-lbc, .bg-modal-white, .bg-modal-login {
+    .bg-modal-login {
+        /* background-color: #EEE; */
+        background-color: rgba(0, 0, 0, 0.7) !important;
+    }
+    .bg-modal-lbc, .bg-modal-white {
         background-color: #EEE !important;
     }
 

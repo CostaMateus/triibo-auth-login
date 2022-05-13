@@ -285,7 +285,10 @@
                 {
                     transactionId = result.success.transactionId;
 
-                    if ( lbc || logged ) jQuery( modal_valid ).addClass( "bg-modal-white" );
+                    if ( lbc || logged )
+                        jQuery( modal_valid ).addClass( "bg-modal-white" );
+                    else
+                        jQuery( modal_valid ).removeClass( "bg-modal-white" );
 
                     if ( lbc    ) jQuery( modal_lbc    ).addClass( "d-none" );
                     if ( logged ) jQuery( modal_logged ).addClass( "d-none" );
