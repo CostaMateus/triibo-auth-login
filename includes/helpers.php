@@ -3,13 +3,13 @@
     /**
      * Cria usuario no Mkt
      */
-    function TAL_create_user_marketplace( $uId, $cellphone, $email, $pass )
+    function TAL_create_user_marketplace( $uid, $cellphone, $email, $pass )
     {
         $cellphone = "+" . preg_replace( "/\D/", "", $cellphone );
         $name      = explode("@", $email)[0];
 
         $user_id   = wp_insert_user([
-            "user_login"    => $uId,
+            "user_login"    => $uid,
             "user_pass"     => wp_hash_password( "Triibo2021" ),
             "user_nicename" => $name,
             "user_email"    => $email,
@@ -25,6 +25,7 @@
 
             // campo padronizado com o plugin triibo-integration-user
             add_user_meta( $user_id, "triiboId_phone", $cellphone );
+            add_user_meta( $user_id, "_triibo_id",     $uid       );
 
             $user = get_user_by( "id", $user_id );
 

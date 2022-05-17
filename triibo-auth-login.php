@@ -2,7 +2,7 @@
     /**
      * Plugin Name:          #Triibo_Auth_Login
      * Description:          Habilita o login pela Triibo no marketplace.
-     * Version:              4.0.0
+     * Version:              4.1.0
      * Author:               Mateus Costa
      * Author URI:           https://costamateus.com.br/
      * Text Domain:          triibo-auth-login
@@ -377,6 +377,7 @@
         }
         else
         {
+            $uid     = $r_curl["success"]["userInfo"]["id"];
             $cttList = $r_curl["success"]["userInfo"]["contactList"];
             $email   = TAL_email_verified( $cttList );
 
@@ -386,15 +387,22 @@
 
                 if ( $user_id )
                 {
-                    // add triibo_id qnd lbc true
+                    // add triibo_phone e triibo_uid qnd lbc true
                     if ( $_POST["lbc"] )
                     {
-                        $triibo_id = get_user_meta( $user_id, "triiboId_phone", true );
+                        $triibo_phone = get_user_meta( $user_id, "triiboId_phone", true );
+                        $triibo_uid   = get_user_meta( $user_id, "_triibo_id",     true );
 
-                        if ( empty( $triibo_id ) )
+                        if ( empty( $triibo_phone ) )
                         {
-                            // user sem triibo_id
+                            // user sem triiboId_phone
                             update_user_meta( $user_id, "triiboId_phone", "+$cellphone" );
+                        }
+
+                        if ( empty( $triibo_uid ) )
+                        {
+                            // user sem _triibo_id
+                            update_user_meta( $user_id, "_triibo_id", $uid );
                         }
                     }
 
@@ -496,10 +504,11 @@
         {
             if ( $user && wp_check_password( $_POST["password"], $user->data->user_pass, $user->ID ) )
             {
-                TAL_create_or_update_user_triibo( $_POST["cellphone"], $_POST["email"], $user->first_name, $user->nickname );
+                $uid       = TAL_create_or_update_user_triibo( $_POST["cellphone"], $_POST["email"], $user->first_name, $user->nickname );
 
                 $cellphone = "+" . preg_replace( "/\D/", "", $_POST["cellphone"] );
                 update_user_meta( $user->ID, "triiboId_phone", $cellphone );
+                update_user_meta( $user->ID, "_triibo_id",     $uid       );
 
                 $result = TAL_login_by_triibo( "id", $user->ID );
             }
@@ -527,12 +536,13 @@
     add_action( "wp_ajax_TAL_add_triiboid", "TAL_add_triiboid" );
     function TAL_add_triiboid()
     {
-        $user = wp_get_current_user();
+        $user      = wp_get_current_user();
 
-        TAL_create_or_update_user_triibo( $_POST["cellphone"], $user->user_email, $user->first_name, $user->nickname );
+        $uid       = TAL_create_or_update_user_triibo( $_POST["cellphone"], $user->user_email, $user->first_name, $user->nickname );
 
         $cellphone = "+" . preg_replace( "/\D/", "", $_POST["cellphone"] );
         update_user_meta( $user->ID, "triiboId_phone", $cellphone );
+        update_user_meta( $user->ID, "_triibo_id",     $uid       );
 
         $result = [
             "success" => [
