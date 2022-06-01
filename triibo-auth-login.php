@@ -2,7 +2,7 @@
     /**
      * Plugin Name:          #Triibo_Auth_Login
      * Description:          Habilita o login pela Triibo no marketplace.
-     * Version:              4.1.0
+     * Version:              4.2.5
      * Author:               Mateus Costa
      * Author URI:           https://costamateus.com.br/
      * Text Domain:          triibo-auth-login
@@ -175,8 +175,26 @@
         if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
             include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
-            include_once( plugin_dir_path( __FILE__ ) . "includes/css/style.css.php"     );
-            include_once( plugin_dir_path( __FILE__ ) . "includes/js/script.js.php"      );
+            // include_once( plugin_dir_path( __FILE__ ) . "includes/css/style.css.php"     );
+            // include_once( plugin_dir_path( __FILE__ ) . "includes/js/script.js.php"      );
+
+            // create my own version codes
+            $mask_path = "includes/js/jQuery.mask.min.js";
+            $js_path   = "includes/js/script.js";
+            $css_path  = "includes/css/style.css";
+
+            $mask_ver  = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $mask_path ));
+            $js_ver    = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $js_path   ));
+            $css_ver   = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $css_path  ));
+
+            wp_enqueue_script( "TAL_jMaskScript", plugins_url( $mask_path, __FILE__ ), array( "jquery" ), $mask_ver );
+            wp_register_style( "TAL_css",         plugins_url( $css_path,  __FILE__ ), false,             $css_ver  );
+            wp_enqueue_style ( "TAL_css" );
+
+            wp_enqueue_script(  "TAL_script", plugins_url( $js_path, __FILE__ ), array( "jquery" ), $js_ver );
+            wp_localize_script( "TAL_script", "TAL_script_", [
+                "url_red" => WC_Login_Before_Checkout::get_checkout_url(),
+            ] );
         }
     }
 

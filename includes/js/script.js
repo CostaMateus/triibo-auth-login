@@ -1,38 +1,40 @@
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" ></script>
-<script>
-    jQuery( "#cellphone" ).mask( "+55 (00) 00000-0000" );
-    jQuery( "#cellphone" ).blur( function( event ) {
+( function ( $ ) {
+
+    "use strict";
+
+    $( "#cellphone" ).mask( "+55 (00) 00000-0000" );
+    $( "#cellphone" ).blur( function( event ) {
         // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
-        if ( jQuery( this ).val().length == 19 )
-            jQuery( "#cellphone" ).mask( "+55 (00) 00000-0009" );
+        if ( $( this ).val().length == 19 )
+            $( "#cellphone" ).mask( "+55 (00) 00000-0009" );
         else
-            jQuery( "#cellphone" ).mask( "+55 (00) 0000-00009" );
+            $( "#cellphone" ).mask( "+55 (00) 0000-00009" );
     });
 
-    jQuery( "#cellphone-lbc" ).mask( "+55 (00) 00000-0000" );
-    jQuery( "#cellphone-lbc" ).blur( function( event ) {
+    $( "#cellphone-lbc" ).mask( "+55 (00) 00000-0000" );
+    $( "#cellphone-lbc" ).blur( function( event ) {
         // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
-        if ( jQuery( this ).val().length == 19 )
-            jQuery( "#cellphone-lbc" ).mask( "+55 (00) 00000-0009" );
+        if ( $( this ).val().length == 19 )
+            $( "#cellphone-lbc" ).mask( "+55 (00) 00000-0009" );
         else
-            jQuery( "#cellphone-lbc" ).mask( "+55 (00) 0000-00009" );
+            $( "#cellphone-lbc" ).mask( "+55 (00) 0000-00009" );
     });
 
-    jQuery( "#cellphone-logged" ).mask( "+55 (00) 00000-0000" );
-    jQuery( "#cellphone-logged" ).blur( function( event ) {
+    $( "#cellphone-logged" ).mask( "+55 (00) 00000-0000" );
+    $( "#cellphone-logged" ).blur( function( event ) {
         // Celular com 9 dígitos + 2 dígitos DDD e 8 da máscara
-        if ( jQuery( this ).val().length == 19 )
-            jQuery( "#cellphone-logged" ).mask( "+55 (00) 00000-0009" );
+        if ( $( this ).val().length == 19 )
+            $( "#cellphone-logged" ).mask( "+55 (00) 00000-0009" );
         else
-            jQuery( "#cellphone-logged" ).mask( "+55 (00) 0000-00009" );
+            $( "#cellphone-logged" ).mask( "+55 (00) 0000-00009" );
     });
 
     let genericError1  = "Ocorreu um erro, tente novamente.";
     let genericError2  = "Algo deu errado, tente novamente.";
 
     // vars parametros ajax
-    let url_red       = "<?php echo WC_Login_Before_Checkout::get_checkout_url(); ?>";
+    let url_red       = TAL_script_.url_red;
     let lbc           = false;
     let logged        = false;
     let code          = null;
@@ -79,9 +81,9 @@
 
 
     /**
-     * Monitora todos os clicks na página
-     * Verifica IDs especificos
-     */
+        * Monitora todos os clicks na página
+        * Verifica IDs especificos
+        */
     window.addEventListener( "click", function ( e ) {
         switch ( e.target.id )
         {
@@ -128,48 +130,48 @@
 
 
     /**
-     * Reenvia codigo por sms
-     */
+        * Reenvia codigo por sms
+        */
     window.resendCode = function ()
     {
         if ( lbc && ! logged )
         {
-            jQuery( btn_auth_lbc ).click();
+            $( btn_auth_lbc ).click();
         }
         else if ( ! lbc && logged )
         {
-            jQuery( btn_logged ).click();
+            $( btn_logged ).click();
         }
         else
         {
-            jQuery( btn_auth ).click();
+            $( btn_auth ).click();
         }
 
         disableBtns();
 
-        jQuery( error_valid    ).addClass( "d-none" );
-        jQuery( "#code"        ).removeClass( "error-border" );
-        jQuery( "#code-resend" ).removeClass( "d-none" );
+        $( error_valid    ).addClass( "d-none" );
+        $( "#code"        ).removeClass( "error-border" );
+        $( "#code-resend" ).removeClass( "d-none" );
 
         setTimeout( function() {
             enableBtns();
-            jQuery( "#code-resend" ).addClass( "d-none" );
+            $( "#code-resend" ).addClass( "d-none" );
         }, 3000 );
     }
 
     /**
-     * Reenvia codigo por email
-     */
+        * Reenvia codigo por email
+        */
     window.resendCodeEmail = function ()
     {
         disableBtns();
 
-        jQuery( error_v_email        ).addClass( "d-none" );
-        jQuery( "#code-email"        ).removeClass( "error-border" );
+        $( error_v_email        ).addClass( "d-none" );
+        $( "#code-email"        ).removeClass( "error-border" );
 
-        email = jQuery( "#form-register-email" ).val();
+        email = $( "#form-register-email" ).val();
 
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -183,15 +185,15 @@
 
                 if ( result.error != null)
                 {
-                    jQuery( error_v_email ).removeClass( "d-none" ).html( genericError1 );
+                    $( error_v_email ).removeClass( "d-none" ).html( genericError1 );
                 }
                 else
                 {
-                    jQuery( "#code-email" ).focus();
-                    jQuery( "#code-resend-email" ).removeClass( "d-none" );
+                    $( "#code-email" ).focus();
+                    $( "#code-resend-email" ).removeClass( "d-none" );
 
                     setTimeout( function() {
-                        jQuery( "#code-resend-email" ).addClass( "d-none" );
+                        $( "#code-resend-email" ).addClass( "d-none" );
                     }, 3000 );
                 }
             },
@@ -202,8 +204,8 @@
     }
 
     /**
-     * Fecha modais
-     */
+        * Fecha modais
+        */
     window.closeModal = function()
     {
         if ( ! lbc && ! logged )
@@ -216,20 +218,20 @@
 
 
     /**
-     * Valida celular e chama função para enviar código por SMS
-     */
+        * Valida celular e chama função para enviar código por SMS
+        */
     window.submitAuth = function( id, err )
     {
         disableBtns();
 
-        cellphone = jQuery( id ).val();
+        cellphone = $( id ).val();
 
         if ( cellphone != "" )
         {
             if ( cellphone.length == 19 || cellphone.length == 18 )
             {
-                jQuery( err ).addClass( "d-none" );
-                jQuery( id  ).removeClass( "error-border" );
+                $( err ).addClass( "d-none" );
+                $( id  ).removeClass( "error-border" );
 
                 // envia o código por sms
                 callAuthAjax( id, err );
@@ -237,23 +239,23 @@
             else
             {
                 enableBtns();
-                jQuery( err ).removeClass( "d-none" ).html( "Insira um número válido." );
+                $( err ).removeClass( "d-none" ).html( "Insira um número válido." );
             }
         }
         else
         {
             enableBtns();
-            jQuery( err ).removeClass( "d-none" ).html( "Insira um número de celular." );
+            $( err ).removeClass( "d-none" ).html( "Insira um número de celular." );
         }
     }
 
 
     /**
-     * Envia código por sms e abre modal de validação
-     */
+        * Envia código por sms e abre modal de validação
+        */
     window.callAuthAjax = function ( id, err )
     {
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -272,29 +274,29 @@
                     if ( result.error.errorCode == 1005 )
                     {
                         errorMsg = "Quantidade de tentativas excedida, tente novamente em 15min.";
-                        jQuery( id ).addClass( "error-border" );
+                        $( id ).addClass( "error-border" );
                     }
                     else
                     {
                         errorMsg = genericError2;
                     }
 
-                    jQuery( err ).removeClass( "d-none" ).html( errorMsg );
+                    $( err ).removeClass( "d-none" ).html( errorMsg );
                 }
                 else
                 {
                     transactionId = result.success.transactionId;
 
                     if ( lbc || logged )
-                        jQuery( modal_valid ).addClass( "bg-modal-white" );
+                        $( modal_valid ).addClass( "bg-modal-white" );
                     else
-                        jQuery( modal_valid ).removeClass( "bg-modal-white" );
+                        $( modal_valid ).removeClass( "bg-modal-white" );
 
-                    if ( lbc    ) jQuery( modal_lbc    ).addClass( "d-none" );
-                    if ( logged ) jQuery( modal_logged ).addClass( "d-none" );
+                    if ( lbc    ) $( modal_lbc    ).addClass( "d-none" );
+                    if ( logged ) $( modal_logged ).addClass( "d-none" );
 
-                    jQuery( modal_valid ).removeClass( "d-none" );
-                    jQuery( "#code" ).focus();
+                    $( modal_valid ).removeClass( "d-none" );
+                    $( "#code" ).focus();
                 }
             },
             error: function( err ) {
@@ -305,18 +307,18 @@
 
 
     /**
-     * Valida se foi informado um código SMS e chama função de validação do código SMS
-     */
+        * Valida se foi informado um código SMS e chama função de validação do código SMS
+        */
     window.submitValidate = function()
     {
         disableBtns();
 
-        code = jQuery( "#code" ).val();
+        code = $( "#code" ).val();
 
         if ( code != "" && code.length == 6 )
         {
-            jQuery( error_valid ).addClass( "d-none" );
-            jQuery( "#code" ).removeClass( "error-border" );
+            $( error_valid ).addClass( "d-none" );
+            $( "#code" ).removeClass( "error-border" );
 
             // valida código informado
             callValidateSMS();
@@ -325,13 +327,13 @@
         {
             enableBtns();
             errorMsg = ( code == "" ) ? "Insira código recebido." : "O código tem 6 dígitos." ;
-            jQuery( error_valid ).removeClass( "d-none" ).html( errorMsg );
+            $( error_valid ).removeClass( "d-none" ).html( errorMsg );
         }
     }
 
     /**
-     * Valida o código do sms e chama função que busca o usuário na Triibo e no Mkt
-     */
+        * Valida o código do sms e chama função que busca o usuário na Triibo e no Mkt
+        */
     window.callValidateSMS = function ()
     {
         let id  = null;
@@ -353,7 +355,7 @@
             err = error_auth;
         }
 
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -372,32 +374,32 @@
                     switch ( result.error.errorCode )
                     {
                         case 1006:
-                            jQuery( error_valid ).removeClass( "d-none" ).html( "Código inválido." );
-                            jQuery( "#code"     ).addClass( "error-border" );
+                            $( error_valid ).removeClass( "d-none" ).html( "Código inválido." );
+                            $( "#code"     ).addClass( "error-border" );
                         break;
 
                         case 1007:
-                            jQuery( error_valid ).removeClass( "d-none" ).html( "Código expirado." );
-                            jQuery( "#code"     ).addClass( "error-border" );
+                            $( error_valid ).removeClass( "d-none" ).html( "Código expirado." );
+                            $( "#code"     ).addClass( "error-border" );
                         break;
 
                         case 1009:
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( err         ).removeClass( "d-none" ).html( "Código expirado." );
-                            jQuery( id          ).addClass( "error-border" );
+                            $( modal_valid ).addClass( "d-none" );
+                            $( err         ).removeClass( "d-none" ).html( "Código expirado." );
+                            $( id          ).addClass( "error-border" );
                         break;
 
                         case 1005:
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( err         ).removeClass( "d-none" ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
-                            jQuery( id          ).addClass( "error-border" );
+                            $( modal_valid ).addClass( "d-none" );
+                            $( err         ).removeClass( "d-none" ).html( "Quantidade de tentativas excedida, tente novamente em 15min." );
+                            $( id          ).addClass( "error-border" );
                         break;
 
                         case 1004:
                         case 1008:
                         default:
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( err         ).removeClass( "d-none" ).html( "Algo de erro, tente novamente." );
+                            $( modal_valid ).addClass( "d-none" );
+                            $( err         ).removeClass( "d-none" ).html( "Algo de erro, tente novamente." );
                         break;
                     }
                 }
@@ -405,7 +407,7 @@
                 {
                     disableBtns();
 
-                    jQuery( "#modal-form-load" ).removeClass( "d-none" );
+                    $( "#modal-form-load" ).removeClass( "d-none" );
 
                     if ( logged )
                     {
@@ -427,13 +429,13 @@
     }
 
     /**
-     * Busca usuário na Triibo.
-     * Caso não exista, abre modal de email e senha.
-     * Caso exista, ??? // redireciona para página do perfil.
-     */
+        * Busca usuário na Triibo.
+        * Caso não exista, abre modal de email e senha.
+        * Caso exista, ??? // redireciona para página do perfil.
+        */
     window.callUserInfo = function()
     {
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -456,9 +458,9 @@
                             let p1 = "Notamos que sua conta Triibo ainda não está associada a uma conta Marketplace.";
                             setRegistertexts( t1, p1 );
 
-                            jQuery( "#modal-form-load" ).addClass( "d-none" );
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( modal_regis ).removeClass( "d-none" );
+                            $( "#modal-form-load" ).addClass( "d-none" );
+                            $( modal_valid ).addClass( "d-none" );
+                            $( modal_regis ).removeClass( "d-none" );
                         break;
 
                         // não encontrou número na Triibo
@@ -467,20 +469,20 @@
                             let p4 = "Notamos que seu número ainda não está associado a uma conta Triibo.";
                             setRegistertexts( t4, p4 );
 
-                            jQuery( "#modal-form-load" ).addClass( "d-none" );
-                            jQuery( modal_valid ).addClass( "d-none" );
-                            jQuery( modal_regis ).removeClass( "d-none" );
+                            $( "#modal-form-load" ).addClass( "d-none" );
+                            $( modal_valid ).addClass( "d-none" );
+                            $( modal_regis ).removeClass( "d-none" );
                         break;
 
                         // erro na consulta a Triibo
                         case 500:
                         default:
-                            jQuery( "#modal-form-load" ).addClass( "d-none" );
-                            jQuery( modal_valid ).addClass( "d-none" );
+                            $( "#modal-form-load" ).addClass( "d-none" );
+                            $( modal_valid ).addClass( "d-none" );
 
                             var err = lbc ? error_auth_lbc : error_auth;
 
-                            jQuery( err ).removeClass( "d-none" ).html( genericError1 );
+                            $( err ).removeClass( "d-none" ).html( genericError1 );
                         break;
                     }
                 }
@@ -488,7 +490,7 @@
                 {
                     disableBtns();
                     hideModals();
-                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
 
                     if ( lbc )
                         window.location.href = url_red;
@@ -503,11 +505,11 @@
     }
 
     /**
-     *
-     */
+        *
+        */
     window.callAddTriiboId = function ()
     {
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -521,7 +523,7 @@
                 {
                     enableBtns();
 
-                    jQuery( "#modal-form-load" ).addClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "d-none" );
 
                     console.log( result );
                 }
@@ -530,7 +532,7 @@
                     disableBtns();
                     hideModals();
 
-                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
 
                     window.location.href = url_red;
                 }
@@ -544,21 +546,21 @@
 
 
     /**
-     * Verifica email e senha informados, chama função de validação conta Mkt
-     */
+        * Verifica email e senha informados, chama função de validação conta Mkt
+        */
     window.submitRegister = function()
     {
         disableBtns();
 
-        email = jQuery( "#form-register-email" ).val();
-        pass  = jQuery( "#form-register-password" ).val();
+        email = $( "#form-register-email" ).val();
+        pass  = $( "#form-register-password" ).val();
 
         if ( email != "" && ( pass != "" && pass.length >= 8 ) )
         {
-            jQuery( error_regis ).addClass( "d-none" );
-            jQuery( "#form-register-email"    ).removeClass( "error-border" );
-            jQuery( "#form-register-password" ).removeClass( "error-border" );
-            // jQuery( "#modal-form-load"   ).removeClass( "d-none" );
+            $( error_regis ).addClass( "d-none" );
+            $( "#form-register-email"    ).removeClass( "error-border" );
+            $( "#form-register-password" ).removeClass( "error-border" );
+            // $( "#modal-form-load"   ).removeClass( "d-none" );
 
             // Busca usuário
             callFindUser();
@@ -566,18 +568,18 @@
         else
         {
             enableBtns();
-            jQuery( error_regis ).removeClass( "d-none" ).html( "E-mail/Senha não podem ser em branco. A senha deve ter no mínimo 8 caracteres." );
+            $( error_regis ).removeClass( "d-none" ).html( "E-mail/Senha não podem ser em branco. A senha deve ter no mínimo 8 caracteres." );
         }
     }
 
     /**
-     * Verifica se email existe no Mkt.
-     * Caso não exista, envia código por email, abre modal de validação de código.
-     * Caso exista, valida senha. Se estiver correta, cria usuário na Triibo, se não, exibe erro.
-     */
+        * Verifica se email existe no Mkt.
+        * Caso não exista, envia código por email, abre modal de validação de código.
+        * Caso exista, valida senha. Se estiver correta, cria usuário na Triibo, se não, exibe erro.
+        */
     window.callFindUser = function()
     {
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -593,29 +595,29 @@
 
                 if ( result.error != null )
                 {
-                    jQuery( "#modal-form-load" ).addClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "d-none" );
 
                     switch ( result.error.code )
                     {
                         // email não cadastrado no marketplace
                         case 301:
-                            jQuery( modal_regis   ).addClass( "d-none" );
-                            jQuery( modal_v_email ).removeClass( "d-none" );
-                            jQuery( "#code-email" ).focus();
+                            $( modal_regis   ).addClass( "d-none" );
+                            $( modal_v_email ).removeClass( "d-none" );
+                            $( "#code-email" ).focus();
                         break;
 
                         // email/senha não conferem
                         case 401:
                         default:
-                            jQuery( error_regis ).removeClass( "d-none" ).html( "E-mail e/ou senha incorreta" );
-                            jQuery( "#form-register-email"    ).addClass( "error-border" );
-                            jQuery( "#form-register-password" ).addClass( "error-border" );
+                            $( error_regis ).removeClass( "d-none" ).html( "E-mail e/ou senha incorreta" );
+                            $( "#form-register-email"    ).addClass( "error-border" );
+                            $( "#form-register-password" ).addClass( "error-border" );
                         break;
                     }
                 }
                 else
                 {
-                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
 
                     hideModals();
                     disableBtns();
@@ -634,18 +636,18 @@
 
 
     /**
-     * Valida se foi informado um código EMAIL e chama função de validação do código EMAIL
-     */
+        * Valida se foi informado um código EMAIL e chama função de validação do código EMAIL
+        */
     window.submitValidateEmail = function()
     {
         disableBtns();
 
-        codeEmail = jQuery( "#code-email" ).val();
+        codeEmail = $( "#code-email" ).val();
 
         if ( code != "" && code.length == 6 )
         {
-            jQuery( error_v_email ).addClass( "d-none" );
-            jQuery( "#code-email" ).removeClass( "error-border" );
+            $( error_v_email ).addClass( "d-none" );
+            $( "#code-email" ).removeClass( "error-border" );
 
             // valida código informado
             callValidateEmail();
@@ -655,18 +657,18 @@
             enableBtns();
 
             errorMsg = ( codeEmail == "" ) ? "Insira código recebido." : "O código tem 6 dígitos." ;
-            jQuery( error_v_email ).removeClass( "d-none" ).html( errorMsg );
+            $( error_v_email ).removeClass( "d-none" ).html( errorMsg );
         }
     }
 
     /**
-     * Valida o código do email.
-     * Caso valide, cria conta na Triibo e no Mkt, e redireciona para o página do perfil do usuário
-     * Caso não, exibe erro.
-     */
+        * Valida o código do email.
+        * Caso valide, cria conta na Triibo e no Mkt, e redireciona para o página do perfil do usuário
+        * Caso não, exibe erro.
+        */
     window.callValidateEmail = function ()
     {
-        jQuery.ajax({
+        $.ajax({
             url : "/wp-admin/admin-ajax.php",
             type: "POST",
             data: {
@@ -687,21 +689,21 @@
                     {
                         // código informado incorreto
                         case 401:
-                            jQuery( error_v_email ).removeClass( "d-none" ).html( "Código inválido." );
-                            jQuery( "#code-email" ).addClass( "error-border" );
+                            $( error_v_email ).removeClass( "d-none" ).html( "Código inválido." );
+                            $( "#code-email" ).addClass( "error-border" );
                         break;
 
                         // erro interno
                         case 500:
                         default:
-                            jQuery( modal_v_email ).addClass("d-none");
-                            jQuery( error_auth    ).removeClass( "d-none" ).html( genericError2 );
+                            $( modal_v_email ).addClass("d-none");
+                            $( error_auth    ).removeClass( "d-none" ).html( genericError2 );
                         break;
                     }
                 }
                 else
                 {
-                    jQuery( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
+                    $( "#modal-form-load" ).addClass( "bg-modal-white" ).removeClass( "d-none" );
 
                     hideModals();
                     disableBtns();
@@ -721,88 +723,88 @@
 
 
     /**
-     * Desabilita os botões dos modais
-     */
+        * Desabilita os botões dos modais
+        */
     window.disableBtns = function ()
     {
-        jQuery( btn_auth     ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_auth_lbc ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_logged   ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_auth     ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_auth_lbc ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_logged   ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
 
-        jQuery( btn_valid    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_v_email  ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
-        jQuery( btn_regis    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_valid    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_v_email  ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
+        $( btn_regis    ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
     }
 
     /**
-     * Habilita os botões dos modais
-     */
+        * Habilita os botões dos modais
+        */
     window.enableBtns = function ()
     {
-        jQuery( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_auth_lbc ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_logged   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_auth_lbc ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_logged   ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
 
-        jQuery( btn_valid    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_v_email  ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
-        jQuery( btn_regis    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_valid    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_v_email  ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
+        $( btn_regis    ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
     }
 
     /**
-     * Esconde os modais
-     */
+        * Esconde os modais
+        */
     window.hideModals = function ()
     {
-        jQuery( modal_lbc     ).addClass( "d-none" );
-        jQuery( modal_logged  ).addClass( "d-none" );
-        jQuery( modal_valid   ).addClass( "d-none" );
-        jQuery( modal_v_email ).addClass( "d-none" );
-        jQuery( modal_regis   ).addClass( "d-none" );
+        $( modal_lbc     ).addClass( "d-none" );
+        $( modal_logged  ).addClass( "d-none" );
+        $( modal_valid   ).addClass( "d-none" );
+        $( modal_v_email ).addClass( "d-none" );
+        $( modal_regis   ).addClass( "d-none" );
     }
 
     /**
-     * Esconde os pagagrafos de erros
-     */
+        * Esconde os pagagrafos de erros
+        */
     window.hideErros = function ()
     {
-        jQuery( error_auth     ).addClass( "d-none" ).html( "" );
-        jQuery( error_auth_lbc ).addClass( "d-none" ).html( "" );
-        jQuery( error_logged   ).addClass( "d-none" ).html( "" );
-        jQuery( error_valid    ).addClass( "d-none" ).html( "" );
-        jQuery( error_v_email  ).addClass( "d-none" ).html( "" );
-        jQuery( error_regis    ).addClass( "d-none" ).html( "" );
+        $( error_auth     ).addClass( "d-none" ).html( "" );
+        $( error_auth_lbc ).addClass( "d-none" ).html( "" );
+        $( error_logged   ).addClass( "d-none" ).html( "" );
+        $( error_valid    ).addClass( "d-none" ).html( "" );
+        $( error_v_email  ).addClass( "d-none" ).html( "" );
+        $( error_regis    ).addClass( "d-none" ).html( "" );
     }
 
     /**
-     * Exibe erro no console quando há falha no ajax.
-     */
+        * Exibe erro no console quando há falha no ajax.
+        */
     window.ajaxError = function ( err )
     {
         console.log( err );
         hideModals();
         enableBtns();
-        jQuery( "#modal-form-load" ).addClass( "d-none" );
+        $( "#modal-form-load" ).addClass( "d-none" );
 
         if ( lbc && ! logged )
         {
-            jQuery( error_auth_lbc ).removeClass( "d-none" ).html( genericError1 );
+            $( error_auth_lbc ).removeClass( "d-none" ).html( genericError1 );
         }
         else if ( ! lbc && logged )
         {
-            jQuery( error_logged ).removeClass( "d-none" ).html( genericError1 );
+            $( error_logged ).removeClass( "d-none" ).html( genericError1 );
         }
         else
         {
-            jQuery( error_auth ).removeClass( "d-none" ).html( genericError1 );
+            $( error_auth ).removeClass( "d-none" ).html( genericError1 );
         }
     }
 
     window.setRegistertexts = function ( t, p )
     {
-        jQuery( "#register-title" ).html( t );
-        jQuery( "#register-p1"    ).html( p );
-        jQuery( "#register-p2"    ).html( "Informe o e-mail e a senha da sua conta Marketplace para completarmos seu cadastro." );
-        jQuery( "#register-p3"    ).html( "Caso não tenha uma conta no Marketplace, criaremos uma para você." );
+        $( "#register-title" ).html( t );
+        $( "#register-p1"    ).html( p );
+        $( "#register-p2"    ).html( "Informe o e-mail e a senha da sua conta Marketplace para completarmos seu cadastro." );
+        $( "#register-p3"    ).html( "Caso não tenha uma conta no Marketplace, criaremos uma para você." );
     }
 
-</script>
+} )( jQuery );
