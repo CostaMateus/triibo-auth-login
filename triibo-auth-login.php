@@ -2,7 +2,7 @@
     /**
      * Plugin Name:          #Triibo_Auth_Login
      * Description:          Habilita o login pela Triibo no marketplace.
-     * Version:              4.2.5
+     * Version:              4.2.9
      * Author:               Mateus Costa
      * Author URI:           https://costamateus.com.br/
      * Text Domain:          triibo-auth-login
