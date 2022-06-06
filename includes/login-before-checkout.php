@@ -11,8 +11,8 @@ class WC_Login_Before_Checkout
 {
     protected static $_lbc_url      = null;
 	protected static $_instance     = null;
-    protected static $_disclaimer_1 = "[disclaimer]";
-    protected static $_disclaimer_2 = "[disclaimer]";
+    protected static $_disclaimer_1 = "Antes de avançar para o Checkout, informe seu celular para acessar sua conta.<br><br>Caso não tenha uma conta, você será guiado pelo processo de criação.";
+    protected static $_disclaimer_2 = "Antes de avançar para o Checkout, informe seu celular para receber o código SMS e validar sua conta.";
 
 	protected function __construct ()
     {
