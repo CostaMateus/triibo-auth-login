@@ -2,12 +2,14 @@
     <div id="modal-form-auth-logged" class="bg-modal-lbc <?php echo ( WC_Login_Before_Checkout::has_query_param() ) ? "" : "d-none"; ?>">
         <div class="bg-modal-login-child">
             <img id="tal_logo" style="width:40%;vertical-align:middle;" alt="" loading="lazy" class="mx-auto" src="<?php echo apply_filters( "martfury_site_logo", martfury_get_option( "logo" )); ?>" >
-            <p class="text-center text-muted small mb-0" >
-                <?php echo WC_Login_Before_Checkout::get_disclaimer( true ); ?>
-            </p>
             <div class="modal-header" >
-                <h5>Informe seu celular para continuar:</h5>
+                <h5 style="font-weight:400 !important; font-size: 15px !important;" >
+                    <?php echo WC_Login_Before_Checkout::get_disclaimer(); ?>
+                </h5>
             </div>
+            <!-- <div class="modal-header" >
+                <h5>Informe seu celular para continuar:</h5>
+            </div> -->
             <form id="form-auth-logged" method="post">
                 <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-0" >
                     <input type="hidden" name="form-auth-logged">
