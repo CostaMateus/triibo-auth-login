@@ -4,7 +4,7 @@
             <img id="tal_logo" style="width:40%;vertical-align:middle;" alt="" loading="lazy" class="mx-auto" src="<?php echo apply_filters( "martfury_site_logo", martfury_get_option( "logo" )); ?>" >
             <div class="modal-header" >
                 <h5 style="font-weight:400 !important; font-size: 15px !important;" >
-                    <?php echo WC_Login_Before_Checkout::get_disclaimer(); ?>
+                    <?php echo WC_Login_Before_Checkout::get_disclaimer( true ); ?>
                 </h5>
             </div>
             <!-- <div class="modal-header" >
