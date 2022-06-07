@@ -175,10 +175,7 @@
         if ( get_transient( "_TAL_STATUS" ) == "active" )
         {
             include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
-            // include_once( plugin_dir_path( __FILE__ ) . "includes/css/style.css.php"     );
-            // include_once( plugin_dir_path( __FILE__ ) . "includes/js/script.js.php"      );
 
-            // create my own version codes
             $mask_path = "includes/js/jQuery.mask.min.js";
             $js_path   = "includes/js/script.js";
             $css_path  = "includes/css/style.css";

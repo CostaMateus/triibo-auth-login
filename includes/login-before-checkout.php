@@ -109,7 +109,22 @@ class WC_Login_Before_Checkout
     public function modal_myacc_dashboard()
     {
         include_once( plugin_dir_path( TAL_PATH_FILE ) . "includes/pages/modal-myacc-dashboard.php" );
-        include_once( plugin_dir_path( TAL_PATH_FILE ) . "includes/css/style.css.php"               );
-        include_once( plugin_dir_path( TAL_PATH_FILE ) . "includes/js/script.js.php"                );
+
+        $mask_path = "js/jQuery.mask.min.js";
+        $js_path   = "js/script.js";
+        $css_path  = "css/style.css";
+
+        $mask_ver  = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $mask_path ));
+        $js_ver    = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $js_path   ));
+        $css_ver   = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $css_path  ));
+
+        wp_enqueue_script( "TAL_jMaskScript", plugins_url( $mask_path, __FILE__ ), array( "jquery" ), $mask_ver );
+        wp_register_style( "TAL_css_2",       plugins_url( $css_path,  __FILE__ ), false,             $css_ver  );
+        wp_enqueue_style ( "TAL_css_2" );
+
+        wp_enqueue_script(  "TAL_script_2", plugins_url( $js_path, __FILE__ ), array( "jquery" ), $js_ver );
+        wp_localize_script( "TAL_script_2", "TAL_script_", [
+            "url_red" => WC_Login_Before_Checkout::get_checkout_url(),
+        ] );
     }
 }
