@@ -21,6 +21,8 @@
                 <p></p>
                 <button id="btn-form-auth-lbc" type="submit" class="woocommerce-Button button set-spin">Solicitar código <div class="d-none spin-load"></div></button>
             </form>
+
+            <a class="float-left mt-20" href="javascript:history.go(-1)">Retornar para o site</a>
         </div>
     </div>
 
