@@ -1,8 +1,8 @@
 <?php
     /**
      * Plugin Name:          #Triibo_Auth_Login
-     * Description:          Habilita o login pela Triibo no marketplace.
-     * Version:              4.2.9
+     * Description:          Habilita o login pela Triibo e força o login pela Triibo antes do checkout.
+     * Version:              4.3.0
      * Author:               Mateus Costa
      * Author URI:           https://costamateus.com.br/
      * Text Domain:          triibo-auth-login
