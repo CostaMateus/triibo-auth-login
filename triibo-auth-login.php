@@ -208,7 +208,8 @@
             "manage_options",
             "login-pela-triibo",
             "TAL_admin",
-            plugin_dir_url( __FILE__ ) . "includes/images/triibo20.png"
+            plugin_dir_url( __FILE__ ) . "includes/images/triibo20.png",
+            65
         );
     }
     function TAL_admin()
