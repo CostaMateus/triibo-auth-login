@@ -37,7 +37,7 @@
                 <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-0">
                     <input type="hidden" name="form-validate">
                     <input id="code" type="text" class="woocommerce-Input woocommerce-Input--text input-text" maxlength="6"
-                           name="code" placeholder="Código" pattern="[0-9]{6}" title="O código tem seis (6) números" required autofocus />
+                           name="code" placeholder="Código" pattern="[0-9]{6}" title="O código tem seis (6) números" required />
 
                     <!-- Error message -->
                     <p id="error-valid" class="bg-transp text-center text-danger pt-8 mb-0 d-none" ></p>
