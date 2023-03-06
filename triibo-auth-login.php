@@ -177,7 +177,7 @@
             include_once( plugin_dir_path( __FILE__ ) . "includes/pages/modal-login.php" );
 
             $mask_path = "includes/js/jQuery.mask.min.js";
-            $js_path   = "includes/js/script.js";
+            $js_path   = "includes/js/script1.js";
             $css_path  = "includes/css/style.css";
 
             $mask_ver  = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $mask_path ));
