@@ -15,7 +15,7 @@
     // don't call the file directly
     if ( ! defined( "ABSPATH" ) ) exit;
 
-    if ( ! is_plugin_active( "woocommerce/woocommerce.php" ) ) exit;
+    if ( ! in_array( "woocommerce/woocommerce.php", apply_filters( "active_plugins", get_option( "active_plugins" ) ) ) ) return;
 
     date_default_timezone_set("America/Sao_Paulo");
 
@@ -184,9 +184,8 @@
             $js_ver    = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $js_path   ));
             $css_ver   = date("ymd-His", filemtime( plugin_dir_path( __FILE__ ) . $css_path  ));
 
-            wp_enqueue_script( "TAL_jMaskScript", plugins_url( $mask_path, __FILE__ ), array( "jquery" ), $mask_ver );
-            wp_register_style( "TAL_css",         plugins_url( $css_path,  __FILE__ ), false,             $css_ver  );
-            wp_enqueue_style ( "TAL_css" );
+            wp_enqueue_script( "TAL_jMaskScript", plugins_url( $mask_path, __FILE__ ), array( "jquery" ), $mask_ver, false );
+            wp_enqueue_style(  "TAL_css",         plugins_url( $css_path,  __FILE__ ), false,             $css_ver, "all"  );
 
             wp_enqueue_script(  "TAL_script", plugins_url( $js_path, __FILE__ ), array( "jquery" ), $js_ver );
             wp_localize_script( "TAL_script", "TAL_script_", [
