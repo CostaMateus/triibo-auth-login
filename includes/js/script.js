@@ -79,11 +79,12 @@
     let error_regis    = document.getElementById( "error-register"      );
     let btn_regis      = document.getElementById( "btn-form-register"   );
 
+    // let countdown      = 0;
 
     /**
-        * Monitora todos os clicks na página
-        * Verifica IDs especificos
-        */
+     * Monitora todos os clicks na página
+     * Verifica IDs especificos
+     */
     window.addEventListener( "click", function ( e ) {
         switch ( e.target.id )
         {
@@ -102,6 +103,8 @@
             case "btn-form-auth-lbc":
                 e.preventDefault();
                 lbc = true;
+                // countdown = 40;
+                // setInterval( countdown, 1000, countdown );
                 window.submitAuth( "#cellphone-lbc", error_auth_lbc );
             break;
 
@@ -128,10 +131,15 @@
         }
     }, false);
 
+    // window.countdown = function( count )
+    // {
+    //     countdown = count - 1;
+    //     $( "#resend-count" ).html( `Reenviar código em ${countdown}` );
+    // }
 
     /**
-        * Reenvia codigo por sms
-        */
+     * Reenvia codigo por sms
+     */
     window.resendCode = function ()
     {
         if ( lbc && ! logged )
@@ -160,8 +168,8 @@
     }
 
     /**
-        * Reenvia codigo por email
-        */
+     * Reenvia codigo por email
+     */
     window.resendCodeEmail = function ()
     {
         disableBtns();
@@ -204,8 +212,8 @@
     }
 
     /**
-        * Fecha modais
-        */
+     * Fecha modais
+     */
     window.closeModal = function()
     {
         if ( ! lbc && ! logged )
@@ -218,8 +226,8 @@
 
 
     /**
-        * Valida celular e chama função para enviar código por SMS
-        */
+     * Valida celular e chama função para enviar código por SMS
+     */
     window.submitAuth = function( id, err )
     {
         disableBtns();
@@ -251,8 +259,8 @@
 
 
     /**
-        * Envia código por sms e abre modal de validação
-        */
+     * Envia código por sms e abre modal de validação
+     */
     window.callAuthAjax = function ( id, err )
     {
         $.ajax({
@@ -307,8 +315,8 @@
 
 
     /**
-        * Valida se foi informado um código SMS e chama função de validação do código SMS
-        */
+     * Valida se foi informado um código SMS e chama função de validação do código SMS
+     */
     window.submitValidate = function()
     {
         disableBtns();
@@ -332,8 +340,8 @@
     }
 
     /**
-        * Valida o código do sms e chama função que busca o usuário na Triibo e no Mkt
-        */
+     * Valida o código do sms e chama função que busca o usuário na Triibo e no Mkt
+     */
     window.callValidateSMS = function ()
     {
         let id  = null;
@@ -429,10 +437,10 @@
     }
 
     /**
-        * Busca usuário na Triibo.
-        * Caso não exista, abre modal de email e senha.
-        * Caso exista, ??? // redireciona para página do perfil.
-        */
+     * Busca usuário na Triibo.
+     * Caso não exista, abre modal de email e senha.
+     * Caso exista, ??? // redireciona para página do perfil.
+     */
     window.callUserInfo = function()
     {
         $.ajax({
@@ -505,8 +513,8 @@
     }
 
     /**
-        *
-        */
+     *
+     */
     window.callAddTriiboId = function ()
     {
         $.ajax({
@@ -546,8 +554,8 @@
 
 
     /**
-        * Verifica email e senha informados, chama função de validação conta Mkt
-        */
+     * Verifica email e senha informados, chama função de validação conta Mkt
+     */
     window.submitRegister = function()
     {
         disableBtns();
@@ -573,10 +581,10 @@
     }
 
     /**
-        * Verifica se email existe no Mkt.
-        * Caso não exista, envia código por email, abre modal de validação de código.
-        * Caso exista, valida senha. Se estiver correta, cria usuário na Triibo, se não, exibe erro.
-        */
+     * Verifica se email existe no Mkt.
+     * Caso não exista, envia código por email, abre modal de validação de código.
+     * Caso exista, valida senha. Se estiver correta, cria usuário na Triibo, se não, exibe erro.
+     */
     window.callFindUser = function()
     {
         $.ajax({
@@ -636,8 +644,8 @@
 
 
     /**
-        * Valida se foi informado um código EMAIL e chama função de validação do código EMAIL
-        */
+     * Valida se foi informado um código EMAIL e chama função de validação do código EMAIL
+     */
     window.submitValidateEmail = function()
     {
         disableBtns();
@@ -662,10 +670,10 @@
     }
 
     /**
-        * Valida o código do email.
-        * Caso valide, cria conta na Triibo e no Mkt, e redireciona para o página do perfil do usuário
-        * Caso não, exibe erro.
-        */
+     * Valida o código do email.
+     * Caso valide, cria conta na Triibo e no Mkt, e redireciona para o página do perfil do usuário
+     * Caso não, exibe erro.
+     */
     window.callValidateEmail = function ()
     {
         $.ajax({
@@ -723,8 +731,8 @@
 
 
     /**
-        * Desabilita os botões dos modais
-        */
+     * Desabilita os botões dos modais
+     */
     window.disableBtns = function ()
     {
         $( btn_auth     ).prop( "disabled", "disabled" ).find( "div" ).removeClass( "d-none" );
@@ -737,8 +745,8 @@
     }
 
     /**
-        * Habilita os botões dos modais
-        */
+     * Habilita os botões dos modais
+     */
     window.enableBtns = function ()
     {
         $( btn_auth     ).prop( "disabled", null ).find( "div" ).addClass( "d-none" );
@@ -751,8 +759,8 @@
     }
 
     /**
-        * Esconde os modais
-        */
+     * Esconde os modais
+     */
     window.hideModals = function ()
     {
         $( modal_lbc     ).addClass( "d-none" );
@@ -763,8 +771,8 @@
     }
 
     /**
-        * Esconde os pagagrafos de erros
-        */
+     * Esconde os pagagrafos de erros
+     */
     window.hideErros = function ()
     {
         $( error_auth     ).addClass( "d-none" ).html( "" );
@@ -776,8 +784,8 @@
     }
 
     /**
-        * Exibe erro no console quando há falha no ajax.
-        */
+     * Exibe erro no console quando há falha no ajax.
+     */
     window.ajaxError = function ( err )
     {
         console.log( err );
