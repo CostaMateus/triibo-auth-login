@@ -79,7 +79,8 @@
     let error_regis    = document.getElementById( "error-register"      );
     let btn_regis      = document.getElementById( "btn-form-register"   );
 
-    // let countdown      = 0;
+    let cd             = 0;
+    let intervalId     = null;
 
     /**
      * Monitora todos os clicks na página
@@ -103,8 +104,6 @@
             case "btn-form-auth-lbc":
                 e.preventDefault();
                 lbc = true;
-                // countdown = 40;
-                // setInterval( countdown, 1000, countdown );
                 window.submitAuth( "#cellphone-lbc", error_auth_lbc );
             break;
 
@@ -131,17 +130,32 @@
         }
     }, false);
 
-    // window.countdown = function( count )
-    // {
-    //     countdown = count - 1;
-    //     $( "#resend-count" ).html( `Reenviar código em ${countdown}` );
-    // }
+    /**
+     * Contagem regressiva para reenviar código
+     */
+    window.countdown = function()
+    {
+        if ( cd == 0 )
+        {
+            clearInterval( intervalId );
+            $( "#resend-count" ).addClass( "d-none" );
+            $( "#resend"       ).removeClass( "d-none" );
+            $( "#resend-count" ).html( "Reenviar código em 40" );
+        }
+        else
+        {
+            $( "#resend-count" ).html( `Reenviar código em ${cd}` );
+            cd -= 1;
+        }
+    }
 
     /**
      * Reenvia codigo por sms
      */
     window.resendCode = function ()
     {
+        $( "#resend" ).addClass( "d-none" );
+
         if ( lbc && ! logged )
         {
             $( btn_auth_lbc ).click();
@@ -305,6 +319,10 @@
 
                     $( modal_valid ).removeClass( "d-none" );
                     $( "#code" ).focus();
+
+                    cd         = 40;
+                    intervalId = setInterval( countdown, 1000 );
+                    $( "#resend-count" ).removeClass( "d-none" );
                 }
             },
             error: function( err ) {

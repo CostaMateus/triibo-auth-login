@@ -20,9 +20,10 @@
                            name="code" placeholder="Código" pattern="[0-9]{6}" title="O código tem seis (6) números" required />
 
                     <!-- Error message -->
-                    <p id="error-valid" class="bg-transp text-center text-danger pt-8 mb-0 d-none" ></p>
-                    <p id="code-resend" class="bg-transp float-left text-dark pb-20 mt-20 mb-0 d-none" >Código reenviado</p>
-                    <a id="resend"      class="bg-transp float-right pointer pb-20 mt-20 mb-0" onclick="resendCode()" >Reenviar código</a>
+                    <p id="error-valid"  class="bg-transp text-center text-danger pt-8 mb-0 d-none" ></p>
+                    <p id="code-resend"  class="bg-transp float-left text-dark pb-20 mt-20 mb-0 d-none" >Código reenviado</p>
+                    <a id="resend"       class="bg-transp float-right pointer pb-20 mt-20 mb-0 d-none" onclick="resendCode()" >Reenviar código</a>
+                    <p id="resend-count" class="bg-transp float-right pb-20 mt-20 mb-0" >Reenviar código em 40</p>
                 </p>
                 <button id="btn-form-validate" type="submit" class="woocommerce-Button button set-spin" >Entrar <div class="d-none spin-load"></div></button>
             </form>
