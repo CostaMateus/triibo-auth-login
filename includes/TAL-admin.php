@@ -18,7 +18,7 @@
 
     .d-none    { display: none !important; }
     .set-spin  { display: flex !important; justify-content: center; }
-    .spin-load { width: 8px; height: 8px; margin: auto 5px; border: 3px solid #AEAEAE; border-top: 3px solid #0071A1; border-radius: 50%; -webkit-animation: spin 1s linear infinite; /* Safari */ animation: spin 1s linear infinite; }
+    .spin-load { width: 8px; height: 8px; margin: auto 5px; border: 2px solid #AEAEAE; border-top: 3px solid #0071A1; border-radius: 50%; -webkit-animation: spin 1s linear infinite; /* Safari */ animation: spin 1s linear infinite; }
 
     @-webkit-keyframes spin {
         0%   { -webkit-transform: rotate(0deg);   }
